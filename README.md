@@ -11,7 +11,7 @@
   _Soy una estudiante de sexto semestre de Ingeniería de Sistemas con experiencia en análisis, diseño y gestión de proyectos de software. He trabajado como monitora académica y administrativa, lo que me ha permitido desarrollar habilidades técnicas y blandas como la gestión de equipos, liderazgo y la comunicación efectiva._
 
 - ![Foto](URL_DE_LA_FOTO) **Juan Felipe Galvis**  
-  _info2_
+  _Soy estudiante de Ingeniería de Sistemas de sexto semestre. Me apasionan los temas de ciberseguridad y diseño. Trabajo en el área de servicio al cliente, lo cual me ha ayudado mucho a desarrollar habilidades sociales y conocer un poco del mundo laboral. Me gustan mucho las caminatas al aire libre y explorar diferentes zonas ambientales en Colombia._
 
 - ![Foto](URL_DE_LA_FOTO) **Martín Vásquez**  
   _info3_
