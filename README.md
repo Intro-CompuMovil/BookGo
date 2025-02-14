@@ -36,12 +36,3 @@
 ### 🔹 Pantallas Principales/Mockups
 
 
----
-
-## 📌 Tecnologías a utilizar  
-- **Google Maps API**: Visualización de puntos de intercambio de libros y cálculo de rutas.  
-- **Google Books API**: Obtención de información sobre los libros disponibles.  
-- **Firebase Firestore**: Almacenamiento de datos de usuarios, logros y eventos en la nube.  
-- **Firebase Authentication**: Gestión de autenticación de usuarios.  
-- **Google ARCore**: Uso de realidad aumentada para la búsqueda de libros ocultos.  
-- **GPS del dispositivo**: Determinación de ubicación y rutas en tiempo real.  
