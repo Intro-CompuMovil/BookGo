@@ -12,7 +12,7 @@
 
 - **Juan Felipe Galvis**
   
-  <img width="300" alt="image" src="https://github.com/user-attachments/assets/8c78c5f9-72ab-49af-b164-e825609b8e6a" />
+  <img width="250" alt="image" src="https://github.com/user-attachments/assets/8c78c5f9-72ab-49af-b164-e825609b8e6a" />
   
   _Soy estudiante de Ingeniería de Sistemas de sexto semestre. Me apasionan los temas de ciberseguridad y diseño. Trabajo en el área de servicio al cliente, lo cual me ha ayudado mucho a desarrollar habilidades sociales y conocer un poco del mundo laboral. Me gustan mucho las caminatas al aire libre y explorar diferentes zonas ambientales en Colombia._
 
