@@ -19,8 +19,7 @@
   _Soy estudiante de Ingeniería de Sistemas de sexto semestre. Me apasionan los temas de ciberseguridad y diseño. Trabajo en el área de servicio al cliente, lo cual me ha ayudado mucho a desarrollar habilidades sociales y conocer un poco del mundo laboral. Me gustan mucho las caminatas al aire libre y explorar diferentes zonas ambientales en Colombia._
 
 - ![Foto](.perfil.png) **Martín Vásquez**  
-  _info3_
-aaa
+  _Soy estudiante de Ingenieria de Sistemas cursando el sexto semestre de la carrera, estoy especialmente interesado en el area de inteligencia artificial y desarrollo web o videojuegos, he tenido experiencias en proyectos como monitor de diferentes materias de la carrera asi como semillero o experiencias externas lo que me ha permitido conocer y experimentar multiples y diversas tecnologias._
 ---
 
 
