@@ -37,6 +37,6 @@ aaa
 
 ### 🔹 Pantallas Principales/Mockups
 
-[Mockups BookGO.pdf](https://github.com/user-attachments/files/18837437/Mockups.BookGO.pdf)
+[Mockups BookGO.pdf](./MockupsBookGO.pdf)
 
 
