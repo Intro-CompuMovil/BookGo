@@ -37,6 +37,6 @@ aaa
 
 ### 🔹 Pantallas Principales/Mockups
 
-[Mockups BookGO.pdf](./MockupsBookGO.pdf)
+[Mockups BookGO.pdf](./Visily-Export_17-02-2025_10-29.pdf)
 
 
