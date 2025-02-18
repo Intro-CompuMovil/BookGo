@@ -7,7 +7,9 @@
 
 ## 👥 Integrantes  
 
-- ![Foto] **Valeria Arenas**  
+- **Valeria Arenas**
+<img width="250" alt="image" src="https://github.com/user-attachments/assets/846afee6-0c29-4d6f-8287-6f003842b64f" />
+
   _Soy una estudiante de sexto semestre de Ingeniería de Sistemas con experiencia en análisis, diseño y gestión de proyectos de software. He trabajado como monitora académica y administrativa, lo que me ha permitido desarrollar habilidades técnicas y blandas como la gestión de equipos, liderazgo y la comunicación efectiva._
 
 - **Juan Felipe Galvis**
