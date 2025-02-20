@@ -1,0 +1,41 @@
+# Archivos y carpetas generadas por Android Studio
+.idea/
+.gradle/
+build/
+local.properties
+*.iml
+
+# Carpetas de salida de compilación
+/captures/
+/outputs/
+/generated/
+
+# Dependencias de Gradle
+/.gradle/
+/app/build/
+/**/build/
+
+# Configuración de usuario y caché
+/.cxx/
+/.externalNativeBuild/
+/*.keystore
+/*.jks
+/.vscode/
+/*.log
+
+# Archivos específicos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Cache de paquetes de IntelliJ y Android Studio
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/libraries
+.idea/caches
+.idea/modules.xml
+
+# Configuración de Android Studio
+.gradle/
+/local.properties
+/.idea/
