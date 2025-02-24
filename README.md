@@ -47,4 +47,4 @@ _Soy una estudiante de sexto semestre de Ingeniería de Sistemas con experiencia
 
 [Mockups BookGO.pdf](./Visily-Export_17-02-2025_10-29.pdf)
 
-
+-- NOTA TAREA 1: 5.0
