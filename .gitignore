@@ -8,20 +8,20 @@ local.properties
 # Carpetas de salida de compilación
 /captures/
 /outputs/
-/generated/
+.generated/
+.app/build/
+/**/build/
 
 # Dependencias de Gradle
 /.gradle/
-/app/build/
-/**/build/
+.externalNativeBuild/
+.cxx
 
 # Configuración de usuario y caché
-/.cxx/
-/.externalNativeBuild/
 /*.keystore
 /*.jks
 /.vscode/
-/*.log
+*.log
 
 # Archivos específicos del sistema operativo
 .DS_Store
@@ -34,8 +34,5 @@ Thumbs.db
 .idea/libraries
 .idea/caches
 .idea/modules.xml
-
-# Configuración de Android Studio
-.gradle/
-/local.properties
-/.idea/
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
