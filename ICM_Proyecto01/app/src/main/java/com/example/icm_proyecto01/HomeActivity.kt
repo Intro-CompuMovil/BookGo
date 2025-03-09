@@ -10,8 +10,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_ACTIVITY_RECOGNITION
 import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_BACKGROUND_LOCATION
 import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_FINE_LOCATION
+import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_MULTIPLE
 import com.example.icm_proyecto01.databinding.ActivityHomeBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -27,7 +29,19 @@ class HomeActivity : AppCompatActivity() {
 
         userName = intent.getStringExtra("userName")
 
+        binding.profileImage.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            intent.putExtra("userName", userName) // Reenviamos el nombre a ProfileActivity
+            startActivity(intent)
+        }
 
+        // Botón "Crear Punto de Intercambio"
+        binding.btnCreateExchangePoint.setOnClickListener {
+            // startActivity(Intent(this, CreateExchangePointActivity::class.java)) // Aún no implementado
+        }
+
+
+        //BARRA DE NAVEGACION
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
@@ -52,78 +66,89 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        // Imagen de perfil: Ir a la pantalla de perfil
-        val profileImage = findViewById<ImageView>(R.id.profileImage)
-        binding.profileImage.setOnClickListener {
-          //  startActivity(Intent(this, ProfileActivity::class.java))
-        }
 
-        // Botón "Crear Punto de Intercambio"
-        binding.btnCreateExchangePoint.setOnClickListener {
-            // startActivity(Intent(this, CreateExchangePointActivity::class.java)) // Aún no implementado
-        }
 
-        //dentro del onCreate
-
-        // Pedir permiso de ubicación (en dos pasos)
+        // PEDIR PERMISOS
+        // permiso de ubicación precisa. si se acepta, solicitar ubicación en segundo plano
         when {
-            ContextCompat.checkSelfPermission(
-                this, android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED -> {
-            // Permiso de ubicación en primer plano concedido, ahora pedimos el de fondo si es necesario
-            pedirPermisoBackground()
-            }
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this, android.Manifest.permission.ACCESS_FINE_LOCATION) -> {
-                // Mostrar UI educativa
-                pedirPermiso(this, android.Manifest.permission.ACCESS_FINE_LOCATION, "", PERMISSION_FINE_LOCATION )
-
+            ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED -> {
+                // Si ambos permisos están concedidos, iniciar tracking de ubicación y pasos
+                //iniciarConteoPasos()
             }
             else -> {
-                // You can directly ask for the permission.
-                pedirPermiso(this, android.Manifest.permission.ACCESS_FINE_LOCATION, "", PERMISSION_FINE_LOCATION )
+                // Pedir ambos permisos juntos en un solo request
+                pedirPermiso(
+                    this,
+                    arrayOf(
+                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                        android.Manifest.permission.ACTIVITY_RECOGNITION
+                    ),
+                    PERMISSION_MULTIPLE
+                )
             }
         }
-    }
 
 
-    private fun pedirPermiso(context: Activity, permiso: String, justificacion: String,
-                             idCode: Int) {
-        if (ContextCompat.checkSelfPermission(context, permiso)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            //metodo de android
-            requestPermissions(arrayOf(permiso), idCode)
-        }
+
+
 
     }
 
-    private fun pedirPermisoBackground() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-            != PackageManager.PERMISSION_GRANTED) {
-            pedirPermiso(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION, "", PERMISSION_BACKGROUND_LOCATION)
+    private fun pedirPermiso(context: Activity, permisos: Array<String>, idCode: Int) {
+        if (permisos.any { ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }) {
+            ActivityCompat.requestPermissions(context, permisos, idCode)
         }
     }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        when (requestCode) {
+        if (requestCode == PERMISSION_MULTIPLE) {
+            var permisoUbicacionConcedido = false
+            var permisoPasosConcedido = false  // Inicializamos correctamente en false
 
-            PERMISSION_FINE_LOCATION -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // Ahora pedimos el permiso de background si es Android 10+
-                    pedirPermisoBackground()
+            for (i in permissions.indices) {
+                when (permissions[i]) {
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            permisoUbicacionConcedido = true
+                        }
+                    }
+
+                    android.Manifest.permission.ACTIVITY_RECOGNITION -> {
+                        if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                            permisoPasosConcedido = true
+                        }
+                    }
                 }
             }
 
-            PERMISSION_BACKGROUND_LOCATION -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    Toast.makeText(this, "Permiso de ubicación en segundo plano concedido", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "Experiencia reducida sin ubicación en segundo plano", Toast.LENGTH_SHORT).show()
+            if (permisoUbicacionConcedido && permisoPasosConcedido) {
+                //iniciarConteoPasos()
+            } else {
+                if (!permisoUbicacionConcedido) {
+                    Toast.makeText(
+                        this,
+                        "Permiso de ubicación requerido para esta función",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                if (!permisoPasosConcedido) {
+                    Toast.makeText(
+                        this,
+                        "Permiso de actividad física requerido para rastrear pasos",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
     }
+
+
+
+
+
 }
