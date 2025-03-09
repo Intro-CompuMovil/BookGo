@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -28,9 +29,12 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        userName = intent.getStringExtra("userName")
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        userName = sharedPref.getString("userName", "Jane Doe")
+
 
         cargarImagenDePerfil()
+        cargarPuntosDeIntercambio()
 
         binding.profileImage.setOnClickListener {
 
@@ -41,7 +45,9 @@ class HomeActivity : AppCompatActivity() {
 
         // Botón "Crear Punto de Intercambio"
         binding.btnCreateExchangePoint.setOnClickListener {
-            startActivity(Intent(this, CreateExchangePointActivity::class.java))
+            val intent = Intent(this, CreateExchangePointActivity::class.java)
+            intent.putExtra("userName", userName) // Reenviamos el nombre a ProfileActivity
+            startActivity(intent)
         }
 
 
@@ -108,6 +114,35 @@ class HomeActivity : AppCompatActivity() {
             binding.profileImage.setImageURI(Uri.parse(savedImageUri))
         }
     }
+
+
+    private fun cargarPuntosDeIntercambio() {
+        val sharedPref = getSharedPreferences("ExchangePoints", MODE_PRIVATE)
+        val points = sharedPref.getStringSet("points", null)
+
+        if (points != null) {
+            // Limpiar vista anterior
+            //binding.puntosCercanosContainer.removeAllViews()
+
+            for (punto in points) {
+                val datos = punto.split("|")
+                if (datos.size == 4) {
+                    val cardView = layoutInflater.inflate(R.layout.item_exchange_point, binding.puntosCercanosContainer, false)
+
+                    val tvLocation = cardView.findViewById<TextView>(R.id.tvLocation)
+                    val tvDescription = cardView.findViewById<TextView>(R.id.tvDescription)
+                    val tvDateTime = cardView.findViewById<TextView>(R.id.tvDateTime)
+
+                    tvLocation.text = datos[1] // Dirección
+                    tvDescription.text = "Libro: ${datos[0]}" // Título del libro
+                    tvDateTime.text = "${datos[2]} - ${datos[3]}" // Fecha y Hora
+
+                    binding.puntosCercanosContainer.addView(cardView)
+                }
+            }
+        }
+    }
+
 
     private fun pedirPermiso(context: Activity, permisos: Array<String>, idCode: Int) {
         if (permisos.any { ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }) {
