@@ -4,26 +4,94 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".EventDetailActivity">
 
+
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:padding="10dp"
+        android:src="@drawable/green_back_button"
+        android:contentDescription="Volver"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-        android:id="@+id/tvEventDetails"
+        android:id="@+id/tvEventTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Detalles del Evento"
-        android:textSize="20sp"
+        android:text="Información del Evento"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnBack" />
+
+    <ImageView
+        android:id="@+id/ivEventImage"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="17dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/presentation_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvEventTitle" />
+
+    <TextView
+        android:id="@+id/tvEventName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Nombre del Evento"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/green"
+        app:layout_constraintTop_toBottomOf="@id/ivEventImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"/>
+
+    <TextView
+        android:id="@+id/tvEventDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fecha del evento"
+        android:drawablePadding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvEventName"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp"/>
+
+    <TextView
+        android:id="@+id/tvEventLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ubicación del evento"
+        android:drawablePadding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvEventDate"
         app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/tvEventDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Descripción del evento"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvEventLocation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
         android:id="@+id/btnAttend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
         android:text="Asistir"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:backgroundTint="@color/green"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toBottomOf="@id/tvEventDescription"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="16dp"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

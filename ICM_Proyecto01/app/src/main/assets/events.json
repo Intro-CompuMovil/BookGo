@@ -1,0 +1,22 @@
+{
+  "events": [
+    {
+      "name": "Intercambio de Crepúsculo",
+      "location": "Biblioteca Central",
+      "date": "10 de Marzo - 3:00 PM",
+      "description": "SÓLO libros inspirados en la saga de Crepúsculo!! ven y comparte con nosotras..."
+    },
+    {
+      "name": "Feria de Libros Usados",
+      "location": "Parque del Libro",
+      "date": "12 de Marzo - 11:00 AM",
+      "description": "Buscamos novelas históricas inspiradas en la violencia en Colombia..."
+    },
+    {
+      "name": "Club de Lectura: Ciencia Ficción",
+      "location": "Café Literario",
+      "date": "15 de Marzo - 6:00 PM",
+      "description": "Inspirados en el romance histórico de la realeza europea :)"
+    }
+  ]
+}
