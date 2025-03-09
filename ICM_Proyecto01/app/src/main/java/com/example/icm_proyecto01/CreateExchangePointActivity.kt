@@ -23,6 +23,12 @@ class CreateExchangePointActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         userName = sharedPref.getString("userName", "Jane Doe")
 
+
+        binding.btnBack.setOnClickListener{
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+        }
+
         // Selector de fecha
         binding.btnSelectDate.setOnClickListener {
             val calendar = Calendar.getInstance()
