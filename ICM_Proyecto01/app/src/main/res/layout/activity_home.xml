@@ -34,7 +34,7 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:src="@drawable/mapita"
+        android:src="@drawable/gray_map"
         android:scaleType="centerCrop"
         android:layout_marginBottom="8dp"/>
 
