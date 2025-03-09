@@ -1,6 +1,7 @@
 package com.example.icm_proyecto01
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityProfileBinding
@@ -16,6 +17,12 @@ class ProfileActivity : AppCompatActivity() {
 
         val userName = intent.getStringExtra("userName") ?: "Jane Doe"
         binding.tvUserName.text = userName
+
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        val savedImageUri = sharedPref.getString("profileImageUri", null)
+        if (savedImageUri != null) {
+            binding.profileImage.setImageURI(Uri.parse(savedImageUri))
+        }
 
         binding.tvEditProfile.setOnClickListener {
             val intent = Intent(this, EditProfileActivity::class.java)
