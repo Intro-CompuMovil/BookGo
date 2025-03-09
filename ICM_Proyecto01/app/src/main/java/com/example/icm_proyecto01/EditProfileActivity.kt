@@ -87,7 +87,7 @@ class EditProfileActivity : AppCompatActivity() {
                         val imageStream = contentResolver.openInputStream(imageUri!!)
                         val selectedImage = BitmapFactory.decodeStream(imageStream)
 
-                        binding.profileImage.setImageBitmap(selectedImage) // Establece la imagen en el ImageView
+                        binding.profileImage.setImageBitmap(selectedImage)
 
                         // Guardar la URI en SharedPreferences
                         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
