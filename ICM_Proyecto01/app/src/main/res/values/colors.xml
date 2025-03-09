@@ -5,4 +5,8 @@
     <color name="teal_700">#00796B</color>
     <color name="teal_200">#80CBC4</color>
     <color name="green">#4CAF50</color>
+    <color name="backroundGreen">#734CAF50</color>
+    <color name="lightGray">#73B8C7B8</color>
+
+
 </resources>

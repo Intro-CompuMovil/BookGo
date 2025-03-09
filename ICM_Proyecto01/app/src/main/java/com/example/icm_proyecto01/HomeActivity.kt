@@ -4,15 +4,12 @@ package com.example.icm_proyecto01
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.icm_proyecto01.Miscellaneous
 import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_BACKGROUND_LOCATION
 import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_FINE_LOCATION
 import com.example.icm_proyecto01.databinding.ActivityHomeBinding
@@ -20,7 +17,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
-
+    private var userName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +25,8 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //menu inferior principal
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        userName = intent.getStringExtra("userName")
+
 
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -46,7 +43,9 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_profile -> {
-                  //  startActivity(Intent(this, ProfileActivity::class.java)) // aun no
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    intent.putExtra("userName", userName) // Reenviamos el nombre a ProfileActivity
+                    startActivity(intent)
                     true
                 }
                 else -> false
@@ -98,8 +97,6 @@ class HomeActivity : AppCompatActivity() {
         }
 
     }
-
-    
 
     private fun pedirPermisoBackground() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)

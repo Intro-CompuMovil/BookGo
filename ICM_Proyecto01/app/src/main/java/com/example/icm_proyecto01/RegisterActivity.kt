@@ -3,8 +3,6 @@ package com.example.icm_proyecto01
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityRegisterBinding
@@ -15,14 +13,12 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //manejo de binding:
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Navegar a la pantalla principal
         binding.btnRegister.setOnClickListener{
 
-            val nameText = binding.etName.text.toString()
+            val nameText = binding.etNewUserName.text.toString()
             val emailText = binding.etEmail.text.toString()
             val passwordText = binding.etPassword.text.toString()
             val repetirPasswordText = binding.etRepetirPassword.text.toString()
@@ -38,7 +34,7 @@ class RegisterActivity : AppCompatActivity() {
 
             }
             val caja = Bundle()
-            caja.putString("Nombre", nameText)
+            caja.putString("Usuario", nameText)
             caja.putString("Email", emailText)
             caja.putString("Password", passwordText)
 
@@ -46,7 +42,7 @@ class RegisterActivity : AppCompatActivity() {
             i.putExtra("paquete", caja) // por ahora no tiene uso funcional, pero se guarda su intent para futuras funcionalidades
 
             startActivity(i)
-            finish() // Cierra esta actividad para evitar que el usuario regrese al registro
+            finish()
         }
 
         // Volver a LoginActivity si ya tiene cuenta

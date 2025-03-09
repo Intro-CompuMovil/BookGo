@@ -21,11 +21,11 @@
 
     <!-- Campo de Nombre -->
     <EditText
-        android:id="@+id/etName"
+        android:id="@+id/etNewUserName"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:hint="Nombre"
-        android:inputType="textPersonName"
+        android:hint="Nombre de Usuario"
+        android:inputType="textShortMessage"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
         app:layout_constraintTop_toBottomOf="@id/tvRegisterTitle"
@@ -43,7 +43,7 @@
         android:inputType="textEmailAddress"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
-        app:layout_constraintTop_toBottomOf="@id/etName"
+        app:layout_constraintTop_toBottomOf="@id/etNewUserName"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
