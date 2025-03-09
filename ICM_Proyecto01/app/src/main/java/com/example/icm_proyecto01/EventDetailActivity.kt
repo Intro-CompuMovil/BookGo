@@ -2,8 +2,6 @@ package com.example.icm_proyecto01
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityEventDetailBinding
@@ -17,22 +15,31 @@ class EventDetailActivity : AppCompatActivity() {
         binding = ActivityEventDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val eventName = intent.getStringExtra("EVENT_NAME") ?: "Evento desconocido"
-        val eventLocation = intent.getStringExtra("EVENT_LOCATION") ?: "Ubicación no disponible"
-        val eventDate = intent.getStringExtra("EVENT_DATE") ?: "Fecha no disponible"
+        val name = intent.getStringExtra("EVENT_NAME") ?: "Evento Desconocido"
+        val location = intent.getStringExtra("EVENT_LOCATION") ?: "Ubicación no disponible"
+        val date = intent.getStringExtra("EVENT_DATE") ?: "Fecha no disponible"
+        val description = intent.getStringExtra("EVENT_DESCRIPTION") ?: "Descripción no disponible"
 
-        binding.tvEventDetails.text = "$eventName\n$eventLocation\n$eventDate"
+        binding.tvEventName.text = name
+        binding.tvEventLocation.text = location
+        binding.tvEventDate.text = date
+        binding.tvEventDescription.text = description
 
         binding.btnAttend.setOnClickListener {
-            Toast.makeText(this, "¡Te has registrado en $eventName!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "¡Te has registrado en $name!", Toast.LENGTH_SHORT).show()
 
-            // Esperar 1 segundo antes de regresar a la lista de eventos
+            // Regresar a la lista de eventos después de 1 segundo
             binding.btnAttend.postDelayed({
                 val intent = Intent(this, ExploreActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP // Cierra las actividades anteriores
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 startActivity(intent)
                 finish()
             }, 1000)
+        }
+
+        binding.btnBack.setOnClickListener{
+            val intent = Intent(this, ExploreActivity::class.java)
+            startActivity(intent)
         }
     }
 }

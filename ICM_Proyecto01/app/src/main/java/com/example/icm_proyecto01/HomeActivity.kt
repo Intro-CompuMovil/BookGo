@@ -35,6 +35,7 @@ class HomeActivity : AppCompatActivity() {
 
         cargarImagenDePerfil()
         cargarPuntosDeIntercambio()
+        actualizarImagenMapa()
 
         binding.profileImage.setOnClickListener {
 
@@ -143,6 +144,18 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    //por ahora se maneja actualizar imagen del mapa, pero se utilizará para funcionalidades de mapa futuras
+    private fun actualizarImagenMapa() {
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        val ubicacionPermitida = sharedPref.getBoolean("ubicacionPermitida", false)
+        if (ubicacionPermitida) {
+            binding.mapView.setImageResource(R.drawable.mapita)
+        } else {
+            binding.mapView.setImageResource(R.drawable.gray_map)
+        }
+    }
+    
+
 
     private fun pedirPermiso(context: Activity, permisos: Array<String>, idCode: Int) {
         if (permisos.any { ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED }) {
@@ -156,7 +169,7 @@ class HomeActivity : AppCompatActivity() {
 
         if (requestCode == PERMISSION_MULTIPLE) {
             var permisoUbicacionConcedido = false
-            var permisoPasosConcedido = false  // Inicializamos correctamente en false
+            var permisoPasosConcedido = false
 
             for (i in permissions.indices) {
                 when (permissions[i]) {
@@ -164,9 +177,13 @@ class HomeActivity : AppCompatActivity() {
                     android.Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
                         if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             permisoUbicacionConcedido = true
+                            val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+                            with(sharedPref.edit()) {
+                                putBoolean("ubicacionPermitida", true)
+                                apply()
+                            }
                         }
                     }
-
                     android.Manifest.permission.ACTIVITY_RECOGNITION -> {
                         if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             permisoPasosConcedido = true
@@ -174,28 +191,16 @@ class HomeActivity : AppCompatActivity() {
                     }
                 }
             }
+            actualizarImagenMapa()
 
-            if (permisoUbicacionConcedido && permisoPasosConcedido) {
-                //iniciarConteoPasos()
-            } else {
-                if (permisoUbicacionConcedido) {
-                    binding.mapView.setImageResource(R.drawable.mapita)
-                } else {
-                    binding.mapView.setImageResource(R.drawable.gray_map)
-                    Toast.makeText(this, "Permiso de ubicación requerido para esta función", Toast.LENGTH_SHORT).show()
-                }
-                if (!permisoPasosConcedido) {
-                    Toast.makeText(
-                        this,
-                        "Permiso de actividad física requerido para rastrear pasos",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+            if (!permisoUbicacionConcedido) {
+                Toast.makeText(this, "Permiso de ubicación requerido para esta función", Toast.LENGTH_SHORT).show()
+            }
+            if (!permisoPasosConcedido) {
+                Toast.makeText(this, "Permiso de actividad física requerido para rastrear pasos", Toast.LENGTH_SHORT).show()
             }
         }
     }
-
-
 
 
 

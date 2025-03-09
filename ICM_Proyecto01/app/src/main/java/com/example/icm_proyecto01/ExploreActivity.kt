@@ -5,22 +5,24 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.icm_proyecto01.databinding.ActivityExploreBinding
+import org.json.JSONObject
 
 class ExploreActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityExploreBinding
+    private lateinit var eventList: List<Event>
+    private var userName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityExploreBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        //eventos de ejemplo
-        val eventList = listOf(
-            Event("Intercambio de Ficción", "Biblioteca Central", "10 de Marzo - 3:00 PM"),
-            Event("Feria de Libros Usados", "Parque del Libro", "12 de Marzo - 11:00 AM"),
-            Event("Club de Lectura: Ciencia Ficción", "Café Literario", "15 de Marzo - 6:00 PM")
-        )
+        // Recuperar el nombre de usuario desde SharedPreferences
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        userName = sharedPref.getString("userName", "Jane Doe")
+
+        eventList = loadEventsFromJSON()
 
         binding.rvEvents.layoutManager = LinearLayoutManager(this)
         binding.rvEvents.adapter = EventAdapter(eventList) { selectedEvent ->
@@ -28,6 +30,7 @@ class ExploreActivity : AppCompatActivity() {
                 putExtra("EVENT_NAME", selectedEvent.name)
                 putExtra("EVENT_LOCATION", selectedEvent.location)
                 putExtra("EVENT_DATE", selectedEvent.date)
+                putExtra("EVENT_DESCRIPTION", selectedEvent.description)
             }
             startActivity(intent)
         }
@@ -39,25 +42,45 @@ class ExploreActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> {
                     startActivity(Intent(this, HomeActivity::class.java))
-                    finish() // Cierra esta actividad para evitar duplicados
+                    finish()
                     true
                 }
-                R.id.nav_explore -> {
-                    // Ya estamos en Explorar, no hacer nada
-                    true
-                }
+                R.id.nav_explore -> true
                 R.id.nav_messages -> {
-                    // startActivity(Intent(this, MessagesActivity::class.java)) // Cuando esté lista
                     finish()
                     true
                 }
                 R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    intent.putExtra("userName", userName)
+                    startActivity(intent)
                     finish()
                     true
                 }
                 else -> false
             }
         }
+    }
+
+    private fun loadEventsFromJSON(): List<Event> {
+        val eventList = mutableListOf<Event>()
+        try {
+            val json = JSONObject(Miscellaneous.loadJSONFromAsset(baseContext, "events.json") ?: return eventList)
+            val eventsArray = json.getJSONArray("events")
+
+            for (i in 0 until eventsArray.length()) {
+                val jsonObject = eventsArray.getJSONObject(i)
+                val event = Event(
+                    name = jsonObject.getString("name"),
+                    location = jsonObject.getString("location"),
+                    date = jsonObject.getString("date"),
+                    description = jsonObject.getString("description")
+                )
+                eventList.add(event)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return eventList
     }
 }
