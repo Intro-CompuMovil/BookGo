@@ -143,12 +143,11 @@ class HomeActivity : AppCompatActivity() {
             if (permisoUbicacionConcedido && permisoPasosConcedido) {
                 //iniciarConteoPasos()
             } else {
-                if (!permisoUbicacionConcedido) {
-                    Toast.makeText(
-                        this,
-                        "Permiso de ubicación requerido para esta función",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                if (permisoUbicacionConcedido) {
+                    binding.mapView.setImageResource(R.drawable.mapita)
+                } else {
+                    binding.mapView.setImageResource(R.drawable.gray_map)
+                    Toast.makeText(this, "Permiso de ubicación requerido para esta función", Toast.LENGTH_SHORT).show()
                 }
                 if (!permisoPasosConcedido) {
                     Toast.makeText(
