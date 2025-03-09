@@ -24,15 +24,12 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-
-
             val i = Intent(this, HomeActivity::class.java)
             i.putExtra("userName", userText)
             startActivity(i)
             finish()
         }
 
-        // se puede omitir
         binding.tvGoToRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
