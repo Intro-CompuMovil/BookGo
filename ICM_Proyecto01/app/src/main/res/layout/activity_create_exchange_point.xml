@@ -6,91 +6,127 @@
     android:layout_height="match_parent"
     tools:context=".CreateExchangePointActivity">
 
+    <!-- Botón de regreso -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:padding="10dp"
+        android:src="@drawable/green_back_button"
+        android:contentDescription="Volver"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Título -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Crear Punto de Intercambio"
-        android:textSize="20sp"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
+        android:fontFamily="@font/poppins_bold"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="16dp" />
+        app:layout_constraintTop_toBottomOf="@id/btnBack" />
 
-    <!--para el libro -->
-    <EditText
-        android:id="@+id/etBookTitle"
+
+    <LinearLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Título del libro"
-        android:inputType="text"
-        android:layout_margin="16dp"
+        android:background="@color/neutralGray"
+        android:layout_margin="12dp"
+        android:padding="12dp"
+        android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="4dp">
 
-    <!--campo para dirección -->
-    <EditText
-        android:id="@+id/etAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Dirección"
-        android:inputType="text"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/etBookTitle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        <!--para el libro -->
 
-    <!--seeleccionar fecha -->
-    <Button
-        android:id="@+id/btnSelectDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Seleccionar Fecha"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/etAddress"
-        app:layout_constraintStart_toStartOf="parent" />
+        <EditText
+            android:id="@+id/etBookTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Título del libro"
+            android:inputType="text"
+            android:layout_margin="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Texto fecha -->
-    <TextView
-        android:id="@+id/tvSelectedDate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fecha: No seleccionada"
-        app:layout_constraintTop_toBottomOf="@id/btnSelectDate"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="16dp" />
+        <!--campo para dirección -->
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Dirección"
+            android:inputType="text"
+            android:layout_margin="16dp"
+            app:layout_constraintTop_toBottomOf="@id/etBookTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-    <!--Seleccionar hora -->
-    <Button
-        android:id="@+id/btnSelectTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Seleccionar Hora"
-        android:layout_margin="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tvSelectedDate"
-        app:layout_constraintStart_toStartOf="parent" />
+        <!--seeleccionar fecha -->
+        <Button
+            android:id="@+id/btnSelectDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/green"
+            android:text="Seleccionar Fecha"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/etAddress" />
 
-    <!-- Texto hora-->
-    <TextView
-        android:id="@+id/tvSelectedTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hora: No seleccionada"
-        app:layout_constraintTop_toBottomOf="@id/btnSelectTime"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="16dp" />
+        <!-- Texto fecha -->
+        <TextView
+            android:id="@+id/tvSelectedDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha: No seleccionada"
+            app:layout_constraintTop_toBottomOf="@id/btnSelectDate"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp" />
+
+        <!--Seleccionar hora -->
+        <Button
+            android:id="@+id/btnSelectTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Hora"
+            android:backgroundTint="@color/green"
+            android:layout_margin="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tvSelectedDate"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- Texto hora-->
+        <TextView
+            android:id="@+id/tvSelectedTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hora: No seleccionada"
+            app:layout_constraintTop_toBottomOf="@id/btnSelectTime"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp" />
+
+
+    </LinearLayout>
 
     <!--Botón Confirmar -->
     <Button
         android:id="@+id/btnConfirm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Confirmar Intercambio"
+        android:layout_margin="16dp"
         android:backgroundTint="@color/green"
+        android:text="Confirmar Intercambio"
         android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/tvSelectedTime"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="16dp" />
+        app:layout_constraintTop_toBottomOf="@id/container" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

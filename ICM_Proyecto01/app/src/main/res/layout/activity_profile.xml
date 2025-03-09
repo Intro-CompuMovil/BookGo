@@ -19,7 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Perfil"
-            android:textSize="20sp"
+            android:fontFamily="@font/poppins_bold"
+            android:textSize="28sp"
             android:textStyle="bold"
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
@@ -32,7 +33,7 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:cardBackgroundColor="@color/cardview_light_background"
-        android:layout_margin="20dp"
+        android:layout_margin="12dp"
         android:layout_below="@id/header">
 
         <RelativeLayout
@@ -94,14 +95,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Editar Perfil"
-        android:textSize="14sp"
+        android:textSize="18sp"
         android:textColor="@color/green"
         android:paddingTop="8dp"
         android:clickable="true"
         android:focusable="true"
         android:textStyle="bold"
         android:layout_below="@id/profileCard"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="1dp"/>
 
     <!-- Sección de Libros -->
     <TextView
@@ -109,8 +111,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tus Libros"
-        android:textSize="18sp"
+        android:fontFamily="@font/poppins_semibold"
+        android:textSize="22sp"
         android:textStyle="bold"
+        android:layout_marginTop="18dp"
         android:layout_marginStart="16dp"
         android:layout_below="@id/tvEditProfile"/>
 
