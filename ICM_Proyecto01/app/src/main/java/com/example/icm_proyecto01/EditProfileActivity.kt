@@ -3,6 +3,7 @@ package com.example.icm_proyecto01
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,6 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_GALLERY
 import com.example.icm_proyecto01.databinding.ActivityEditProfileBinding
+import java.io.FileNotFoundException
 
 class EditProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditProfileBinding
@@ -31,7 +33,6 @@ class EditProfileActivity : AppCompatActivity() {
         if (savedImageUri != null) {
             binding.profileImage.setImageURI(Uri.parse(savedImageUri))
         }
-
         binding.btnSaveProfile.setOnClickListener {
             val newUserName = binding.etUserName.text.toString()
 
@@ -78,16 +79,25 @@ class EditProfileActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == PERMISSION_GALLERY && resultCode == Activity.RESULT_OK) {
-            val imageUri: Uri? = data?.data
-            if (imageUri != null) {
-                binding.profileImage.setImageURI(imageUri) // Muestra la imagen en la UI
+        when (requestCode) {
+            PERMISSION_GALLERY -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    try {
+                        val imageUri: Uri? = data?.data
+                        val imageStream = contentResolver.openInputStream(imageUri!!)
+                        val selectedImage = BitmapFactory.decodeStream(imageStream)
 
-                // Guardar la URI en SharedPreferences
-                val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
-                with(sharedPref.edit()) {
-                    putString("profileImageUri", imageUri.toString())
-                    apply()
+                        binding.profileImage.setImageBitmap(selectedImage) // Establece la imagen en el ImageView
+
+                        // Guardar la URI en SharedPreferences
+                        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+                        with(sharedPref.edit()) {
+                            putString("profileImageUri", imageUri.toString())
+                            apply()
+                        }
+                    } catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                    }
                 }
             }
         }
@@ -116,5 +126,7 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
 }

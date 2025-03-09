@@ -4,6 +4,7 @@ package com.example.icm_proyecto01
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
@@ -29,7 +30,10 @@ class HomeActivity : AppCompatActivity() {
 
         userName = intent.getStringExtra("userName")
 
+        cargarImagenDePerfil()
+
         binding.profileImage.setOnClickListener {
+
             val intent = Intent(this, ProfileActivity::class.java)
             intent.putExtra("userName", userName) // Reenviamos el nombre a ProfileActivity
             startActivity(intent)
@@ -93,6 +97,16 @@ class HomeActivity : AppCompatActivity() {
 
 
 
+    }
+
+
+    private fun cargarImagenDePerfil() {
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        val savedImageUri = sharedPref.getString("profileImageUri", null)
+
+        if (savedImageUri != null) {
+            binding.profileImage.setImageURI(Uri.parse(savedImageUri))
+        }
     }
 
     private fun pedirPermiso(context: Activity, permisos: Array<String>, idCode: Int) {
