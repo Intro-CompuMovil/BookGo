@@ -18,6 +18,11 @@ class LoginActivity : AppCompatActivity() {
         binding.btnLogin.setOnClickListener {
             val userText = binding.etUserName.text.toString()
             val passwordText = binding.etPassword.text.toString()
+            val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                putString("userName", userText) // Aquí podrías usar el nombre en vez del email si está disponible
+                apply()
+            }
 
             if (userText.isBlank() || passwordText.isBlank()){
                 Toast.makeText(this, "Por favor ingrese todos los datos", Toast.LENGTH_LONG).show()

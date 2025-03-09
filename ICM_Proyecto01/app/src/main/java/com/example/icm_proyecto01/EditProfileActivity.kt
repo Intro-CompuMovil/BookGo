@@ -25,16 +25,23 @@ class EditProfileActivity : AppCompatActivity() {
         binding = ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val userName = intent.getStringExtra("userName") ?: ""
+        // Cargar el nombre de usuario desde SharedPreferences
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        val userName = sharedPref.getString("userName", "Jane Doe")
         binding.etUserName.setText(userName)
 
-        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        // Cargar la imagen de perfil si existe, desde SharedPreferences tambien
         val savedImageUri = sharedPref.getString("profileImageUri", null)
         if (savedImageUri != null) {
             binding.profileImage.setImageURI(Uri.parse(savedImageUri))
         }
+
         binding.btnSaveProfile.setOnClickListener {
             val newUserName = binding.etUserName.text.toString()
+            with(sharedPref.edit()) {
+                putString("userName", newUserName)
+                apply()
+            }
 
             val intent = Intent(this, ProfileActivity::class.java)
             intent.putExtra("userName", newUserName)
@@ -71,6 +78,8 @@ class EditProfileActivity : AppCompatActivity() {
 
     }
 
+
+
     private fun abrirGaleria() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         startActivityForResult(intent, PERMISSION_GALLERY)
@@ -89,7 +98,7 @@ class EditProfileActivity : AppCompatActivity() {
 
                         binding.profileImage.setImageBitmap(selectedImage)
 
-                        // Guardar la URI en SharedPreferences
+                        // Guardar la URI en SharedPreferences para que se mantenga en toda la navegacion
                         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
                         with(sharedPref.edit()) {
                             putString("profileImageUri", imageUri.toString())

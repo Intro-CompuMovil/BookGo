@@ -66,6 +66,7 @@
         android:padding="16dp">
 
         <LinearLayout
+            android:id="@+id/puntosCercanosContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -93,14 +94,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Busco libros de acción o ficción! Hoy, 10:00 - 11:00"
+                        android:text="Libro: 1984, George Orwell"
                         android:textSize="14sp"
                         android:textColor="@android:color/darker_gray"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ver libro disponible"
+                        android:text="Fecha: 26/3/2025 - Hora 12:00"
                         android:textSize="14sp"
                         android:textColor="@color/green"
                         android:textStyle="bold"/>
