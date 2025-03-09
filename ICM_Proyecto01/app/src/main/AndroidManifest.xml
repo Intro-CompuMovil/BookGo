@@ -58,6 +58,14 @@
         <activity
             android:name=".HomeActivity"
             android:exported="true" />
+
+        <activity
+            android:name=".ChatActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".MessagesActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

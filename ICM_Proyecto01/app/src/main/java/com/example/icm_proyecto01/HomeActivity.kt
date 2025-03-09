@@ -62,7 +62,7 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_messages -> {
-                    // startActivity(Intent(this, MessagesActivity::class.java)) // Aún no implementado
+                    startActivity(Intent(this, MessagesActivity::class.java)) // Aún no implementado
                     true
                 }
                 R.id.nav_profile -> {

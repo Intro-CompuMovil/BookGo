@@ -45,7 +45,7 @@ class ProfileActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_messages -> {
-                    // startActivity(Intent(this, MessagesActivity::class.java)) // Cuando esté lista
+                    startActivity(Intent(this, MessagesActivity::class.java)) // Cuando esté lista
                     finish()
                     true
                 }
