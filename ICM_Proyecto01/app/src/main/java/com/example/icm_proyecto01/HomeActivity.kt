@@ -36,7 +36,7 @@ class HomeActivity : AppCompatActivity() {
 
         // Botón "Crear Punto de Intercambio"
         binding.btnCreateExchangePoint.setOnClickListener {
-            // startActivity(Intent(this, CreateExchangePointActivity::class.java)) // Aún no implementado
+            startActivity(Intent(this, CreateExchangePointActivity::class.java))
         }
 
 
