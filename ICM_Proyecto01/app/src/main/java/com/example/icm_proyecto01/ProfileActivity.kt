@@ -34,7 +34,11 @@ class ProfileActivity : AppCompatActivity() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
+                    val userNameBack = intent.getStringExtra("userName") ?: ""
+                    binding.tvUserName.setText(userName)
+                    val intent = Intent(this, HomeActivity::class.java)
+                    intent.putExtra("userName", userNameBack)
+                    startActivity(intent)
                     true
                 }
                 R.id.nav_explore -> {

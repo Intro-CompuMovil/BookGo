@@ -23,7 +23,6 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //manejo de binding:
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -69,7 +68,6 @@ class HomeActivity : AppCompatActivity() {
 
 
         // PEDIR PERMISOS
-        // permiso de ubicación precisa. si se acepta, solicitar ubicación en segundo plano
         when {
             ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED -> {
@@ -107,7 +105,7 @@ class HomeActivity : AppCompatActivity() {
 
         if (requestCode == PERMISSION_MULTIPLE) {
             var permisoUbicacionConcedido = false
-            var permisoPasosConcedido = false  // Inicializamos correctamente en false
+            var permisoPasosConcedido = false
 
             for (i in permissions.indices) {
                 when (permissions[i]) {
