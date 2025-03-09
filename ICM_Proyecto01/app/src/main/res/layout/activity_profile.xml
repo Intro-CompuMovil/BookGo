@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ProfileActivity">
+
+    <!-- Encabezado -->
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Perfil"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+
+    <!-- Sección de perfil -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/profileCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/cardview_light_background"
+        android:layout_margin="20dp"
+        android:layout_below="@id/header">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/profileImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/icono_perfil"
+                android:scaleType="centerCrop"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"/>
+
+            <RelativeLayout
+                android:id="@+id/profileInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/profileImage"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical"
+                android:layout_centerVertical="true">
+
+                <TextView
+                    android:id="@+id/tvUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jane Doe"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/green"/>
+
+                <TextView
+                    android:id="@+id/tvUserLevel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nivel de Lector 2"
+                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:layout_below="@+id/tvUserName"
+                    />
+
+                <TextView
+                    android:id="@+id/tvUserEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="janedoe@gmail.com"
+                    android:textSize="14sp"
+                    android:textColor="@color/black"
+                    android:layout_below="@+id/tvUserLevel"/>
+            </RelativeLayout>
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Botón Editar Perfil -->
+    <TextView
+        android:id="@+id/tvEditProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Editar Perfil"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:paddingTop="8dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:textStyle="bold"
+        android:layout_below="@id/profileCard"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Sección de Libros -->
+    <TextView
+        android:id="@+id/tvBooksTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tus Libros"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginStart="16dp"
+        android:layout_below="@id/tvEditProfile"/>
+
+    <ScrollView
+        android:id="@+id/booksScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_below="@id/tvBooksTitle">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:src="@drawable/mock_book_1"
+                android:scaleType="centerCrop"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:src="@drawable/mock_book_2"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="8dp"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Botón Registrar Libro -->
+    <Button
+        android:id="@+id/btnRegisterBook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Registrar Libro"
+        android:backgroundTint="@color/green"
+        android:textColor="@android:color/white"
+        android:padding="8dp"
+        android:layout_below="@id/booksScroll"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Menú inferior de navegación -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:menu="@menu/bottom_navigation_menu"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>
