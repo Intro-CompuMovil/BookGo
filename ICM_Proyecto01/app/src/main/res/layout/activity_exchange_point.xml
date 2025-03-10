@@ -12,7 +12,7 @@
         android:id="@+id/backButton"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_back"
+        android:src="@drawable/ic_back_arrow"
         android:contentDescription="Back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -101,14 +101,24 @@
                     android:text="Juan Álvarez ofrece:"
                     android:textStyle="italic"
                     android:textSize="14sp"
-                    android:fontFamily="@font/poppins_italic"
-                    android:textColor="@color/gray"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textColor="@color/black"
                     android:paddingBottom="4dp"/>
 
-                <TextView android:text="Título: Maus"/>
-                <TextView android:text="Autor: Art Spiegelman"/>
-                <TextView android:text="Género: Novela Gráfica"/>
-                <TextView android:text="Estado: Como Nuevo"/>
+                <TextView
+                    android:text="Título: Maus"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+                <TextView android:text="Autor: Art Spiegelman"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+                <TextView android:text="Género: Novela Gráfica"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+                <TextView android:text="Estado: Como Nuevo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -162,7 +172,7 @@
                 android:text="Cambiar Libro"
                 android:textColor="@color/green"
                 android:textSize="14sp"
-                android:fontFamily="@font/poppins_medium"
+                android:fontFamily="@font/poppins_regular"
                 android:paddingTop="4dp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

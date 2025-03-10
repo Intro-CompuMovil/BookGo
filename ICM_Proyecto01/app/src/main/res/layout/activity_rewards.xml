@@ -59,7 +59,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/card_background"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp">
 
@@ -68,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:text="Intercambios"
                     android:textSize="14sp"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/black"
                     android:textStyle="bold"/>
 
                 <TextView
@@ -103,7 +102,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@drawable/card_background"
                 android:padding="12dp"
                 android:layout_marginBottom="12dp">
 
@@ -112,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:text="Eventos"
                     android:textSize="14sp"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/black"
                     android:textStyle="bold"/>
 
                 <TextView
