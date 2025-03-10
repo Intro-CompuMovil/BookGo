@@ -35,6 +35,9 @@
             android:name=".CreateExchangePointActivity"
             android:exported="false" />
         <activity
+            android:name=".NewBookActivity"
+            android:exported="false" />
+        <activity
             android:name=".EditProfileActivity"
             android:exported="false" />
         <activity
@@ -48,7 +51,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Login -->
+        </activity>
+        <activity
+            android:name=".ExchangePointActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".RewardsActivity"
+            android:exported="false"/>
+        <!-- Login -->
         <activity
             android:name=".LoginActivity"
             android:exported="true" />
