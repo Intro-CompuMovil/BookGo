@@ -35,11 +35,14 @@
             android:name=".CreateExchangePointActivity"
             android:exported="false" />
         <activity
+            android:name=".NewBookActivity"
+            android:exported="false" />
+        <activity
             android:name=".EditProfileActivity"
             android:exported="false" />
         <activity
             android:name=".ProfileActivity"
-            android:exported="false" /> <!-- Pantalla de presentación -->
+            android:exported="false" />
         <activity
             android:name=".PresentationActivity"
             android:exported="true">
@@ -48,13 +51,20 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Login -->
+        </activity>
+        <activity
+            android:name=".ExchangePointActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".RewardsActivity"
+            android:exported="false"/>
+        <!-- Login -->
         <activity
             android:name=".LoginActivity"
-            android:exported="true" /> <!-- Registro -->
+            android:exported="true" />
         <activity
             android:name=".RegisterActivity"
-            android:exported="true" /> <!-- Pantalla principal (Home) -->
+            android:exported="true" />
         <activity
             android:name=".HomeActivity"
             android:exported="true" />

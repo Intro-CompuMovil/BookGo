@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="bookImage" type="id" />
+    <item name="profilePicture" type="id" />
+    <item name="btnGallery" type="id" />
+    <item name="etBookAuthor" type="id" />
+    <item name="btnCamera" type="id" />
+    <item name="spinnerState" type="id" />
+    <item name="spinnerGenre" type="id" />
+</resources>
