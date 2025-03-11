@@ -10,7 +10,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="8dp">
 
         <TextView
             android:id="@+id/title"
@@ -109,7 +109,7 @@
         android:fontFamily="@font/poppins_semibold"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="16dp"
         android:layout_below="@id/tvEditProfile"/>
 
@@ -117,7 +117,7 @@
         android:id="@+id/booksScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:padding="8dp"
         android:layout_below="@id/tvBooksTitle">
 
         <LinearLayout
