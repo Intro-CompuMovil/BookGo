@@ -6,7 +6,6 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!-- Top Bar with Back Button, Title, and Profile Image -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,6 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Recompensas"
+            android:layout_margin="12dp"
+            android:fontFamily="@font/poppins_bold"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_centerInParent="true"/>
@@ -42,7 +43,6 @@
             android:layout_centerVertical="true"/>
     </RelativeLayout>
 
-    <!-- Rewards List -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -54,7 +54,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Reward Card 1 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,6 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Intercambios"
+                    android:fontFamily="@font/poppins_regular"
                     android:textSize="14sp"
                     android:textColor="@color/black"
                     android:textStyle="bold"/>
@@ -97,7 +97,6 @@
                     android:layout_marginTop="4dp"/>
             </LinearLayout>
 
-            <!-- Reward Card 2 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -110,6 +109,7 @@
                     android:layout_height="wrap_content"
                     android:text="Eventos"
                     android:textSize="14sp"
+                    android:fontFamily="@font/poppins_regular"
                     android:textColor="@color/black"
                     android:textStyle="bold"/>
 
@@ -132,7 +132,7 @@
                 <SeekBar
                     android:id="@+id/seekBar2"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:max="2"
                     android:progress="1"
                     android:thumbTint="@color/green"
@@ -142,13 +142,5 @@
 
         </LinearLayout>
     </ScrollView>
-
-    <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:menu="@menu/bottom_navigation_menu"
-        android:background="?android:attr/windowBackground"/>
 
 </LinearLayout>
