@@ -12,7 +12,8 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:padding="10dp"
-        android:src="@drawable/green_back_button"
+        android:src="@drawable/ic_back_arrow"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Volver"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
