@@ -142,14 +142,52 @@
 
     <Button
         android:id="@+id/btnRegisterBook"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Registrar Libro"
         android:backgroundTint="@color/green"
         android:textColor="@android:color/white"
         android:padding="8dp"
         android:layout_below="@id/booksScroll"
-        android:layout_centerHorizontal="true"/>
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Contenedor para alinear los botones de Libro Oculto -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/btnRegisterBook"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp">
+
+        <Button
+            android:id="@+id/btnRegisterHiddenBook"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Registrar Libro Oculto"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:layout_marginEnd="8dp"
+            android:minHeight="48dp"/>
+
+        <Button
+            android:id="@+id/btnSearchHiddenBook"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Buscar Libro Oculto"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:layout_marginStart="8dp"
+            android:minHeight="48dp"/>
+    </LinearLayout>
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

@@ -16,7 +16,6 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
         binding = ActivityRegisterHiddenBookBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Registrar el libro oculto
         binding.btnRegisterBook.setOnClickListener {
             val title = binding.etBookTitle.text.toString().trim()
             val author = binding.etBookAuthor.text.toString().trim()
@@ -29,25 +28,23 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Guardar libro en SharedPreferences
             val sharedPref = getSharedPreferences("HiddenBooks", Context.MODE_PRIVATE)
             val editor = sharedPref.edit()
             val bookData = "$title | $author | $genre | $state | $location"
             editor.putString(title, bookData)
             editor.apply()
 
-            // Confirmación y regreso al perfil
             Toast.makeText(this, "Libro oculto registrado correctamente", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
             finish()
         }
 
-        // Acción para volver al perfil
         binding.btnBack.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
             finish()
+
         }
     }
 }
