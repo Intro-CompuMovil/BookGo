@@ -51,6 +51,17 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // 🚀 Agregar navegación para Registrar y Buscar Libro Oculto
+        binding.btnRegisterHiddenBook.setOnClickListener {
+            val intent = Intent(this, RegisterHiddenBookActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnSearchHiddenBook.setOnClickListener {
+            val intent = Intent(this, BookSearchActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.profileImage.setOnClickListener {
             if (checkCameraPermission()) {
                 openCamera()
@@ -77,7 +88,7 @@ class ProfileActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_messages -> {
-                    startActivity(Intent(this, MessagesActivity::class.java)) // Cuando esté lista
+                    startActivity(Intent(this, MessagesActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true
