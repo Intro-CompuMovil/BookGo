@@ -51,18 +51,22 @@ class ExploreActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> {
                     startActivity(Intent(this, HomeActivity::class.java))
+                    overridePendingTransition(0, 0)
                     finish()
                     true
                 }
                 R.id.nav_explore -> true
+
                 R.id.nav_messages -> {
-                    finish()
+                    startActivity(Intent(this, MessagesActivity::class.java)) // Aún no implementado
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.nav_profile -> {
                     val intent = Intent(this, ProfileActivity::class.java)
                     intent.putExtra("userName", userName)
                     startActivity(intent)
+                    overridePendingTransition(0, 0)
                     finish()
                     true
                 }
@@ -71,6 +75,7 @@ class ExploreActivity : AppCompatActivity() {
         }
     }
 
+    // se tiene esta lógica para leer los eventos del archivo .json, pero no se implementa de modo que se puedan crear eventos de acuerdo al flujo
     private fun loadEventsFromJSON(): List<Event> {
         val eventList = mutableListOf<Event>()
         val sharedPreferences = getSharedPreferences("EventsData", Context.MODE_PRIVATE)
