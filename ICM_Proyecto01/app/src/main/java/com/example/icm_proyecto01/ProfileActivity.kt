@@ -29,7 +29,14 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Marcar el item de perfil como seleccionado por defecto
+        binding.btnRegisterHiddenBook.setOnClickListener {
+           startActivity(Intent(this, RegisterHiddenBookActivity::class.java))
+        }
+
+        binding.btnSearchHiddenBook.setOnClickListener {
+            startActivity(Intent(this, BookSearchActivity::class.java))
+        }
+
         binding.bottomNavigation.selectedItemId = R.id.nav_profile
 
         binding.bottomNavigation.setOnItemSelectedListener { item ->
