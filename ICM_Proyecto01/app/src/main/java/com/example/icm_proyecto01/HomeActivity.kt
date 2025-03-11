@@ -36,6 +36,12 @@ class HomeActivity : AppCompatActivity() {
         cargarPuntosDeIntercambio()
         actualizarImagenMapa()
 
+        binding.puntoIntercambio.setOnClickListener {
+            val intent = Intent(this, ExchangePointActivity::class.java)
+            startActivity(intent)
+        }
+
+
         binding.profileImage.setOnClickListener {
 
             val intent = Intent(this, ProfileActivity::class.java)
