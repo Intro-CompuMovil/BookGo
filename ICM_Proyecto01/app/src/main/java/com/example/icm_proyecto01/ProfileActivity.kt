@@ -29,6 +29,16 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        // Navegar a la pantalla de registro de libro oculto
+        binding.btnRegisterHiddenBook.setOnClickListener {
+           startActivity(Intent(this, RegisterHiddenBookActivity::class.java))
+        }
+
+        // Navegar a la pantalla de búsqueda de libro oculto
+        binding.btnSearchHiddenBook.setOnClickListener {
+            startActivity(Intent(this, BookSearchActivity::class.java))
+        }
+
         // Marcar el ítem de perfil como seleccionado por defecto
         binding.bottomNavigation.selectedItemId = R.id.nav_profile
 
