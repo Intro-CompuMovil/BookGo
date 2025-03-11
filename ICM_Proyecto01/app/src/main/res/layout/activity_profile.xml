@@ -139,66 +139,78 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- ✅ Keep both "Registrar Libro" and "Recompensas" buttons -->
-    <Button
-        android:id="@+id/btnRegisterBook"
+
+    <!-- Contenedor principal de botones en formato 2x2 -->
+    <GridLayout
+        android:id="@+id/buttonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/booksScroll"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="2dp"
-        android:backgroundTint="@color/green"
-        android:padding="8dp"
-        android:text="Registrar Libro"
-        android:textColor="@android:color/white" />
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:columnCount="2"
+        android:rowCount="2"
+        android:alignmentMode="alignMargins"
+        android:padding="8dp">
 
-    <Button
-        android:id="@+id/btnRewards"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/booksScroll"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@color/green"
-        android:padding="8dp"
-        android:text="Recompensas"
-        android:textColor="@android:color/white" />
+        <!-- Botón Registrar Libro -->
+        <Button
+            android:id="@+id/btnRegisterBook"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:text="Registrar Libro"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:minHeight="48dp"
+            android:layout_margin="4dp"/>
 
-    <!-- ✅ Keep both "Registrar Libro Oculto" and "Buscar Libro Oculto" buttons -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/btnRegisterBook"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp">
+        <!-- Botón Recompensas -->
+        <Button
+            android:id="@+id/btnRewards"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:text="Recompensas"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:minHeight="48dp"
+            android:layout_margin="4dp"/>
 
+        <!-- Botón Registrar Libro Oculto -->
         <Button
             android:id="@+id/btnRegisterHiddenBook"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
             android:text="Registrar Libro Oculto"
             android:backgroundTint="@color/green"
             android:textColor="@android:color/white"
             android:padding="8dp"
-            android:layout_marginEnd="8dp"
-            android:minHeight="48dp"/>
+            android:minHeight="48dp"
+            android:layout_margin="4dp"/>
 
+        <!-- Botón Buscar Libro Oculto -->
         <Button
             android:id="@+id/btnSearchHiddenBook"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
             android:text="Buscar Libro Oculto"
             android:backgroundTint="@color/green"
             android:textColor="@android:color/white"
             android:padding="8dp"
-            android:layout_marginStart="8dp"
-            android:minHeight="48dp"/>
-    </LinearLayout>
+            android:minHeight="48dp"
+            android:layout_margin="4dp"/>
+    </GridLayout>
+
 
     <!-- Menú inferior de navegación -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
