@@ -2,25 +2,25 @@ package com.example.icm_proyecto01
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.icm_proyecto01.databinding.ActivityBookSearchBinding
 
 class BookSearchActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityBookSearchBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_book_search)
+        binding = ActivityBookSearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val btnFoundBook = findViewById<Button>(R.id.btnFoundBook)
-
-        btnFoundBook.setOnClickListener {
-            // Mostrar mensaje de confirmación
+        binding.btnFoundBook.setOnClickListener {
             Toast.makeText(this, "¡Libro oculto encontrado!", Toast.LENGTH_SHORT).show()
 
-            // Regresar a la pantalla de perfil después del Toast
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
-            finish() // Cierra esta actividad para evitar que el usuario vuelva con "atrás"
+            finish()
         }
     }
 }
