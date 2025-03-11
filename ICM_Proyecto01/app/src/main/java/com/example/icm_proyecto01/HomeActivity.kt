@@ -60,16 +60,19 @@ class HomeActivity : AppCompatActivity() {
                 }
                 R.id.nav_explore -> {
                     startActivity(Intent(this, ExploreActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.nav_messages -> {
-                    // startActivity(Intent(this, MessagesActivity::class.java)) // Aún no implementado
+                    startActivity(Intent(this, MessagesActivity::class.java)) // Aún no implementado
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.nav_profile -> {
                     val intent = Intent(this, ProfileActivity::class.java)
                     intent.putExtra("userName", userName) // Reenviamos el nombre a ProfileActivity
                     startActivity(intent)
+                    overridePendingTransition(0, 0)
                     true
                 }
                 else -> false
@@ -82,7 +85,7 @@ class HomeActivity : AppCompatActivity() {
         when {
             ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED -> {
-                // Si ambos permisos están concedidos, iniciar tracking de ubicación y pasos
+                // Si ambos permisos están concedidos, iniciar tracking de ubicación y pasos. por ahora esta vacío previo a su implementacion
                 //iniciarConteoPasos()
             }
             else -> {
@@ -120,9 +123,6 @@ class HomeActivity : AppCompatActivity() {
         val points = sharedPref.getStringSet("points", null)
 
         if (points != null) {
-            // Limpiar vista anterior
-            //binding.puntosCercanosContainer.removeAllViews()
-
             for (punto in points) {
                 val datos = punto.split("|")
                 if (datos.size == 4) {
