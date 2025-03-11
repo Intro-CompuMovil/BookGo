@@ -29,6 +29,16 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.btnRegisterBook.setOnClickListener{
+            val intent = Intent(this, NewBookActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnRewards.setOnClickListener{
+            val intent = Intent(this, RewardsActivity::class.java)
+            startActivity(intent)
+        }
+
         // Marcar el item de perfil como seleccionado por defecto
         binding.bottomNavigation.selectedItemId = R.id.nav_profile
 

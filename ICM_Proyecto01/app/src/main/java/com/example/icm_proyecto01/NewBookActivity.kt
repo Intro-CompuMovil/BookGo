@@ -18,5 +18,10 @@ class NewBookActivity : AppCompatActivity() {
             val intent = Intent(this, ProfileActivity::class.java)
             startActivity(intent)
         }
+
+        binding.btnBack.setOnClickListener {
+            finish() // Close current activity
+        }
+
     }
 }
