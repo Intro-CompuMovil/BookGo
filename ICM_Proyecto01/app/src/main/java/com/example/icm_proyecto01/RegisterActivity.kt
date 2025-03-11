@@ -1,55 +1,124 @@
 package com.example.icm_proyecto01
 
-
-import android.content.Intent
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.databinding.ActivityRegisterBinding
+import java.io.File
+import java.io.FileOutputStream
+import android.content.Intent
+
 
 class RegisterActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityRegisterBinding
+    private val CAMERA_PERMISSION_CODE = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnRegister.setOnClickListener{
+        binding.btnSelectImage.setOnClickListener {
+            if (checkCameraPermission()) {
+                openCamera()
+            } else {
+                requestCameraPermission()
+            }
+        }
 
+        binding.btnRegister.setOnClickListener {
             val nameText = binding.etNewUserName.text.toString()
             val emailText = binding.etEmail.text.toString()
             val passwordText = binding.etPassword.text.toString()
             val repetirPasswordText = binding.etRepetirPassword.text.toString()
 
-            if (nameText.isBlank() || emailText.isBlank() || passwordText.isBlank() || repetirPasswordText.isBlank()){
+            if (nameText.isBlank() || emailText.isBlank() || passwordText.isBlank() || repetirPasswordText.isBlank()) {
                 Toast.makeText(this, "Por favor ingrese todos los datos", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
 
-            else if(passwordText != repetirPasswordText){
+            if (passwordText != repetirPasswordText) {
                 Toast.makeText(this, "Las contraseñas no coinciden. Inténtelo de nuevo", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
-
             }
-            val caja = Bundle()
-            caja.putString("Usuario", nameText)
-            caja.putString("Email", emailText)
-            caja.putString("Password", passwordText)
 
-            val i = Intent(this, PresentationActivity::class.java)
-            i.putExtra("paquete", caja) // por ahora no tiene uso funcional, pero se guarda su intent para futuras funcionalidades
+            val caja = Bundle().apply {
+                putString("Usuario", nameText)
+                putString("Email", emailText)
+                putString("Password", passwordText)
+            }
 
-            startActivity(i)
+            val intent = Intent(this, PresentationActivity::class.java)
+            intent.putExtra("paquete", caja)
+            startActivity(intent)
             finish()
         }
 
-        // Volver a LoginActivity si ya tiene cuenta
         binding.tvGoToLogin.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun checkCameraPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this, Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestCameraPermission() {
+        ActivityCompat.requestPermissions(
+            this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera()
+            } else {
+                Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val imageBitmap = result.data?.extras?.get("data") as? Bitmap
+            imageBitmap?.let {
+                binding.ivProfilePicture.setImageBitmap(it)
+                saveImageToStorage(it)
+            }
+        }
+    }
+
+    private fun openCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraLauncher.launch(cameraIntent)
+    }
+
+    private fun saveImageToStorage(bitmap: Bitmap) {
+        val file = File(getExternalFilesDir(null), "profile_image.jpg")
+        FileOutputStream(file).use { outputStream ->
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        }
+
+        val imageUri = Uri.fromFile(file)
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE).edit()
+        sharedPref.putString("profileImageUri", imageUri.toString())
+        sharedPref.apply()
     }
 }
