@@ -9,11 +9,16 @@ import com.example.icm_proyecto01.databinding.ActivityMessagesBinding
 class MessagesActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMessagesBinding
+    private var userName: String? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMessagesBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        userName = sharedPref.getString("userName", "Jane Doe")
 
         // Supuestos chats
         val chatList = listOf(
@@ -45,9 +50,12 @@ class MessagesActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-                R.id.nav_messages -> true // Ya estamos en la pantalla de mensajes
+                R.id.nav_messages -> true
+
                 R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    intent.putExtra("userName", userName)
+                    startActivity(intent)
                     overridePendingTransition(0, 0)
                     finish()
                     true

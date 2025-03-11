@@ -41,6 +41,7 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+<<<<<<< HEAD
         binding.btnRegisterBook.setOnClickListener {
             val intent = Intent(this, NewBookActivity::class.java)
             startActivity(intent)
@@ -49,6 +50,23 @@ class ProfileActivity : AppCompatActivity() {
         binding.btnRewards.setOnClickListener {
             val intent = Intent(this, RewardsActivity::class.java)
             startActivity(intent)
+=======
+        // Merge both sets of buttons from features_martin and main branches
+        binding.btnRegisterBook.setOnClickListener {
+            startActivity(Intent(this, NewBookActivity::class.java))
+        }
+
+        binding.btnRewards.setOnClickListener {
+            startActivity(Intent(this, RewardsActivity::class.java))
+        }
+
+        binding.btnRegisterHiddenBook.setOnClickListener {
+            startActivity(Intent(this, RegisterHiddenBookActivity::class.java))
+        }
+
+        binding.btnSearchHiddenBook.setOnClickListener {
+            startActivity(Intent(this, BookSearchActivity::class.java))
+>>>>>>> ac0a3a86337e1e92774988b04966004d3611d3ee
         }
 
         binding.profileImage.setOnClickListener {
@@ -87,6 +105,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
     }
+<<<<<<< HEAD
 
     private fun checkCameraPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -139,4 +158,6 @@ class ProfileActivity : AppCompatActivity() {
         sharedPref.putString("profileImageUri", imageUri.toString())
         sharedPref.apply()
     }
+=======
+>>>>>>> ac0a3a86337e1e92774988b04966004d3611d3ee
 }

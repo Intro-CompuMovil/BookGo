@@ -70,8 +70,9 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_messages -> {
-                    startActivity(Intent(this, MessagesActivity::class.java)) // Aún no implementado
-                    overridePendingTransition(0, 0)
+                    val intent = Intent(this, MessagesActivity::class.java)
+                    intent.putExtra("userName", userName) // Reenviamos el nombre a ProfileActivity
+                    startActivity(intent)
                     true
                 }
                 R.id.nav_profile -> {
