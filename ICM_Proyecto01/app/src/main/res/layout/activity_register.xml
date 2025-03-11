@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RegisterActivity">
 
+    <!-- Register Title -->
     <TextView
         android:id="@+id/tvRegisterTitle"
         android:layout_width="wrap_content"
@@ -19,6 +21,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="50dp"/>
 
+    <!-- Register Subtitle -->
     <TextView
         android:id="@+id/tvRegisterSubtitle"
         android:layout_width="wrap_content"
@@ -28,8 +31,37 @@
         android:fontFamily="@font/poppins_regular"
         app:layout_constraintTop_toBottomOf="@id/tvRegisterTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"/>
 
+    <!-- Profile Picture -->
+    <ImageView
+        android:id="@+id/ivProfilePicture"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_user_placeholder"
+        android:background="@android:drawable/editbox_background"
+        android:contentDescription="Profile Picture"
+        app:layout_constraintTop_toBottomOf="@id/tvRegisterSubtitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp"/>
+
+    <!-- Button to Select Image -->
+    <Button
+        android:id="@+id/btnSelectImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Elegir Imagen"
+        android:backgroundTint="@color/green"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/ivProfilePicture"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"/>
+
+    <!-- Username Input -->
     <EditText
         android:id="@+id/etNewUserName"
         android:layout_width="0dp"
@@ -38,12 +70,13 @@
         android:inputType="textShortMessage"
         android:padding="12dp"
         android:background="@android:drawable/edit_text"
-        app:layout_constraintTop_toBottomOf="@id/tvRegisterSubtitle"
+        app:layout_constraintTop_toBottomOf="@id/btnSelectImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"
         android:layout_marginHorizontal="30dp"/>
 
+    <!-- Email Input -->
     <EditText
         android:id="@+id/etEmail"
         android:layout_width="0dp"
@@ -58,6 +91,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginHorizontal="30dp"/>
 
+    <!-- Password Input -->
     <EditText
         android:id="@+id/etPassword"
         android:layout_width="0dp"
@@ -72,6 +106,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginHorizontal="30dp"/>
 
+    <!-- Confirm Password Input -->
     <EditText
         android:id="@+id/etRepetirPassword"
         android:layout_width="0dp"
@@ -86,6 +121,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginHorizontal="30dp"/>
 
+    <!-- Register Button -->
     <Button
         android:id="@+id/btnRegister"
         android:layout_width="0dp"
@@ -100,17 +136,18 @@
         android:layout_marginTop="24dp"
         android:layout_marginHorizontal="30dp"/>
 
-    <!--volver a Login -->
+    <!-- Login Text Layout -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/btnRegister"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp">
 
+        <!-- Already have an account -->
         <TextView
             android:id="@+id/tvToLogin"
             android:layout_width="wrap_content"
@@ -119,21 +156,16 @@
             android:textColor="@color/black"
             android:textSize="14sp"/>
 
-        <!-- Espaciado personalizado entre los textos -->
-        <TextView
-            android:layout_width="8dp"
-            android:layout_height="wrap_content"/>
-
+        <!-- Go to Login -->
         <TextView
             android:id="@+id/tvGoToLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Inicia sesión"
-            android:textColor="@color/green"
-            android:textSize="14sp"
             android:clickable="true"
-            android:focusable="true"/>
+            android:focusable="true"
+            android:text=" Inicia sesión"
+            android:textColor="@color/green"
+            android:textSize="14sp"/>
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
