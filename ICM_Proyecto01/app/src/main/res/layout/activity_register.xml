@@ -62,7 +62,7 @@
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/profile_pic"
+        android:src="@drawable/icono_perfil"
         android:background="@android:drawable/editbox_background"
         android:contentDescription="Profile Picture"
         app:layout_constraintTop_toBottomOf="@id/tvRegisterSubtitle"
