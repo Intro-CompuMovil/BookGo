@@ -1,16 +1,19 @@
 package com.example.icm_proyecto01
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.icm_proyecto01.databinding.ActivityExploreBinding
+import org.json.JSONArray
 import org.json.JSONObject
 
 class ExploreActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityExploreBinding
-    private lateinit var eventList: List<Event>
+    private lateinit var eventList: MutableList<Event>
     private var userName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +25,7 @@ class ExploreActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         userName = sharedPref.getString("userName", "Jane Doe")
 
-        eventList = loadEventsFromJSON()
+        eventList = loadEventsFromJSON().toMutableList()
 
         binding.rvEvents.layoutManager = LinearLayoutManager(this)
         binding.rvEvents.adapter = EventAdapter(eventList) { selectedEvent ->
@@ -32,6 +35,12 @@ class ExploreActivity : AppCompatActivity() {
                 putExtra("EVENT_DATE", selectedEvent.date)
                 putExtra("EVENT_DESCRIPTION", selectedEvent.description)
             }
+            startActivity(intent)
+        }
+
+        // Botón para crear un nuevo evento
+        binding.btnCreateEvent.setOnClickListener {
+            val intent = Intent(this, CreateEventActivity::class.java)
             startActivity(intent)
         }
 
@@ -64,9 +73,11 @@ class ExploreActivity : AppCompatActivity() {
 
     private fun loadEventsFromJSON(): List<Event> {
         val eventList = mutableListOf<Event>()
+        val sharedPreferences = getSharedPreferences("EventsData", Context.MODE_PRIVATE)
+        val eventsJsonString = sharedPreferences.getString("events", "[]") ?: "[]"
+
         try {
-            val json = JSONObject(Miscellaneous.loadJSONFromAsset(baseContext, "events.json") ?: return eventList)
-            val eventsArray = json.getJSONArray("events")
+            val eventsArray = JSONArray(eventsJsonString)
 
             for (i in 0 until eventsArray.length()) {
                 val jsonObject = eventsArray.getJSONObject(i)
