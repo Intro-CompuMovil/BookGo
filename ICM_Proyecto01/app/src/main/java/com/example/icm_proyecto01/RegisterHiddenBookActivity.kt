@@ -10,11 +10,15 @@ import com.example.icm_proyecto01.databinding.ActivityRegisterHiddenBookBinding
 class RegisterHiddenBookActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityRegisterHiddenBookBinding
+    private var userName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterHiddenBookBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        userName = sharedPref.getString("userName", "Jane Doe")
 
         binding.btnRegisterBook.setOnClickListener {
             val title = binding.etBookTitle.text.toString().trim()
@@ -36,12 +40,14 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
 
             Toast.makeText(this, "Libro oculto registrado correctamente", Toast.LENGTH_SHORT).show()
             val intent = Intent(this, ProfileActivity::class.java)
+            intent.putExtra("userName", userName)
             startActivity(intent)
             finish()
         }
 
         binding.btnBack.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
+            intent.putExtra("userName", userName)
             startActivity(intent)
             finish()
 

@@ -73,6 +73,7 @@ class HomeActivity : AppCompatActivity() {
                     val intent = Intent(this, MessagesActivity::class.java)
                     intent.putExtra("userName", userName) // Reenviamos el nombre a ProfileActivity
                     startActivity(intent)
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.nav_profile -> {
@@ -107,8 +108,6 @@ class HomeActivity : AppCompatActivity() {
                 )
             }
         }
-
-
 
 
 
@@ -148,17 +147,6 @@ class HomeActivity : AppCompatActivity() {
             }
         }
     }
-
-    //por ahora se maneja actualizar imagen del mapa, pero se utilizará para funcionalidades de mapa futuras
-    private fun actualizarImagenMapa() {
-        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
-        val ubicacionPermitida = sharedPref.getBoolean("ubicacionPermitida", false)
-        if (ubicacionPermitida) {
-            binding.mapView.setImageResource(R.drawable.mapita)
-        } else {
-            binding.mapView.setImageResource(R.drawable.gray_map)
-        }
-    }
     
 
 
@@ -182,6 +170,7 @@ class HomeActivity : AppCompatActivity() {
                     android.Manifest.permission.ACCESS_BACKGROUND_LOCATION -> {
                         if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                             permisoUbicacionConcedido = true
+                            // se utiliza sharedPreferences para guardar la decisión y cambiar la imagen de mapa
                             val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
                             with(sharedPref.edit()) {
                                 putBoolean("ubicacionPermitida", true)
@@ -208,5 +197,15 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
+    //por ahora se maneja actualizar imagen del mapa, pero se utilizará para funcionalidades de mapa futuras
+    private fun actualizarImagenMapa() {
+        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        val ubicacionPermitida = sharedPref.getBoolean("ubicacionPermitida", false)
+        if (ubicacionPermitida) {
+            binding.mapView.setImageResource(R.drawable.mapita)
+        } else {
+            binding.mapView.setImageResource(R.drawable.gray_map)
+        }
+    }
 
 }

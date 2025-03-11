@@ -6,11 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".CreateExchangePointActivity">
 
-    <!-- Botón de regreso -->
     <ImageView
         android:id="@+id/btnBack"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:padding="10dp"
         android:src="@drawable/ic_back_arrow"
         android:background="?attr/selectableItemBackgroundBorderless"
@@ -18,7 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Título -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
@@ -47,8 +45,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:elevation="4dp">
 
-        <!--para el libro -->
-
         <EditText
             android:id="@+id/etBookTitle"
             android:layout_width="match_parent"
@@ -60,7 +56,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!--campo para dirección -->
         <EditText
             android:id="@+id/etAddress"
             android:layout_width="match_parent"
@@ -72,7 +67,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <!--seeleccionar fecha -->
         <Button
             android:id="@+id/btnSelectDate"
             android:layout_width="wrap_content"
@@ -83,7 +77,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/etAddress" />
 
-        <!-- Texto fecha -->
         <TextView
             android:id="@+id/tvSelectedDate"
             android:layout_width="wrap_content"
@@ -93,7 +86,6 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_margin="16dp" />
 
-        <!--Seleccionar hora -->
         <Button
             android:id="@+id/btnSelectTime"
             android:layout_width="wrap_content"
@@ -104,7 +96,6 @@
             app:layout_constraintTop_toBottomOf="@id/tvSelectedDate"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Texto hora-->
         <TextView
             android:id="@+id/tvSelectedTime"
             android:layout_width="wrap_content"
@@ -117,7 +108,6 @@
 
     </LinearLayout>
 
-    <!--Botón Confirmar -->
     <Button
         android:id="@+id/btnConfirm"
         android:layout_width="wrap_content"

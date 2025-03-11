@@ -15,13 +15,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_GALLERY
+import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_CAMERA
 import com.example.icm_proyecto01.databinding.ActivityEditProfileBinding
 import java.io.File
 import java.io.FileOutputStream
 
 class EditProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityEditProfileBinding
-    private val CAMERA_PERMISSION_CODE = 101
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,33 +58,60 @@ class EditProfileActivity : AppCompatActivity() {
         }
 
         binding.btnChooseGallery.setOnClickListener {
-            when {
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED ||
-                        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED)
-                    -> openGallery()
-
-                else -> requestGalleryPermission()
-            }
+            handlePermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU,
+                Manifest.permission.READ_MEDIA_IMAGES,
+                PERMISSION_GALLERY,
+                galleryLauncher
+            )
         }
 
         binding.btnTakePhoto.setOnClickListener {
-            if (checkCameraPermission()) {
-                openCamera()
-            } else {
-                requestCameraPermission()
+            handlePermission(
+                Manifest.permission.CAMERA,
+                false,
+                "",
+                PERMISSION_CAMERA,
+                cameraLauncher
+            )
+        }
+    }
+
+
+    private fun handlePermission(
+        permission: String,
+        hasAlternativePermission: Boolean,
+        alternativePermission: String,
+        requestCode: Int,
+        launcher: androidx.activity.result.ActivityResultLauncher<Intent>
+    ) {
+        when {
+            ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED ||
+                    (hasAlternativePermission && ContextCompat.checkSelfPermission(this, alternativePermission) == PackageManager.PERMISSION_GRANTED) -> {
+                when (requestCode) {
+                    PERMISSION_GALLERY -> openGallery()
+                    PERMISSION_CAMERA -> openCamera()
+                }
+            }
+            else -> {
+                ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
             }
         }
     }
 
-    // Open Gallery
     private fun openGallery() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         galleryLauncher.launch(intent)
     }
 
-    private val galleryLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private fun openCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraLauncher.launch(cameraIntent)
+    }
+
+
+    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageUri: Uri? = result.data?.data
                 imageUri?.let {
@@ -94,47 +121,8 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
 
-    private fun checkCameraPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this, Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-    }
 
-    private fun requestCameraPermission() {
-        ActivityCompat.requestPermissions(
-            this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE
-        )
-    }
-
-    private fun requestGalleryPermission() {
-        ActivityCompat.requestPermissions(
-            this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_GALLERY
-        )
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        when (requestCode) {
-            PERMISSION_GALLERY -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openGallery()
-                } else {
-                    Toast.makeText(this, "Permiso de galería denegado", Toast.LENGTH_SHORT).show()
-                }
-            }
-            CAMERA_PERMISSION_CODE -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openCamera()
-                } else {
-                    Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
-    private val cameraLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val imageBitmap = result.data?.extras?.get("data") as? Bitmap
                 imageBitmap?.let {
@@ -144,10 +132,6 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
 
-    private fun openCamera() {
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        cameraLauncher.launch(cameraIntent)
-    }
 
     private fun saveImageToStorage(bitmap: Bitmap) {
         val file = File(getExternalFilesDir(null), "profile_image.jpg")
@@ -163,5 +147,20 @@ class EditProfileActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE).edit()
         sharedPref.putString("profileImageUri", uri.toString())
         sharedPref.apply()
+    }
+
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            when (requestCode) {
+                PERMISSION_GALLERY -> openGallery()
+                PERMISSION_CAMERA -> openCamera()
+            }
+        } else {
+            Toast.makeText(this, "Permiso denegado", Toast.LENGTH_SHORT).show()
+        }
     }
 }

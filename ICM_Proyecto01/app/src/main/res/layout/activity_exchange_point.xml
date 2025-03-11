@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/backButton"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:src="@drawable/ic_back_arrow"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Back"
@@ -22,9 +22,10 @@
     <ImageView
         android:id="@+id/staticMap"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/mapita"
-        android:scaleType="fitCenter"
+        android:layout_marginTop="10dp"
         app:layout_constraintTop_toBottomOf="@id/backButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -75,10 +76,10 @@
                     android:layout_height="wrap_content"
                     android:text="Juan Álvarez ofrece:"
                     android:textStyle="italic"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:fontFamily="@font/poppins_bold"
                     android:textColor="@color/black"
-                    android:paddingBottom="4dp"/>
+                    android:paddingBottom="2dp"/>
 
                 <TextView
                     android:text="Título: Maus"
@@ -121,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:text="Libro a Intercambiar"
                 android:textStyle="bold"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:fontFamily="@font/poppins_bold"/>
 
             <TextView
@@ -146,7 +147,7 @@
                 android:text="Cambiar Libro"
                 android:textColor="@color/green"
                 android:textSize="14sp"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/poppins_semibold"
                 android:paddingTop="4dp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
