@@ -29,14 +29,21 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        binding.btnRegisterBook.setOnClickListener{
-            val intent = Intent(this, NewBookActivity::class.java)
-            startActivity(intent)
+        // Merge both sets of buttons from features_martin and main branches
+        binding.btnRegisterBook.setOnClickListener {
+            startActivity(Intent(this, NewBookActivity::class.java))
         }
 
-        binding.btnRewards.setOnClickListener{
-            val intent = Intent(this, RewardsActivity::class.java)
-            startActivity(intent)
+        binding.btnRewards.setOnClickListener {
+            startActivity(Intent(this, RewardsActivity::class.java))
+        }
+
+        binding.btnRegisterHiddenBook.setOnClickListener {
+            startActivity(Intent(this, RegisterHiddenBookActivity::class.java))
+        }
+
+        binding.btnSearchHiddenBook.setOnClickListener {
+            startActivity(Intent(this, BookSearchActivity::class.java))
         }
 
         // Marcar el item de perfil como seleccionado por defecto
@@ -62,8 +69,7 @@ class ProfileActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-                R.id.nav_profile -> { true
-                }
+                R.id.nav_profile -> true
                 else -> false
             }
         }
