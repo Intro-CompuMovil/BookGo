@@ -44,12 +44,12 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
         binding.btnRegister.setOnClickListener {
-            val nameText = binding.etNewUserName.text.toString()
+            val userText = binding.etNewUserName.text.toString()
             val emailText = binding.etEmail.text.toString()
             val passwordText = binding.etPassword.text.toString()
             val repetirPasswordText = binding.etRepetirPassword.text.toString()
 
-            if (nameText.isBlank() || emailText.isBlank() || passwordText.isBlank() || repetirPasswordText.isBlank()) {
+            if (userText.isBlank() || emailText.isBlank() || passwordText.isBlank() || repetirPasswordText.isBlank()) {
                 Toast.makeText(this, "Por favor ingrese todos los datos", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -59,15 +59,22 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+            with(sharedPref.edit()) {
+                putString("userName", userText)
+                apply()
+            }
+
             val caja = Bundle().apply {
-                putString("Usuario", nameText)
+                putString("userName", userText)
                 putString("Email", emailText)
                 putString("Password", passwordText)
             }
 
-            val intent = Intent(this, PresentationActivity::class.java)
-            intent.putExtra("paquete", caja)
-            startActivity(intent)
+
+            val i = Intent(this, HomeActivity::class.java)
+            i.putExtra("paquete",caja)
+            startActivity(i)
             finish()
         }
 

@@ -1,10 +1,13 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginBottom="16dp"
-    android:layout_marginHorizontal="8dp"
+    android:layout_marginHorizontal="20dp"
     android:radius="8dp"
-    android:elevation="4dp">
+    android:elevation="4dp"
+    app:cardCornerRadius="8dp">
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,12 +26,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nombre del Evento"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/black"/>
 
             <TextView
                 android:id="@+id/tvEventLocation"
+                android:layout_marginTop="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ubicación del evento"

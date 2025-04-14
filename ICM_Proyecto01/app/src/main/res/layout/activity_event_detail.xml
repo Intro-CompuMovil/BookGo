@@ -10,10 +10,10 @@
 
     <ImageView
         android:id="@+id/btnBack"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:padding="10dp"
-        android:src="@drawable/green_back_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_back_arrow"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Volver"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,17 +24,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Información del Evento"
-        android:textSize="24sp"
+        android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBack" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"/>
 
     <ImageView
         android:id="@+id/ivEventImage"
         android:layout_width="100dp"
         android:layout_height="200dp"
-        android:layout_marginTop="17dp"
+        android:layout_marginTop="20dp"
         android:scaleType="centerCrop"
         android:src="@drawable/presentation_background"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +54,7 @@
         app:layout_constraintTop_toBottomOf="@id/ivEventImage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"/>
+        android:layout_marginTop="15dp"/>
 
     <TextView
         android:id="@+id/tvEventDate"

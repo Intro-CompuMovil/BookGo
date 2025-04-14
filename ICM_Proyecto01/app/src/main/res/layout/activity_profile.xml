@@ -21,6 +21,7 @@
             android:fontFamily="@font/poppins_bold"
             android:textSize="28sp"
             android:textStyle="bold"
+            android:layout_marginTop="10dp"
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 
@@ -48,6 +49,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"/>
 
+
             <RelativeLayout
                 android:id="@+id/profileInfo"
                 android:layout_width="wrap_content"
@@ -57,20 +59,33 @@
                 android:orientation="vertical"
                 android:layout_centerVertical="true">
 
+                <ImageView
+                    android:id="@+id/tvEditProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/tvUserLevel"
+                    android:layout_toEndOf="@id/tvUserName"
+                    android:layout_marginStart="5dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:paddingTop="8dp"
+                    android:src="@drawable/rounded_edit_square"
+                    android:text="Editar Perfil" />
+
                 <TextView
                     android:id="@+id/tvUserName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Jane Doe"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/green"/>
+                    android:textColor="@color/green"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvUserLevel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nivel de Lector 2"
+                    android:text="Nivel de Lector: 2"
                     android:textSize="14sp"
                     android:textColor="@color/black"
                     android:layout_below="@+id/tvUserName"/>
@@ -83,40 +98,41 @@
                     android:textSize="14sp"
                     android:textColor="@color/black"
                     android:layout_below="@+id/tvUserLevel"/>
+
+
+
             </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/btnRewards"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/profileInfo"
+                android:padding="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/reward_icon"
+                android:text="Recompensas" />
+
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Editar perfil -->
-    <TextView
-        android:id="@+id/tvEditProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Editar Perfil"
-        android:textSize="18sp"
-        android:textColor="@color/green"
-        android:paddingTop="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:textStyle="bold"
-        android:layout_below="@id/profileCard"
-        android:layout_centerHorizontal="true"/>
 
-    <!-- Botón Registrar Libro -->
-
-    <!-- Texto Tus Libros -->
-    <Button
+    <ImageView
         android:id="@+id/btnRegisterBook"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvEditProfile"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
-        android:backgroundTint="@color/green"
-        android:minHeight="48dp"
-        android:padding="8dp"
+        android:src="@drawable/add_circle"
         android:text="Registrar Libro"
-        android:textColor="@android:color/white" />
+        android:layout_below="@id/profileCard"
+        android:layout_toEndOf="@+id/tvBooksTitle"
+        android:layout_marginTop="22dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp" />
 
     <!-- Lista de Libros -->
 
@@ -124,10 +140,10 @@
         android:id="@+id/tvBooksTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvEditProfile"
+        android:layout_below="@id/profileCard"
         android:layout_alignParentStart="true"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="25dp"
         android:fontFamily="@font/poppins_semibold"
         android:text="Tus Libros"
         android:textSize="22sp"
@@ -171,19 +187,6 @@
         android:layout_marginEnd="16dp"
         android:orientation="vertical">
 
-        <!-- Botón Recompensas (Centrado) -->
-        <Button
-            android:id="@+id/btnRewards"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Recompensas"
-            android:backgroundTint="@color/green"
-            android:textColor="@android:color/white"
-            android:padding="8dp"
-            android:minHeight="48dp"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Botones en la mitad izquierda -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
