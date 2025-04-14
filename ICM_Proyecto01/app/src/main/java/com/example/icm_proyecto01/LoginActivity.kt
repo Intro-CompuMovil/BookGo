@@ -20,7 +20,7 @@ class LoginActivity : AppCompatActivity() {
             val passwordText = binding.etPassword.text.toString()
             val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
             with(sharedPref.edit()) {
-                putString("userName", userText) // Aquí podrías usar el nombre en vez del email si está disponible
+                putString("userName", userText)
                 apply()
             }
 

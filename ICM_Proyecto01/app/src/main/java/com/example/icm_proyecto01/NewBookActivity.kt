@@ -19,12 +19,6 @@ class NewBookActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         userName = sharedPref.getString("userName", "Jane Doe")
 
-        // Navigate to ProfileActivity when profileImage is clicked
-        binding.profileImage.setOnClickListener {
-            val intent = Intent(this, ProfileActivity::class.java)
-            startActivity(intent)
-        }
-
         binding.btnBack.setOnClickListener {
             finish()
         }
