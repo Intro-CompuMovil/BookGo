@@ -1,0 +1,13 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Color de fondo transparente -->
+    <solid android:color="#CC8A9E63" />
+    <!-- 80% de opacidad (CC) -->
+
+    <corners android:radius="25dp" />
+
+    <padding
+        android:left="10dp"
+        android:right="10dp"
+        android:top="10dp"
+        android:bottom="10dp" />
+</shape>

@@ -29,18 +29,10 @@
             android:text="Recompensas"
             android:layout_margin="12dp"
             android:fontFamily="@font/poppins_bold"
-            android:textSize="18sp"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:layout_centerInParent="true"/>
 
-        <ImageView
-            android:id="@+id/profileImage"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/icono_perfil"
-            android:scaleType="centerCrop"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
     </RelativeLayout>
 
     <ScrollView
