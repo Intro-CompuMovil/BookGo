@@ -8,5 +8,7 @@ data class ExchangePoint(
     val fecha: String,
     val hora: String,
     val lat: Double,
-    val lon: Double
+    val lon: Double,
+    val estadoLibro: String = "",
+    val portadaUrl: String = ""
 ) : Serializable

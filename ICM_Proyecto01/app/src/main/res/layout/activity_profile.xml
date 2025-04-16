@@ -164,17 +164,7 @@
         android:orientation="horizontal"
         android:gravity="start">
 
-        <Button
-            android:id="@+id/btnRegisterHiddenBook"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Registrar Libro Oculto"
-            android:backgroundTint="@color/green"
-            android:textColor="@android:color/white"
-            android:padding="8dp"
-            android:minHeight="48dp"
-            android:layout_marginEnd="8dp"/>
+
 
         <Button
             android:id="@+id/btnSearchHiddenBook"

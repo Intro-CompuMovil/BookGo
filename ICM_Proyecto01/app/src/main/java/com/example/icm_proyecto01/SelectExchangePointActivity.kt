@@ -46,15 +46,18 @@ class SelectExchangePointActivity : AppCompatActivity() {
         if (!storedSet.isNullOrEmpty()) {
             for (punto in storedSet) {
                 val parts = punto.split("|").map { it.trim() }
-                if (parts.size == 5) {
+                if (parts.size == 7) {
                     val point = ExchangePoint(
                         tituloLibro = parts[0],
                         fecha = parts[1],
                         hora = parts[2],
                         lat = parts[3].toDoubleOrNull() ?: 0.0,
                         lon = parts[4].toDoubleOrNull() ?: 0.0,
+                        estadoLibro = parts[5],
+                        portadaUrl = parts[6],
                         direccion = obtenerDireccionDesdeLatLon(parts[3].toDoubleOrNull(), parts[4].toDoubleOrNull())
                     )
+
                     exchangePoints.add(point)
                 }
             }
@@ -71,6 +74,9 @@ class SelectExchangePointActivity : AppCompatActivity() {
                         putExtra("hora", selectedPoint.hora)
                         putExtra("lat", selectedPoint.lat)
                         putExtra("lon", selectedPoint.lon)
+                        putExtra("estadoLibroDisponible", selectedPoint.estadoLibro)
+                        putExtra("portadaLibroDisponible", selectedPoint.portadaUrl)
+
                     }
                     startActivity(intent)
                 } else {

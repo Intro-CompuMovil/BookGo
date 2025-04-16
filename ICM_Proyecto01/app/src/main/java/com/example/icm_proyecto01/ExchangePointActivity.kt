@@ -9,6 +9,7 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -32,10 +33,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 class ExchangePointActivity : AppCompatActivity() {
 
     private var libroSeleccionado: UserBook? = null
-    private var lat: Double? = null
-    private var lon: Double? = null
-
     private lateinit var binding: ActivityExchangePointBinding
+
     private lateinit var osmMap: MapView
     private lateinit var geocoder: Geocoder
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -52,6 +51,7 @@ class ExchangePointActivity : AppCompatActivity() {
         binding = ActivityExchangePointBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Inicializar mapa y servicios
         osmMap = binding.osmMap
         osmMap.setTileSource(TileSourceFactory.MAPNIK)
         osmMap.setMultiTouchControls(true)
@@ -63,56 +63,59 @@ class ExchangePointActivity : AppCompatActivity() {
 
         pedirPermisos()
 
-        val tituloLibro = intent.getStringExtra("titulo") ?: "Sin título"
-        val direccion = intent.getStringExtra("direccion") ?: "Dirección no disponible"
-        val fecha = intent.getStringExtra("fecha") ?: "-"
-        val hora = intent.getStringExtra("hora") ?: "-"
-
+        // Obtener datos del intent
         val extras = intent.extras
-
         val lat = extras?.getDouble("lat") ?: 0.0
         val lon = extras?.getDouble("lon") ?: 0.0
         puntoDestino = GeoPoint(lat, lon)
 
-        // Recibir el libro si viene desde SelectExchangePointActivity
+        val tituloLibro = intent.getStringExtra("titulo") ?: "Sin título"
+        val direccion = intent.getStringExtra("direccion") ?: "Dirección no disponible"
+        val fecha = intent.getStringExtra("fecha") ?: "-"
+        val hora = intent.getStringExtra("hora") ?: "-"
+        val estadoLibro = intent.getStringExtra("estadoLibro") ?: "No disponible"
+        val portadaUrl = intent.getStringExtra("portadaUrl") ?: ""
+
         libroSeleccionado = intent.getSerializableExtra("libroSeleccionado") as? UserBook
 
+        // Mostrar datos del punto
         binding.tvPuntoDireccion.text = direccion
         binding.tvFechaHora.text = "$fecha - $hora"
-        binding.tvTituloLibro.text = "Intercambio: $tituloLibro"
 
-        libroSeleccionado?.let { libro ->
-            binding.tvLibroSeleccionado.text = libro.titulo
-            binding.tvAutorSeleccionado.text = libro.autor
-            binding.tvGeneroSeleccionado.text = libro.genero
-            binding.tvEstadoSeleccionado.text = "Estado: ${libro.estado}"
+        // Mostrar datos del libro
+        val titulo = libroSeleccionado?.titulo ?: tituloLibro
+        val estado = libroSeleccionado?.estado ?: estadoLibro
+        val portada = libroSeleccionado?.portadaUrl ?: portadaUrl
 
-            if (libro.portadaUrl.isNotEmpty()) {
-                Picasso.get().load(libro.portadaUrl).into(binding.imgLibroSeleccionado)
-            }
+        binding.tvLibroSeleccionado.text = titulo
+        binding.tvEstadoSeleccionado.text = "Estado: $estado"
+
+        if (!portada.isNullOrEmpty() && portada != "null") {
+            Picasso.get().load(portada).placeholder(R.drawable.default_book).into(binding.imgLibroSeleccionado)
+        } else {
+            binding.imgLibroSeleccionado.setImageResource(R.drawable.default_book)
         }
 
-        binding.backButton.setOnClickListener {
-            finish()
-        }
+
+        // Botones
+        binding.backButton.setOnClickListener { finish() }
+
+        binding.btnCancelar.setOnClickListener { finish() }
 
         binding.btnIntercambiar.setOnClickListener {
             val intent = Intent(this, SelectUserBookActivity::class.java).apply {
-                putExtra("titulo", tituloLibro)
+                putExtra("titulo", titulo)
                 putExtra("direccion", direccion)
                 putExtra("fecha", fecha)
                 putExtra("hora", hora)
                 putExtra("lat", lat)
                 putExtra("lon", lon)
+                putExtra("estadoLibroDisponible", estado)
+                putExtra("portadaLibroDisponible", portada)
             }
             startActivity(intent)
         }
 
-
-
-        binding.btnCancelar.setOnClickListener {
-            finish()
-        }
     }
 
     private fun pedirPermisos() {
@@ -123,6 +126,7 @@ class ExchangePointActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun obtenerUbicacion() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
@@ -162,6 +166,7 @@ class ExchangePointActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.osmMap.onResume()
+
         val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
         if (uiManager.nightMode == UiModeManager.MODE_NIGHT_YES) {
             binding.osmMap.overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)

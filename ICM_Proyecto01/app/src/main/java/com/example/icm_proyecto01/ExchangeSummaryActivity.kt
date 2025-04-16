@@ -1,6 +1,8 @@
 package com.example.icm_proyecto01
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityExchangeSummaryBinding
 import com.example.icm_proyecto01.model.UserBook
@@ -15,42 +17,58 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         binding = ActivityExchangeSummaryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val selectedBook = intent.getSerializableExtra("selectedBook") as? UserBook
-
-        val titulo = intent.getStringExtra("titulo") ?: "Sin título"
+        // Libros
+        val userBook = intent.getSerializableExtra("selectedBook") as? UserBook
+        val tituloIntercambio = intent.getStringExtra("titulo") ?: "Sin título"
         val direccion = intent.getStringExtra("direccion") ?: "Sin dirección"
         val fecha = intent.getStringExtra("fecha") ?: "-"
         val hora = intent.getStringExtra("hora") ?: "-"
-        val lat = intent.getDoubleExtra("lat", 0.0)
-        val lon = intent.getDoubleExtra("lon", 0.0)
+        val estadoLibroDisponible = intent.getStringExtra("estadoLibroDisponible") ?: "-"
+        val portadaLibroDisponible = intent.getStringExtra("portadaLibroDisponible") ?: ""
 
-        if (selectedBook != null) {
-            // Mostrar datos del libro
-            binding.tvBookTitle.text = selectedBook.titulo
-            binding.tvBookAuthor.text = selectedBook.autor
-            binding.tvBookGenre.text = selectedBook.genero
-            binding.tvBookState.text = selectedBook.estado
 
-            if (selectedBook.portadaUrl.isNotEmpty()) {
-                Picasso.get().load(selectedBook.portadaUrl).into(binding.bookImage)
-            } else {
-                binding.bookImage.setImageResource(R.drawable.default_book)
-            }
+        binding.tvBookExchangeTitle.text = tituloIntercambio
+        binding.tvBookExchangeState.text = "Estado: $estadoLibroDisponible"
+        binding.tvExchangeLocation.text = direccion
+        binding.tvExchangeDateTime.text = "$fecha - $hora"
 
-            // Mostrar datos del punto de intercambio
-            binding.tvExchangeLocation.text = direccion
-            binding.tvExchangeDateTime.text = "$fecha - $hora"
+        if (portadaLibroDisponible.isNotEmpty() && portadaLibroDisponible != "null") {
+            Picasso.get().load(portadaLibroDisponible)
+                .placeholder(R.drawable.default_book)
+                .into(binding.bookImageExchange)
         } else {
-            binding.tvBookTitle.text = "No se recibió información del libro"
+            binding.bookImageExchange.setImageResource(R.drawable.default_book)
+        }
+
+        // Libro ofrecido por el usuario
+        if (userBook != null) {
+            binding.tvBookUserTitle.text = userBook.titulo
+            binding.tvBookUserAuthor.text = "Autor: ${userBook.autor}"
+            binding.tvBookUserGenre.text = "Género: ${userBook.genero}"
+            binding.tvBookUserState.text = "Estado: ${userBook.estado}"
+
+            if (userBook.portadaUrl.isNotEmpty()) {
+                Picasso.get().load(userBook.portadaUrl).placeholder(R.drawable.default_book)
+                    .into(binding.bookImageUser)
+            } else {
+                binding.bookImageUser.setImageResource(R.drawable.default_book)
+            }
         }
 
         binding.btnConfirmExchange.setOnClickListener {
-            // Aquí se puede guardar el intercambio, mostrar una animación, etc.
-            finish()
+            val intent = Intent(this, ExchangeRouteActivity::class.java).apply {
+                putExtra("titulo", tituloIntercambio)
+                putExtra("direccion", direccion)
+                putExtra("fecha", fecha)
+                putExtra("hora", hora)
+                putExtra("lat", intent.getDoubleExtra("lat", 0.0))
+                putExtra("lon", intent.getDoubleExtra("lon", 0.0))
+            }
+            startActivity(intent)
         }
 
-        binding.btnBack.setOnClickListener {
-            finish()
-        }
+
+        binding.btnBack.setOnClickListener { finish() }
     }
+
 }

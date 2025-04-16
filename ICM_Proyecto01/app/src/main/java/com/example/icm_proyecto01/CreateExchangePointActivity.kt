@@ -1,6 +1,7 @@
 package com.example.icm_proyecto01
 
 import android.Manifest
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -45,6 +47,32 @@ class CreateExchangePointActivity : AppCompatActivity() {
     private var roadOverlay: Polyline? = null
     private var puntoSeleccionado: GeoPoint? = null
 
+    private var selectedBookTitle: String? = null
+    private var selectedBookState: String? = null
+    private var selectedBookCoverUrl: String? = null
+
+
+    private val selectBookLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            selectedBookTitle = data?.getStringExtra("selectedBookTitle")
+            selectedBookState = data?.getStringExtra("selectedBookState")
+            selectedBookCoverUrl = data?.getStringExtra("selectedBookCoverUrl")
+
+
+            binding.tvSelectedBook.text = selectedBookTitle ?: "Libro no seleccionado"
+            binding.tvEstadoLibro.text = "Estado: ${selectedBookState ?: "-"}"
+        }
+    }
+
+
+
+
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateExchangePointBinding.inflate(layoutInflater)
@@ -60,10 +88,16 @@ class CreateExchangePointActivity : AppCompatActivity() {
         inicializarMapa()
         pedirPermisos()
 
-
-        // Cargar el nombre del usuario desde SharedPreferences
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         userName = sharedPref.getString("userName", "Jane Doe")
+
+
+        binding.tvSelectedBook.setOnClickListener {
+            val intent = Intent(this, SelectUserBookActivity::class.java)
+            intent.putExtra("from", "createExchange")
+            selectBookLauncher.launch(intent)
+        }
+
 
 
         binding.btnBack.setOnClickListener{
@@ -107,20 +141,26 @@ class CreateExchangePointActivity : AppCompatActivity() {
 
 
         binding.btnConfirm.setOnClickListener {
-            val bookTitle = binding.etBookTitle.text.toString()
+            val bookTitle = selectedBookTitle ?: ""
             val date = binding.tvSelectedDate.text.toString()
             val time = binding.tvSelectedTime.text.toString()
 
-            if (bookTitle.isEmpty() || date == "Fecha: No seleccionada" || time == "Hora: No seleccionada" || puntoSeleccionado == null) {
-                Toast.makeText(this, "Por favor, completa todos los campos y selecciona una ubicación en el mapa", Toast.LENGTH_SHORT).show()
+            if (selectedBookTitle.isNullOrEmpty() || selectedBookState.isNullOrEmpty() ||
+                date == "Fecha: No seleccionada" || time == "Hora: No seleccionada" || puntoSeleccionado == null
+            ) {
+                Toast.makeText(this, "Por favor, completa todos los campos y selecciona un libro", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
 
             val sharedPrefExchange = getSharedPreferences("ExchangePoints", MODE_PRIVATE)
             val editor = sharedPrefExchange.edit()
 
-            // Guardar punto con latitud y longitud concatenadas al final
-            val punto = "$bookTitle|$date|$time|${puntoSeleccionado!!.latitude}|${puntoSeleccionado!!.longitude}"
+            val portadaUrlFinal = if (selectedBookCoverUrl != null && selectedBookCoverUrl != "null") selectedBookCoverUrl else ""
+            val punto = "$selectedBookTitle|$date|$time|${puntoSeleccionado!!.latitude}|${puntoSeleccionado!!.longitude}|$selectedBookState|$portadaUrlFinal"
+
+
+
             val existingPoints = sharedPrefExchange.getStringSet("points", mutableSetOf()) ?: mutableSetOf()
             existingPoints.add(punto)
             editor.putStringSet("points", existingPoints)
@@ -136,8 +176,11 @@ class CreateExchangePointActivity : AppCompatActivity() {
 
             val intent = Intent(this, HomeActivity::class.java)
             intent.putExtra("userName", userName ?: "Jane Doe")
+            intent.putExtra("focusLat", puntoSeleccionado!!.latitude)
+            intent.putExtra("focusLon", puntoSeleccionado!!.longitude)
             startActivity(intent)
             finish()
+
         }
     }
 

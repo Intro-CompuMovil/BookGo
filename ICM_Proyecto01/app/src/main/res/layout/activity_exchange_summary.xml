@@ -9,6 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Botón de retroceso -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="32dp"
@@ -17,6 +18,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Volver" />
 
+        <!-- Título -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,33 +27,129 @@
             android:textStyle="bold"
             android:layout_marginTop="16dp" />
 
-        <!-- Info Libro -->
-        <ImageView
-            android:id="@+id/bookImage"
-            android:layout_width="120dp"
-            android:layout_height="160dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/default_book" />
-
-        <TextView android:id="@+id/tvBookTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Título" android:textSize="16sp" android:textStyle="bold" android:layout_marginTop="8dp"/>
-        <TextView android:id="@+id/tvBookAuthor" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Autor"/>
-        <TextView android:id="@+id/tvBookGenre" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Género"/>
-        <TextView android:id="@+id/tvBookState" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Estado"/>
-
-        <!-- Info Punto de Intercambio -->
+        <!-- Sección libro en punto de intercambio -->
         <TextView
+            android:id="@+id/tvSeccionLibroPunto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Punto de Intercambio"
+            android:text="Libro Disponible en el Punto"
             android:textStyle="bold"
             android:textSize="16sp"
-            android:layout_marginTop="24dp" />
+            android:layout_marginTop="16dp"
+            android:textColor="@android:color/black" />
 
-        <TextView android:id="@+id/tvExchangeLocation" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dirección"/>
-        <TextView android:id="@+id/tvExchangeDateTime" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fecha y hora"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
 
-        <!-- Confirmar -->
+            <ImageView
+                android:id="@+id/bookImageExchange"
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:src="@drawable/default_book"
+                android:scaleType="centerCrop"
+                android:layout_marginEnd="12dp"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/tvBookExchangeTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Título"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvBookExchangeState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estado" />
+
+                <TextView
+                    android:id="@+id/tvExchangeLocation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dirección" />
+
+                <TextView
+                    android:id="@+id/tvExchangeDateTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha y hora" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Separador -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginVertical="16dp"/>
+
+        <!-- Sección libro ofrecido -->
+        <TextView
+            android:id="@+id/tvSeccionLibroUsuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tu Libro Ofrecido"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@android:color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <ImageView
+                android:id="@+id/bookImageUser"
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:src="@drawable/default_book"
+                android:scaleType="centerCrop"
+                android:layout_marginEnd="12dp"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/tvBookUserTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Título"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvBookUserAuthor"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Autor" />
+
+                <TextView
+                    android:id="@+id/tvBookUserGenre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Género" />
+
+                <TextView
+                    android:id="@+id/tvBookUserState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estado" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Botón confirmar -->
         <Button
             android:id="@+id/btnConfirmExchange"
             android:layout_width="match_parent"
@@ -60,6 +158,5 @@
             android:backgroundTint="@color/green"
             android:textColor="@android:color/white"
             android:layout_marginTop="24dp" />
-
     </LinearLayout>
 </ScrollView>

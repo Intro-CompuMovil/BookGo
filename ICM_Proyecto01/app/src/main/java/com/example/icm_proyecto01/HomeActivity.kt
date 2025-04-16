@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
@@ -36,6 +37,7 @@ import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.squareup.picasso.Picasso
 import org.osmdroid.api.IMapController
 import org.osmdroid.views.overlay.TilesOverlay
 
@@ -70,6 +72,19 @@ class HomeActivity : AppCompatActivity() {
         pedirPermisos()
 
         cargarPuntosDeIntercambio()
+
+
+        val focusLat = intent.getDoubleExtra("focusLat", Double.NaN)
+        val focusLon = intent.getDoubleExtra("focusLon", Double.NaN)
+
+        if (!focusLat.isNaN() && !focusLon.isNaN()) {
+            val focusPoint = GeoPoint(focusLat, focusLon)
+            osmMap.controller.setCenter(focusPoint)
+            osmMap.controller.setZoom(17.0)
+
+            osmMap.invalidate()
+        }
+
 
 
         binding.searchAddress.setOnEditorActionListener { _, actionId, _ ->
@@ -142,12 +157,16 @@ class HomeActivity : AppCompatActivity() {
 
             for (punto in points) {
                 val datos = punto.split("|")
-                if (datos.size == 5) {
+                if (datos.size >= 5) {
                     val tituloLibro = datos[0]
                     val fecha = datos[1]
                     val hora = datos[2]
                     val lat = datos[3].toDoubleOrNull()
                     val lon = datos[4].toDoubleOrNull()
+                    val estadoLibro = if (datos.size >= 6) datos[5] else "No disponible"
+                    val portadaUrl = if (datos.size >= 7) datos[6] else ""
+
+
 
                     val direccion = obtenerDireccionDesdeGeoPoint(lat, lon)
 
@@ -158,8 +177,17 @@ class HomeActivity : AppCompatActivity() {
                     val tvDateTime = cardView.findViewById<TextView>(R.id.tvDateTime)
 
                     tvLocation.text = direccion
-                    tvDescription.text = "Libro: $tituloLibro"
+                    tvDescription.text = "Libro: $tituloLibro\nEstado: $estadoLibro"
                     tvDateTime.text = "$fecha - $hora"
+
+
+                    val imgCover = cardView.findViewById<ImageView>(R.id.imgBookCover)
+                    if (portadaUrl.isNotEmpty()) {
+                        Picasso.get().load(portadaUrl).placeholder(R.drawable.default_book).into(imgCover)
+                    } else {
+                        imgCover.setImageResource(R.drawable.default_book)
+                    }
+
 
                     cardView.setOnClickListener {
                         if (lat != null && lon != null) {
@@ -170,8 +198,11 @@ class HomeActivity : AppCompatActivity() {
                                 putExtra("hora", hora)
                                 putExtra("lat", lat)
                                 putExtra("lon", lon)
+                                putExtra("estadoLibro", estadoLibro)
+                                putExtra("portadaUrl", portadaUrl)
                             }
                             startActivity(intent)
+
                         }
                     }
 
@@ -187,6 +218,7 @@ class HomeActivity : AppCompatActivity() {
                         osmMap.overlays.add(marcador)
                     }
                 }
+
             }
 
             osmMap.invalidate()
@@ -302,8 +334,13 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         binding.osmMap.onResume()
+
         val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-        if(uiManager.nightMode == UiModeManager.MODE_NIGHT_YES)
+        if (uiManager.nightMode == UiModeManager.MODE_NIGHT_YES) {
             binding.osmMap.overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
+        }
+
+        cargarPuntosDeIntercambio()
     }
+
 }

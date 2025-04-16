@@ -66,9 +66,7 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(Intent(this, RewardsActivity::class.java))
         }
 
-        binding.btnRegisterHiddenBook.setOnClickListener {
-            startActivity(Intent(this, RegisterHiddenBookActivity::class.java))
-        }
+
 
         binding.btnSearchHiddenBook.setOnClickListener {
             startActivity(Intent(this, SearchHiddenBookActivity::class.java))

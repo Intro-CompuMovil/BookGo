@@ -50,8 +50,18 @@ class BookDetailActivity : AppCompatActivity() {
 
 
         binding.btnOcultar.setOnClickListener {
-            Toast.makeText(this, "Función OCULTAR próximamente", Toast.LENGTH_SHORT).show()
+            selectedBook?.let {
+                val intent = Intent(this, RegisterHiddenBookActivity::class.java).apply {
+                    putExtra("titulo", it.titulo)
+                    putExtra("autor", it.autor)
+                    putExtra("genero", it.genero)
+                    putExtra("estado", it.estado)
+                    putExtra("portada", it.portadaUrl)
+                }
+                startActivity(intent)
+            } ?: Toast.makeText(this, "No se pudo obtener la información del libro", Toast.LENGTH_SHORT).show()
         }
+
 
         binding.btnBack.setOnClickListener {
             finish()

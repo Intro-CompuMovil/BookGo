@@ -1,5 +1,6 @@
 package com.example.icm_proyecto01
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -19,20 +20,20 @@ class SelectUserBookActivity : AppCompatActivity() {
         binding = ActivitySelectUserBookBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val extras = intent.extras
-        if (extras == null) {
-            Toast.makeText(this, "No se recibió información del punto", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
+        val from = intent.getStringExtra("from") ?: ""
 
-        val exchangeTitulo = extras.getString("titulo")
-        val exchangeDireccion = extras.getString("direccion")
-        val exchangeFecha = extras.getString("fecha")
-        val exchangeHora = extras.getString("hora")
-        val exchangeLat = extras.getDouble("lat")
-        val exchangeLon = extras.getDouble("lon")
+        val exchangeTitulo = intent.getStringExtra("titulo")
+        val exchangeDireccion = intent.getStringExtra("direccion")
+        val exchangeFecha = intent.getStringExtra("fecha")
+        val exchangeHora = intent.getStringExtra("hora")
+        val exchangeLat = intent.getDoubleExtra("lat", 0.0)
+        val exchangeLon = intent.getDoubleExtra("lon", 0.0)
 
+        val estadoLibroDisponible = intent.getStringExtra("estadoLibroDisponible")
+        val portadaLibroDisponible = intent.getStringExtra("portadaLibroDisponible")
+
+
+        // Cargar libros del usuario
         val sharedPref = getSharedPreferences("UserBooks", MODE_PRIVATE)
         for ((_, value) in sharedPref.all) {
             val data = value as? String ?: continue
@@ -44,17 +45,32 @@ class SelectUserBookActivity : AppCompatActivity() {
         }
 
         val adapter = UserBooksAdapter(userBooks) { selectedBook ->
-            val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
-                putExtra("selectedBook", selectedBook)
-                putExtra("titulo", exchangeTitulo)
-                putExtra("direccion", exchangeDireccion)
-                putExtra("fecha", exchangeFecha)
-                putExtra("hora", exchangeHora)
-                putExtra("lat", exchangeLat)
-                putExtra("lon", exchangeLon)
+
+            if (from == "createExchange") {
+                val resultIntent = Intent().apply {
+                    putExtra("selectedBookTitle", selectedBook.titulo)
+                    putExtra("selectedBookState", selectedBook.estado)
+                    putExtra("selectedBookCoverUrl", selectedBook.portadaUrl ?: "")
+                }
+                setResult(Activity.RESULT_OK, resultIntent)
+                finish()
+
+            } else {
+                val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
+                    putExtra("selectedBook", selectedBook)
+                    putExtra("titulo", exchangeTitulo)
+                    putExtra("direccion", exchangeDireccion)
+                    putExtra("fecha", exchangeFecha)
+                    putExtra("hora", exchangeHora)
+                    putExtra("lat", exchangeLat)
+                    putExtra("lon", exchangeLon)
+                    putExtra("estadoLibroDisponible", estadoLibroDisponible)
+                    putExtra("portadaLibroDisponible", portadaLibroDisponible)
+                }
+
+                startActivity(intent)
+                finish()
             }
-            startActivity(intent)
-            finish()
         }
 
         binding.rvUserBooks.layoutManager = LinearLayoutManager(this)
