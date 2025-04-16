@@ -13,8 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.databinding.ActivityExchangePointBinding
+import com.example.icm_proyecto01.model.UserBook
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.Road
@@ -28,6 +30,11 @@ import org.osmdroid.views.overlay.TilesOverlay
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 
 class ExchangePointActivity : AppCompatActivity() {
+
+    private var libroSeleccionado: UserBook? = null
+    private var lat: Double? = null
+    private var lon: Double? = null
+
     private lateinit var binding: ActivityExchangePointBinding
     private lateinit var osmMap: MapView
     private lateinit var geocoder: Geocoder
@@ -56,30 +63,54 @@ class ExchangePointActivity : AppCompatActivity() {
 
         pedirPermisos()
 
+        val tituloLibro = intent.getStringExtra("titulo") ?: "Sin título"
+        val direccion = intent.getStringExtra("direccion") ?: "Dirección no disponible"
+        val fecha = intent.getStringExtra("fecha") ?: "-"
+        val hora = intent.getStringExtra("hora") ?: "-"
+
         val extras = intent.extras
-        val tituloLibro = extras?.getString("titulo") ?: "Libro"
-        val direccion = extras?.getString("direccion") ?: "Dirección"
-        val fecha = extras?.getString("fecha") ?: "Fecha"
-        val hora = extras?.getString("hora") ?: "Hora"
+
         val lat = extras?.getDouble("lat") ?: 0.0
         val lon = extras?.getDouble("lon") ?: 0.0
         puntoDestino = GeoPoint(lat, lon)
 
-        binding.tvTituloLibro.text = "Título: $tituloLibro"
-        binding.tvDireccion.text = "Ubicación: $direccion"
+        // Recibir el libro si viene desde SelectExchangePointActivity
+        libroSeleccionado = intent.getSerializableExtra("libroSeleccionado") as? UserBook
+
+        binding.tvPuntoDireccion.text = direccion
         binding.tvFechaHora.text = "$fecha - $hora"
+        binding.tvTituloLibro.text = "Intercambio: $tituloLibro"
+
+        libroSeleccionado?.let { libro ->
+            binding.tvLibroSeleccionado.text = libro.titulo
+            binding.tvAutorSeleccionado.text = libro.autor
+            binding.tvGeneroSeleccionado.text = libro.genero
+            binding.tvEstadoSeleccionado.text = "Estado: ${libro.estado}"
+
+            if (libro.portadaUrl.isNotEmpty()) {
+                Picasso.get().load(libro.portadaUrl).into(binding.imgLibroSeleccionado)
+            }
+        }
 
         binding.backButton.setOnClickListener {
             finish()
         }
 
-        binding.btnOfferBook.setOnClickListener {
-            Toast.makeText(this, "Libro ofrecido correctamente!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
+        binding.btnIntercambiar.setOnClickListener {
+            val intent = Intent(this, SelectUserBookActivity::class.java).apply {
+                putExtra("titulo", tituloLibro)
+                putExtra("direccion", direccion)
+                putExtra("fecha", fecha)
+                putExtra("hora", hora)
+                putExtra("lat", lat)
+                putExtra("lon", lon)
+            }
+            startActivity(intent)
         }
 
-        binding.btnCancel.setOnClickListener {
+
+
+        binding.btnCancelar.setOnClickListener {
             finish()
         }
     }

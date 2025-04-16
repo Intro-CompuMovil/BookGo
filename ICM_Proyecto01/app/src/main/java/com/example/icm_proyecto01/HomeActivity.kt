@@ -151,7 +151,7 @@ class HomeActivity : AppCompatActivity() {
 
                     val direccion = obtenerDireccionDesdeGeoPoint(lat, lon)
 
-                    val cardView = layoutInflater.inflate(R.layout.item_exchange_point, binding.puntosCercanosContainer, false)
+                    val cardView = layoutInflater.inflate(R.layout.item_exchange_point_home, binding.puntosCercanosContainer, false)
 
                     val tvLocation = cardView.findViewById<TextView>(R.id.tvLocation)
                     val tvDescription = cardView.findViewById<TextView>(R.id.tvDescription)

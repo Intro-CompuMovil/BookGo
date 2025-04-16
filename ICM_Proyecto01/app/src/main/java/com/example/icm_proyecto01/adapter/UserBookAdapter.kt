@@ -10,10 +10,10 @@ import com.example.icm_proyecto01.R
 import com.example.icm_proyecto01.model.UserBook
 import com.squareup.picasso.Picasso
 
-class UserBooksAdapter(private val books: List<UserBook>,
-                       private val onClick: (UserBook) -> Unit) : RecyclerView.Adapter<UserBooksAdapter.BookViewHolder>() {
-
-
+class UserBooksAdapter(
+    private val books: List<UserBook>,
+    private val onClick: ((UserBook) -> Unit)? = null  // Callback opcional
+) : RecyclerView.Adapter<UserBooksAdapter.BookViewHolder>() {
 
     inner class BookViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val imgCover: ImageView = view.findViewById(R.id.imgBookCover)
@@ -22,8 +22,8 @@ class UserBooksAdapter(private val books: List<UserBook>,
         private val tvGenre: TextView = view.findViewById(R.id.tvBookGenre)
         private val tvState: TextView = view.findViewById(R.id.tvBookState)
 
-
-        fun bind(book: UserBook) {    tvTitle.text = book.titulo
+        fun bind(book: UserBook) {
+            tvTitle.text = book.titulo
             tvAuthor.text = book.autor
             tvGenre.text = book.genero
             tvState.text = "Estado: ${book.estado}"
@@ -38,13 +38,14 @@ class UserBooksAdapter(private val books: List<UserBook>,
             }
 
             itemView.setOnClickListener {
-                onClick(book)
+                onClick?.invoke(book)
             }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_user_book, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_user_book, parent, false)
         return BookViewHolder(view)
     }
 

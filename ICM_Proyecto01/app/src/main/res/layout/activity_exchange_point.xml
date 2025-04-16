@@ -28,7 +28,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp"/>
 
-    <!-- Card libro ofrecido -->
+    <!-- Card con info del punto de intercambio -->
     <androidx.cardview.widget.CardView
         android:id="@+id/bookCard"
         android:layout_width="0dp"
@@ -47,57 +47,119 @@
             android:padding="16dp">
 
             <TextView
-                android:id="@+id/tvDireccion"
+                android:id="@+id/tvPuntoDireccion"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ubicación:"
                 android:textStyle="bold"
-                android:textSize="14sp"
-                android:fontFamily="@font/poppins_bold"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:id="@+id/tvTituloLibro"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Libro:"
-                android:textSize="14sp"
-                android:fontFamily="@font/poppins_regular"/>
+                android:textSize="14sp"/>
 
             <TextView
                 android:id="@+id/tvFechaHora"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Fecha y hora:"
-                android:textSize="14sp"
-                android:fontFamily="@font/poppins_regular"/>
+                android:textSize="14sp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Botones -->
+    <!-- Card del libro seleccionado -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardLibroSeleccionado"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/bookCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imgLibroSeleccionado"
+                android:layout_width="80dp"
+                android:layout_height="120dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/default_book"
+                android:layout_marginEnd="16dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/tvLibroSeleccionado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Título del libro"
+                    android:textStyle="bold"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/tvAutorSeleccionado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Autor"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/tvGeneroSeleccionado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Género"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/tvEstadoSeleccionado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Estado"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Botones inferior -->
     <LinearLayout
         android:id="@+id/buttonContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/bookCard"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintTop_toBottomOf="@id/cardLibroSeleccionado"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
-            android:id="@+id/btnOfferBook"
+            android:id="@+id/btnIntercambiar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Ofrecer Libro"
+            android:text="Intercambiar"
             android:layout_margin="8dp"
             android:backgroundTint="@color/green"
             android:textColor="@android:color/white"
             android:layout_weight="1"/>
 
         <Button
-            android:id="@+id/btnCancel"
+            android:id="@+id/btnCancelar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Cancelar"

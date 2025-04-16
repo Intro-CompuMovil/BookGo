@@ -24,16 +24,22 @@ import java.io.FileOutputStream
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
 
+    private var fromExchange: Boolean = false
+    private var exchangeData: Bundle? = null
+
     override fun onResume() {
         super.onResume()
         cargarLibrosUsuario()
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Verifica si viene desde punto de intercambio
+        fromExchange = intent.getBooleanExtra("fromExchange", false)
+        exchangeData = intent.extras  // contiene lat, lon, direccion, etc.
 
         val userName = intent.getStringExtra("userName") ?: "Jane Doe"
         binding.tvUserName.text = userName
@@ -46,41 +52,6 @@ class ProfileActivity : AppCompatActivity() {
 
         cargarLibrosUsuario()
 
-        // Cargar libros del usuario desde SharedPreferences
-        val librosUsuario = mutableListOf<UserBook>()
-        val librosGuardados = getSharedPreferences("UserBooks", MODE_PRIVATE).all
-
-        for ((_, value) in librosGuardados) {
-            val data = value as? String ?: continue
-            val partes = data.split("|").map { it.trim() }
-            if (partes.size >= 5) {
-                val libro = UserBook(
-                    titulo = partes[0],
-                    autor = partes[1],
-                    genero = partes[2],
-                    estado = partes[3],
-                    portadaUrl = partes[4]
-                )
-                librosUsuario.add(libro)
-            }
-        }
-
-        val adapter = UserBooksAdapter(librosUsuario) { libroSeleccionado ->
-            val intent = Intent(this, BookDetailActivity::class.java)
-            intent.putExtra("title", libroSeleccionado.titulo)
-            intent.putExtra("author", libroSeleccionado.autor)
-            intent.putExtra("genre", libroSeleccionado.genero)
-            intent.putExtra("state", libroSeleccionado.estado)
-            intent.putExtra("image", libroSeleccionado.portadaUrl)
-            startActivity(intent)
-        }
-        binding.booksScroll.layoutManager = LinearLayoutManager(this)
-        binding.booksScroll.adapter = adapter
-
-
-
-
-        // Acciones
         binding.tvEditProfile.setOnClickListener {
             startActivity(Intent(this, EditProfileActivity::class.java).apply {
                 putExtra("userName", userName)
@@ -103,13 +74,11 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(Intent(this, SearchHiddenBookActivity::class.java))
         }
 
-        // Imagen de perfil
         binding.profileImage.setOnClickListener {
             if (checkCameraPermission()) openCamera()
             else requestCameraPermission()
         }
 
-        // Menú inferior
         binding.bottomNavigation.selectedItemId = R.id.nav_profile
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -135,6 +104,55 @@ class ProfileActivity : AppCompatActivity() {
                 else -> false
             }
         }
+    }
+
+    private fun cargarLibrosUsuario() {
+        val sharedPref = getSharedPreferences("UserBooks", MODE_PRIVATE)
+        val allBooks = sharedPref.all
+        val userBooks = mutableListOf<UserBook>()
+
+        for ((_, value) in allBooks) {
+            val data = value as? String ?: continue
+            val parts = data.split("|").map { it.trim() }
+
+            if (parts.size >= 5) {
+                val book = UserBook(
+                    titulo = parts[0],
+                    autor = parts[1],
+                    genero = parts[2],
+                    estado = parts[3],
+                    portadaUrl = parts[4]
+                )
+                userBooks.add(book)
+            }
+        }
+
+        val adapter = if (fromExchange) {
+            UserBooksAdapter(userBooks) { selectedBook ->
+                val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
+                    putExtra("selectedBook", selectedBook)
+                    putExtra("titulo", exchangeData?.getString("titulo"))
+                    putExtra("direccion", exchangeData?.getString("direccion"))
+                    putExtra("fecha", exchangeData?.getString("fecha"))
+                    putExtra("hora", exchangeData?.getString("hora"))
+                    putExtra("lat", exchangeData?.getDouble("lat") ?: 0.0)
+                    putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
+                }
+                startActivity(intent)
+                finish()  // vuelve al flujo principal
+            }
+        } else {
+            UserBooksAdapter(userBooks) { libroSeleccionado ->
+                val intent = Intent(this, BookDetailActivity::class.java).apply {
+                    putExtra("book", libroSeleccionado)
+                }
+                startActivity(intent)
+
+            }
+        }
+
+        binding.booksScroll.layoutManager = LinearLayoutManager(this)
+        binding.booksScroll.adapter = adapter
     }
 
     private fun checkCameraPermission(): Boolean {
@@ -189,41 +207,7 @@ class ProfileActivity : AppCompatActivity() {
             .apply()
     }
 
-    private fun cargarLibrosUsuario() {
-        val sharedPref = getSharedPreferences("UserBooks", MODE_PRIVATE)
-        val allBooks = sharedPref.all
-        val userBooks = mutableListOf<UserBook>()
 
-        for ((_, value) in allBooks) {
-            val data = value as? String ?: continue
-            val parts = data.split("|").map { it.trim() }
-
-            if (parts.size >= 5) {
-                val book = UserBook(
-                    titulo = parts[0],
-                    autor = parts[1],
-                    genero = parts[2],
-                    estado = parts[3],
-                    portadaUrl = parts[4]
-                )
-                userBooks.add(book)
-            }
-        }
-
-        val adapter = UserBooksAdapter(userBooks) { libroSeleccionado ->
-            val intent = Intent(this, BookDetailActivity::class.java).apply {
-                putExtra("title", libroSeleccionado.titulo)
-                putExtra("author", libroSeleccionado.autor)
-                putExtra("genre", libroSeleccionado.genero)
-                putExtra("state", libroSeleccionado.estado)
-                putExtra("image", libroSeleccionado.portadaUrl)
-            }
-            startActivity(intent)
-        }
-
-        binding.booksScroll.layoutManager = LinearLayoutManager(this)
-        binding.booksScroll.adapter = adapter
-    }
 
 
 }
