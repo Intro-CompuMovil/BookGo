@@ -53,21 +53,17 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         roadManager = OSRMRoadManager(this, "ANDROID")
 
-        // Obtener datos del libro
+        // Obtener datos del intent
         val bookTitle = intent.getStringExtra("titulo") ?: ""
         val bookAuthor = intent.getStringExtra("autor") ?: ""
         val bookGenre = intent.getStringExtra("genero") ?: ""
         val bookState = intent.getStringExtra("estado") ?: ""
         val portadaUrl = intent.getStringExtra("portada") ?: ""
 
-        binding.etBookTitle.setText(bookTitle)
-        binding.etBookAuthor.setText(bookAuthor)
-        binding.etBookGenre.setText(bookGenre)
-        binding.etBookState.setText(bookState)
-        binding.etBookTitle.isEnabled = false
-        binding.etBookAuthor.isEnabled = false
-        binding.etBookGenre.isEnabled = false
-        binding.etBookState.isEnabled = false
+        binding.etBookTitle.text = bookTitle
+        binding.etBookAuthor.text = bookAuthor
+        binding.etBookGenre.text = bookGenre
+        binding.etBookState.text = bookState
 
         if (portadaUrl.isNotEmpty()) {
             Picasso.get().load(portadaUrl).placeholder(R.drawable.default_book).into(binding.bookImage)
@@ -92,6 +88,7 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         userName = sharedPref.getString("userName", "Jane Doe")
 
+        // Botón registrar libro oculto
         binding.btnRegisterBook.setOnClickListener {
             val title = bookTitle.trim()
             val author = bookAuthor.trim()
@@ -100,14 +97,19 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
             val location = binding.etBookLocation.text.toString().trim()
             val punto = puntoSeleccionado
 
-            if (title.isEmpty() || author.isEmpty() || location.isEmpty() || punto == null) {
-                Toast.makeText(this, "Por favor, completa todos los campos y selecciona una ubicación", Toast.LENGTH_SHORT).show()
+            if (location.isEmpty()) {
+                Toast.makeText(this, "Ingresa una ubicación para el libro oculto", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val sharedPref = getSharedPreferences("HiddenBooks", Context.MODE_PRIVATE)
-            val editor = sharedPref.edit()
-            val bookData = "$title | $author | $genre | $state | $location | ${punto.latitude} | ${punto.longitude}"
+            if (punto == null) {
+                Toast.makeText(this, "Debes seleccionar un punto en el mapa", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val sharedHidden = getSharedPreferences("HiddenBooks", Context.MODE_PRIVATE)
+            val editor = sharedHidden.edit()
+            val bookData = "$title | $author | $genre | $state | $portadaUrl | ${punto.latitude} | ${punto.longitude} | $location"
             editor.putString(title, bookData)
             editor.apply()
 

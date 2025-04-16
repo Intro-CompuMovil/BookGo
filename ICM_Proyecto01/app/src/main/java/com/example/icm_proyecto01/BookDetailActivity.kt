@@ -30,41 +30,42 @@ class BookDetailActivity : AppCompatActivity() {
                 binding.imgBookCover.setImageResource(R.drawable.default_book)
             }
 
+            // ⬇️ VERIFICAR SI EL LIBRO YA ESTÁ OCULTO
+            val hiddenPref = getSharedPreferences("HiddenBooks", MODE_PRIVATE)
+            val isHidden = hiddenPref.contains(book.titulo)
+
+            if (isHidden) {
+                binding.btnOcultar.text = "Desocultar"
+                binding.btnOcultar.setOnClickListener {
+                    hiddenPref.edit().remove(book.titulo).apply()
+                    Toast.makeText(this, "Libro desocultado", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            } else {
+                binding.btnOcultar.text = "Ocultar"
+                binding.btnOcultar.setOnClickListener {
+                    val intent = Intent(this, RegisterHiddenBookActivity::class.java).apply {
+                        putExtra("titulo", book.titulo)
+                        putExtra("autor", book.autor)
+                        putExtra("genero", book.genero)
+                        putExtra("estado", book.estado)
+                        putExtra("portada", book.portadaUrl)
+                    }
+                    startActivity(intent)
+                }
+            }
+
+            // botón de intercambio
             binding.btnIntercambiar.setOnClickListener {
                 val intent = Intent(this, SelectExchangePointActivity::class.java)
                 intent.putExtra("selectedBook", book)
                 startActivity(intent)
             }
-
         } ?: Toast.makeText(this, "No se pudo cargar el libro", Toast.LENGTH_SHORT).show()
-
-
-        binding.btnIntercambiar.setOnClickListener {
-            selectedBook?.let {
-                val intent = Intent(this, SelectExchangePointActivity::class.java)
-                intent.putExtra("selectedBook", it)
-                startActivity(intent)
-            } ?: Toast.makeText(this, "No se pudo obtener la información del libro", Toast.LENGTH_SHORT).show()
-        }
-
-
-
-        binding.btnOcultar.setOnClickListener {
-            selectedBook?.let {
-                val intent = Intent(this, RegisterHiddenBookActivity::class.java).apply {
-                    putExtra("titulo", it.titulo)
-                    putExtra("autor", it.autor)
-                    putExtra("genero", it.genero)
-                    putExtra("estado", it.estado)
-                    putExtra("portada", it.portadaUrl)
-                }
-                startActivity(intent)
-            } ?: Toast.makeText(this, "No se pudo obtener la información del libro", Toast.LENGTH_SHORT).show()
-        }
-
 
         binding.btnBack.setOnClickListener {
             finish()
         }
     }
+
 }
