@@ -10,5 +10,8 @@
     <color name="neutralGray">#f7f7f9</color>
     <color name="red">#F44336</color>
     <color name="blue">#3873EB</color>
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_700">#3700B3</color>
+
 
 </resources>

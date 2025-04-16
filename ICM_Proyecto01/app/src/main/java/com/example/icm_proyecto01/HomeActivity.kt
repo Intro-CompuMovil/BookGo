@@ -39,6 +39,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.squareup.picasso.Picasso
 import org.osmdroid.api.IMapController
+import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
 
 class HomeActivity : AppCompatActivity() {
@@ -73,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
 
         cargarPuntosDeIntercambio()
         cargarEventosEnMapa()
-
+        mostrarLibrosOcultos()
 
         val focusLat = intent.getDoubleExtra("focusLat", Double.NaN)
         val focusLon = intent.getDoubleExtra("focusLon", Double.NaN)
@@ -339,6 +340,51 @@ class HomeActivity : AppCompatActivity() {
         osmMap.invalidate()
     }
 
+
+    //Para libros ocultos
+    private fun mostrarLibroOculto(lat: Double, lon: Double, titulo: String, autor: String, instruccion: String) {
+        val punto = GeoPoint(lat, lon)
+
+        val marcador = Marker(osmMap).apply {
+            position = punto
+            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            title = "📖 $titulo"
+            subDescription = "Autor: $autor\n🔍 Instrucciones: $instruccion"
+            icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_oculto)
+        }
+
+        osmMap.overlays.add(marcador)
+    }
+
+
+    private fun mostrarLibrosOcultos() {
+        val shared = getSharedPreferences("HiddenBooks", Context.MODE_PRIVATE)
+        val all = shared.all
+
+        for ((_, data) in all) {
+            val partes = data.toString().split("|")
+            if (partes.size >= 7) {
+                val titulo = partes[0].trim()
+                val autor = partes[1].trim()
+                val lat = partes[5].toDoubleOrNull()
+                val lon = partes[6].toDoubleOrNull()
+                val instruccion = if (partes.size >= 8) partes[7].trim() else "Sin instrucciones"
+
+                if (lat != null && lon != null) {
+                    mostrarLibroOculto(lat, lon, titulo, autor, instruccion)
+                }
+            }
+        }
+
+        osmMap.invalidate()
+    }
+
+
+
+
+
+
+
     private fun drawRoute(inicio: GeoPoint, destino: GeoPoint) {
         roadOverlay?.let { osmMap.overlays.remove(it) }
 
@@ -377,6 +423,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         cargarPuntosDeIntercambio()
+        mostrarLibrosOcultos()
     }
 
 }
