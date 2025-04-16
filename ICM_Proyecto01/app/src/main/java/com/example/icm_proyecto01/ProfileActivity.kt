@@ -38,7 +38,6 @@ class ProfileActivity : AppCompatActivity() {
         val userName = intent.getStringExtra("userName") ?: "Jane Doe"
         binding.tvUserName.text = userName
 
-        // Imagen de perfil si existe
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         val savedImageUri = sharedPref.getString("profileImageUri", null)
         savedImageUri?.let {
@@ -66,9 +65,18 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
-        val adapter = UserBooksAdapter(librosUsuario)
+        val adapter = UserBooksAdapter(librosUsuario) { libroSeleccionado ->
+            val intent = Intent(this, BookDetailActivity::class.java)
+            intent.putExtra("title", libroSeleccionado.titulo)
+            intent.putExtra("author", libroSeleccionado.autor)
+            intent.putExtra("genre", libroSeleccionado.genero)
+            intent.putExtra("state", libroSeleccionado.estado)
+            intent.putExtra("image", libroSeleccionado.portadaUrl)
+            startActivity(intent)
+        }
         binding.booksScroll.layoutManager = LinearLayoutManager(this)
         binding.booksScroll.adapter = adapter
+
 
 
 
@@ -202,9 +210,20 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
-        val adapter = UserBooksAdapter(userBooks)
+        val adapter = UserBooksAdapter(userBooks) { libroSeleccionado ->
+            val intent = Intent(this, BookDetailActivity::class.java).apply {
+                putExtra("title", libroSeleccionado.titulo)
+                putExtra("author", libroSeleccionado.autor)
+                putExtra("genre", libroSeleccionado.genero)
+                putExtra("state", libroSeleccionado.estado)
+                putExtra("image", libroSeleccionado.portadaUrl)
+            }
+            startActivity(intent)
+        }
+
         binding.booksScroll.layoutManager = LinearLayoutManager(this)
         binding.booksScroll.adapter = adapter
     }
+
 
 }
