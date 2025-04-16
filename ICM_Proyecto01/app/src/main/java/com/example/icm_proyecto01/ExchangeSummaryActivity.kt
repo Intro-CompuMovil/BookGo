@@ -56,13 +56,16 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         }
 
         binding.btnConfirmExchange.setOnClickListener {
+            val lat = intent.getDoubleExtra("lat", 0.0)
+            val lon = intent.getDoubleExtra("lon", 0.0)
+
             val intent = Intent(this, ExchangeRouteActivity::class.java).apply {
                 putExtra("titulo", tituloIntercambio)
                 putExtra("direccion", direccion)
                 putExtra("fecha", fecha)
                 putExtra("hora", hora)
-                putExtra("lat", intent.getDoubleExtra("lat", 0.0))
-                putExtra("lon", intent.getDoubleExtra("lon", 0.0))
+                putExtra("lat", lat)
+                putExtra("lon", lon)
             }
             startActivity(intent)
         }
