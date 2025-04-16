@@ -13,67 +13,71 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_CAMERA
+import com.example.icm_proyecto01.adapters.UserBooksAdapter
 import com.example.icm_proyecto01.databinding.ActivityProfileBinding
+import com.example.icm_proyecto01.model.UserBook
 import java.io.File
 import java.io.FileOutputStream
-import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_CAMERA
-
 
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
+
+    private var fromExchange: Boolean = false
+    private var exchangeData: Bundle? = null
+
+    override fun onResume() {
+        super.onResume()
+        cargarLibrosUsuario()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Verifica si viene desde punto de intercambio
+        fromExchange = intent.getBooleanExtra("fromExchange", false)
+        exchangeData = intent.extras  // contiene lat, lon, direccion, etc.
+
         val userName = intent.getStringExtra("userName") ?: "Jane Doe"
         binding.tvUserName.text = userName
 
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         val savedImageUri = sharedPref.getString("profileImageUri", null)
-        if (savedImageUri != null) {
-            binding.profileImage.setImageURI(Uri.parse(savedImageUri))
+        savedImageUri?.let {
+            binding.profileImage.setImageURI(Uri.parse(it))
         }
 
+        cargarLibrosUsuario()
+
         binding.tvEditProfile.setOnClickListener {
-            val intent = Intent(this, EditProfileActivity::class.java)
-            intent.putExtra("userName", userName)
-            startActivity(intent)
+            startActivity(Intent(this, EditProfileActivity::class.java).apply {
+                putExtra("userName", userName)
+            })
         }
 
         binding.btnRegisterBook.setOnClickListener {
-            val intent = Intent(this, NewBookActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, BookSearchActivity::class.java))
         }
 
         binding.btnRewards.setOnClickListener {
-            val intent = Intent(this, RewardsActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, RewardsActivity::class.java))
         }
 
-        // 🚀 Agregar navegación para Registrar y Buscar Libro Oculto
-        binding.btnRegisterHiddenBook.setOnClickListener {
-            val intent = Intent(this, RegisterHiddenBookActivity::class.java)
-            startActivity(intent)
-        }
+
 
         binding.btnSearchHiddenBook.setOnClickListener {
-            val intent = Intent(this, BookSearchActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, SearchHiddenBookActivity::class.java))
         }
 
         binding.profileImage.setOnClickListener {
-            if (checkCameraPermission()) {
-                openCamera()
-            } else {
-                requestCameraPermission()
-            }
+            if (checkCameraPermission()) openCamera()
+            else requestCameraPermission()
         }
 
-        // Marcar el ítem de perfil como seleccionado por defecto
         binding.bottomNavigation.selectedItemId = R.id.nav_profile
-
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
@@ -100,6 +104,55 @@ class ProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun cargarLibrosUsuario() {
+        val sharedPref = getSharedPreferences("UserBooks", MODE_PRIVATE)
+        val allBooks = sharedPref.all
+        val userBooks = mutableListOf<UserBook>()
+
+        for ((_, value) in allBooks) {
+            val data = value as? String ?: continue
+            val parts = data.split("|").map { it.trim() }
+
+            if (parts.size >= 5) {
+                val book = UserBook(
+                    titulo = parts[0],
+                    autor = parts[1],
+                    genero = parts[2],
+                    estado = parts[3],
+                    portadaUrl = parts[4]
+                )
+                userBooks.add(book)
+            }
+        }
+
+        val adapter = if (fromExchange) {
+            UserBooksAdapter(userBooks) { selectedBook ->
+                val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
+                    putExtra("selectedBook", selectedBook)
+                    putExtra("titulo", exchangeData?.getString("titulo"))
+                    putExtra("direccion", exchangeData?.getString("direccion"))
+                    putExtra("fecha", exchangeData?.getString("fecha"))
+                    putExtra("hora", exchangeData?.getString("hora"))
+                    putExtra("lat", exchangeData?.getDouble("lat") ?: 0.0)
+                    putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
+                }
+                startActivity(intent)
+                finish()  // vuelve al flujo principal
+            }
+        } else {
+            UserBooksAdapter(userBooks) { libroSeleccionado ->
+                val intent = Intent(this, BookDetailActivity::class.java).apply {
+                    putExtra("book", libroSeleccionado)
+                }
+                startActivity(intent)
+
+            }
+        }
+
+        binding.booksScroll.layoutManager = LinearLayoutManager(this)
+        binding.booksScroll.adapter = adapter
+    }
+
     private fun checkCameraPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             this, Manifest.permission.CAMERA
@@ -115,14 +168,15 @@ class ProfileActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_CAMERA) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera()
-            } else {
-                Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
-            }
+        if (requestCode == PERMISSION_CAMERA &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            openCamera()
+        } else {
+            Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -136,19 +190,22 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun openCamera() {
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        cameraLauncher.launch(cameraIntent)
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraLauncher.launch(intent)
     }
 
     private fun saveImageToStorage(bitmap: Bitmap) {
         val file = File(getExternalFilesDir(null), "profile_image.jpg")
-        FileOutputStream(file).use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        FileOutputStream(file).use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
         }
-
         val imageUri = Uri.fromFile(file)
-        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE).edit()
-        sharedPref.putString("profileImageUri", imageUri.toString())
-        sharedPref.apply()
+        getSharedPreferences("UserProfile", MODE_PRIVATE).edit()
+            .putString("profileImageUri", imageUri.toString())
+            .apply()
     }
+
+
+
+
 }

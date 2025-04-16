@@ -1,4 +1,4 @@
-package com.example.icm_proyecto01
+package com.example.icm_proyecto01.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,7 +6,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.icm_proyecto01.databinding.ItemEventBinding
+import com.example.icm_proyecto01.R
+import com.example.icm_proyecto01.model.Event
 
 class EventAdapter(
     private val eventList: List<Event>,

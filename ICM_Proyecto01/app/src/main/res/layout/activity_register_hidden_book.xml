@@ -40,7 +40,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout">
+        app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
+        app:layout_constraintBottom_toTopOf="@+id/mapContainer">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -48,7 +49,6 @@
             android:orientation="vertical"
             android:padding="8dp">
 
-            <!-- Imagen del Libro -->
             <ImageView
                 android:id="@+id/bookImage"
                 android:layout_width="120dp"
@@ -59,14 +59,12 @@
                 android:src="@drawable/default_book" />
 
             <TextView
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Título Completo"
                 android:textSize="14sp"
-                android:textStyle="bold"
-                />
-
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/etBookTitle"
@@ -75,12 +73,12 @@
                 android:background="@drawable/edittext_background"
                 android:hint="Título del libro"
                 android:padding="12dp"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:enabled="false" />
 
-            <!-- Campo: Autor -->
             <TextView
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Autor(es)"
                 android:textSize="14sp"
@@ -93,11 +91,12 @@
                 android:background="@drawable/edittext_background"
                 android:hint="Autor del libro"
                 android:padding="12dp"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:enabled="false" />
 
             <TextView
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Género"
                 android:textSize="14sp"
@@ -107,20 +106,19 @@
                 android:id="@+id/etBookGenre"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-
                 android:background="@drawable/edittext_background"
                 android:hint="Ej. Ciencia ficción"
                 android:padding="12dp"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:enabled="false" />
 
             <TextView
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Estado"
                 android:textSize="14sp"
                 android:textStyle="bold" />
-
 
             <EditText
                 android:id="@+id/etBookState"
@@ -129,16 +127,16 @@
                 android:background="@drawable/edittext_background"
                 android:hint="Ej. Nuevo / Usado"
                 android:padding="12dp"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:enabled="false" />
 
             <TextView
-                android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Ubicación del Libro"
                 android:textSize="14sp"
                 android:textStyle="bold" />
-
 
             <EditText
                 android:id="@+id/etBookLocation"
@@ -149,21 +147,51 @@
                 android:padding="12dp"
                 android:textSize="14sp" />
 
-            <Button
-                android:id="@+id/btnRegisterBook"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:backgroundTint="@color/green"
-                android:padding="12dp"
-                android:text="Registrar Libro Oculto"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
-
         </LinearLayout>
     </ScrollView>
 
+    <RelativeLayout
+        android:id="@+id/mapContainer"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        app:layout_constraintTop_toBottomOf="@id/relativeLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnRegisterBook"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp">
 
+        <org.osmdroid.views.MapView
+            android:id="@+id/osmMap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <EditText
+            android:id="@+id/searchAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Buscar dirección..."
+            android:imeOptions="actionSend"
+            android:inputType="text"
+            android:layout_margin="16dp"
+            android:padding="12dp"
+            android:background="@drawable/round_corners"
+            android:elevation="6dp" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btnRegisterBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:backgroundTint="@color/green"
+        android:padding="12dp"
+        android:text="Registrar Libro Oculto"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

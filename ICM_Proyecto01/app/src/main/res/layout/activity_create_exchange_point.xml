@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".CreateExchangePointActivity">
 
+    <!-- Botón de regreso -->
     <ImageView
         android:id="@+id/btnBack"
         android:layout_width="50dp"
@@ -16,107 +18,128 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Título -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:text="Crear Punto de Intercambio"
         android:textColor="@android:color/black"
         android:textSize="24sp"
         android:textStyle="bold"
         android:fontFamily="@font/poppins_bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBack" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
 
-
+    <!-- Formulario de información -->
     <LinearLayout
         android:id="@+id/container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/neutralGray"
-        android:layout_margin="12dp"
-        android:padding="12dp"
         android:orientation="vertical"
+        android:padding="12dp"
+        android:background="@color/neutralGray"
+        android:elevation="4dp"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="4dp">
+        android:layout_margin="12dp">
 
-        <EditText
-            android:id="@+id/etBookTitle"
+        <TextView
+            android:id="@+id/tvSelectedBook"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Título del libro"
-            android:inputType="text"
-            android:layout_margin="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:text="Libro no seleccionado"
+            android:textColor="@color/green"
+            android:padding="8dp"
+            android:textSize="16sp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/etAddress"
-            android:layout_width="match_parent"
+
+        <TextView
+            android:id="@+id/tvEstadoLibro"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="Dirección"
-            android:inputType="text"
-            android:layout_margin="16dp"
-            app:layout_constraintTop_toBottomOf="@id/etBookTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:text="Estado: No seleccionado"
+            android:layout_marginBottom="12dp" />
+
+
+
 
         <Button
             android:id="@+id/btnSelectDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
             android:backgroundTint="@color/green"
-            android:text="Seleccionar Fecha"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/etAddress" />
+            android:text="Seleccionar Fecha" />
 
         <TextView
             android:id="@+id/tvSelectedDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Fecha: No seleccionada"
-            app:layout_constraintTop_toBottomOf="@id/btnSelectDate"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp" />
+            android:layout_marginBottom="12dp" />
 
         <Button
             android:id="@+id/btnSelectTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Seleccionar Hora"
-            android:backgroundTint="@color/green"
-            android:layout_margin="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvSelectedDate"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:backgroundTint="@color/green" />
 
         <TextView
             android:id="@+id/tvSelectedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hora: No seleccionada"
-            app:layout_constraintTop_toBottomOf="@id/btnSelectTime"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp" />
-
-
+            android:text="Hora: No seleccionada" />
     </LinearLayout>
 
+    <!-- Mapa -->
+    <RelativeLayout
+        android:id="@+id/mapContainer"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        app:layout_constraintTop_toBottomOf="@id/container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp">
+
+        <org.osmdroid.views.MapView
+            android:id="@+id/osmMap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <EditText
+            android:id="@+id/searchAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Buscar dirección..."
+            android:imeOptions="actionSend"
+            android:inputType="text"
+            android:layout_margin="16dp"
+            android:padding="12dp"
+            android:background="@drawable/round_corners"
+            android:elevation="6dp" />
+    </RelativeLayout>
+
+    <!-- Botón confirmar -->
     <Button
         android:id="@+id/btnConfirm"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:backgroundTint="@color/green"
         android:text="Confirmar Intercambio"
         android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mapContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/container" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,9 +1,10 @@
-package com.example.icm_proyecto01
+package com.example.icm_proyecto01.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.icm_proyecto01.databinding.ItemChatBinding
+import com.example.icm_proyecto01.model.Chat
 
 class ChatAdapter(private val chatList: List<Chat>, private val onClick: (Chat) -> Unit) :
     RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {

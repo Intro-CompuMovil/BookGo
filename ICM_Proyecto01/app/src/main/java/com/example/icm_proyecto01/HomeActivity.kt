@@ -16,6 +16,8 @@ import android.os.Bundle
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +37,7 @@ import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.squareup.picasso.Picasso
 import org.osmdroid.api.IMapController
 import org.osmdroid.views.overlay.TilesOverlay
 
@@ -43,9 +46,6 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
 
     private lateinit var osmMap: MapView
-    private lateinit var sensorManager: SensorManager
-    private lateinit var lightSensor: Sensor
-    private lateinit var lightSensorListener: SensorEventListener
     private lateinit var geocoder: Geocoder
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var roadManager: RoadManager
@@ -70,6 +70,22 @@ class HomeActivity : AppCompatActivity() {
 
         inicializarMapa()
         pedirPermisos()
+
+        cargarPuntosDeIntercambio()
+
+
+        val focusLat = intent.getDoubleExtra("focusLat", Double.NaN)
+        val focusLon = intent.getDoubleExtra("focusLon", Double.NaN)
+
+        if (!focusLat.isNaN() && !focusLon.isNaN()) {
+            val focusPoint = GeoPoint(focusLat, focusLon)
+            osmMap.controller.setCenter(focusPoint)
+            osmMap.controller.setZoom(17.0)
+
+            osmMap.invalidate()
+        }
+
+
 
         binding.searchAddress.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -119,6 +135,8 @@ class HomeActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+
     }
 
     private fun inicializarMapa() {
@@ -128,6 +146,100 @@ class HomeActivity : AppCompatActivity() {
         osmMap.setBuiltInZoomControls(true)
 
     }
+
+
+    private fun cargarPuntosDeIntercambio() {
+        val sharedPref = getSharedPreferences("ExchangePoints", MODE_PRIVATE)
+        val points = sharedPref.getStringSet("points", null)
+
+        if (points != null) {
+            binding.puntosCercanosContainer.removeAllViews()
+
+            for (punto in points) {
+                val datos = punto.split("|")
+                if (datos.size >= 5) {
+                    val tituloLibro = datos[0]
+                    val fecha = datos[1]
+                    val hora = datos[2]
+                    val lat = datos[3].toDoubleOrNull()
+                    val lon = datos[4].toDoubleOrNull()
+                    val estadoLibro = if (datos.size >= 6) datos[5] else "No disponible"
+                    val portadaUrl = if (datos.size >= 7) datos[6] else ""
+
+
+
+                    val direccion = obtenerDireccionDesdeGeoPoint(lat, lon)
+
+                    val cardView = layoutInflater.inflate(R.layout.item_exchange_point_home, binding.puntosCercanosContainer, false)
+
+                    val tvLocation = cardView.findViewById<TextView>(R.id.tvLocation)
+                    val tvDescription = cardView.findViewById<TextView>(R.id.tvDescription)
+                    val tvDateTime = cardView.findViewById<TextView>(R.id.tvDateTime)
+
+                    tvLocation.text = direccion
+                    tvDescription.text = "Libro: $tituloLibro\nEstado: $estadoLibro"
+                    tvDateTime.text = "$fecha - $hora"
+
+
+                    val imgCover = cardView.findViewById<ImageView>(R.id.imgBookCover)
+                    if (portadaUrl.isNotEmpty()) {
+                        Picasso.get().load(portadaUrl).placeholder(R.drawable.default_book).into(imgCover)
+                    } else {
+                        imgCover.setImageResource(R.drawable.default_book)
+                    }
+
+
+                    cardView.setOnClickListener {
+                        if (lat != null && lon != null) {
+                            val intent = Intent(this, ExchangePointActivity::class.java).apply {
+                                putExtra("titulo", tituloLibro)
+                                putExtra("direccion", direccion)
+                                putExtra("fecha", fecha)
+                                putExtra("hora", hora)
+                                putExtra("lat", lat)
+                                putExtra("lon", lon)
+                                putExtra("estadoLibro", estadoLibro)
+                                putExtra("portadaUrl", portadaUrl)
+                            }
+                            startActivity(intent)
+
+                        }
+                    }
+
+                    binding.puntosCercanosContainer.addView(cardView)
+
+                    if (lat != null && lon != null) {
+                        val marcador = Marker(osmMap).apply {
+                            position = GeoPoint(lat, lon)
+                            title = "$tituloLibro\n$direccion\n$fecha $hora"
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_exchange_point)
+                        }
+                        osmMap.overlays.add(marcador)
+                    }
+                }
+
+            }
+
+            osmMap.invalidate()
+        }
+    }
+
+
+    private fun obtenerDireccionDesdeGeoPoint(lat: Double?, lon: Double?): String {
+        return if (lat != null && lon != null) {
+            try {
+                val geocoder = Geocoder(this)
+                val address = geocoder.getFromLocation(lat, lon, 1)
+                address?.get(0)?.getAddressLine(0) ?: "Dirección desconocida"
+            } catch (e: Exception) {
+                "Dirección desconocida"
+            }
+        } else {
+            "Dirección desconocida"
+        }
+    }
+
 
 
     private fun pedirPermisos() {
@@ -142,6 +254,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun obtenerUbicacion() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
@@ -212,16 +325,22 @@ class HomeActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
+
+
     override fun onPause() {
         super.onPause()
-        sensorManager.unregisterListener(lightSensorListener)
     }
 
     override fun onResume() {
         super.onResume()
         binding.osmMap.onResume()
+
         val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
-        if(uiManager.nightMode == UiModeManager.MODE_NIGHT_YES)
+        if (uiManager.nightMode == UiModeManager.MODE_NIGHT_YES) {
             binding.osmMap.overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
+        }
+
+        cargarPuntosDeIntercambio()
     }
+
 }
