@@ -4,9 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.icm_proyecto01.adapter.ChatAdapter
 import com.example.icm_proyecto01.databinding.ActivityMessagesBinding
-import com.example.icm_proyecto01.model.Chat
 
 class MessagesActivity : AppCompatActivity() {
 

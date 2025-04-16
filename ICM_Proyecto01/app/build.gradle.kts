@@ -64,8 +64,5 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
     implementation("com.github.MKergall:osmbonuspack:6.9.0")
-    implementation("com.android.volley:volley:1.2.1")
-    implementation ("com.squareup.picasso:picasso:2.71828")
-
 
 }

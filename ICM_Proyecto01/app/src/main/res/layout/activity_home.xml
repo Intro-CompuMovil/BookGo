@@ -31,7 +31,9 @@
     </RelativeLayout>
 
     <!-- Mapa -->
-    <RelativeLayout
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="300dp"
         tools:context=".HomeActivity">
@@ -54,28 +56,24 @@
             android:background="@drawable/round_corners"
             android:elevation="4dp" />
 
-        <!--botón Crear punto de intercambio -->
-        <ImageView
-            android:id="@+id/btnCreateExchangePoint"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="10dp"
-            android:text="Crear Punto de Intercambio"
-            android:src="@drawable/add_circle" />
-
     </RelativeLayout>
 
 
+    <!--botón Crear punto de intercambio -->
+    <Button
+        android:id="@+id/btnCreateExchangePoint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Crear Punto de Intercambio"
+        android:textSize="16sp"
+        android:backgroundTint="@color/green"
+        android:textColor="@android:color/white"/>
 
-
-
+    <!--puntos cercanos??-->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Puntos de Intercambio Cercanos"
+        android:text="Puntos de Intecambio Cercanos"
         android:fontFamily="@font/poppins_bold"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -99,68 +97,40 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="6dp"
-                android:layout_marginHorizontal="4dp">
+                android:layout_marginBottom="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:id="@+id/puntoIntercambio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="12dp">
+                    android:padding="16dp"
+                    android:orientation="vertical">
 
-                    <!-- Imagen del libro -->
-                    <ImageView
-                        android:id="@+id/imgBookCover"
-                        android:layout_width="80dp"
-                        android:layout_height="100dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/default_book"
-                        android:layout_marginEnd="12dp"
-                        android:background="@drawable/neutral_round_corners" />
-
-                    <!-- Contenido de texto -->
-                    <LinearLayout
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical">
+                        android:text="La Pecera, Universidad Javeriana"
+                        android:textSize="16sp"
+                        android:textStyle="bold"/>
 
-                        <TextView
-                            android:id="@+id/tvLocation"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Dirección"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/black"
-                            android:maxLines="2" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Libro: 1984, George Orwell"
+                        android:textSize="14sp"
+                        android:textColor="@android:color/darker_gray"/>
 
-                        <TextView
-                            android:id="@+id/tvDescription"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Libro: Título\nEstado: Bueno"
-                            android:textSize="14sp"
-                            android:textColor="@android:color/darker_gray"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:id="@+id/tvDateTime"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Fecha - Hora"
-                            android:textSize="14sp"
-                            android:textColor="@color/green"
-                            android:textStyle="bold"
-                            android:layout_marginTop="4dp" />
-
-                    </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Fecha: 26/3/2025 - Hora 12:00"
+                        android:textSize="14sp"
+                        android:textColor="@color/green"
+                        android:textStyle="bold"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
-
 
         </LinearLayout>
     </ScrollView>

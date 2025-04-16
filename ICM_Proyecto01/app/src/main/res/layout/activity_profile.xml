@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/profileRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ProfileActivity">
@@ -22,7 +21,7 @@
             android:fontFamily="@font/poppins_bold"
             android:textSize="28sp"
             android:textStyle="bold"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="10dp"
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 
@@ -34,7 +33,7 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
         app:cardBackgroundColor="@color/cardview_light_background"
-        android:layout_marginHorizontal="10dp"
+        android:layout_margin="10dp"
         android:layout_below="@id/header">
 
         <RelativeLayout
@@ -50,12 +49,14 @@
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"/>
 
+
             <RelativeLayout
                 android:id="@+id/profileInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/profileImage"
                 android:layout_marginStart="16dp"
+                android:orientation="vertical"
                 android:layout_centerVertical="true">
 
                 <ImageView
@@ -68,7 +69,8 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:paddingTop="8dp"
-                    android:src="@drawable/rounded_edit_square" />
+                    android:src="@drawable/rounded_edit_square"
+                    android:text="Editar Perfil" />
 
                 <TextView
                     android:id="@+id/tvUserName"
@@ -96,6 +98,9 @@
                     android:textSize="14sp"
                     android:textColor="@color/black"
                     android:layout_below="@+id/tvUserLevel"/>
+
+
+
             </RelativeLayout>
 
             <ImageView
@@ -109,11 +114,28 @@
                 android:padding="8dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@drawable/reward_icon" />
+                android:src="@drawable/reward_icon"
+                android:text="Recompensas" />
+
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Título sección libros -->
+
+    <ImageView
+        android:id="@+id/btnRegisterBook"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add_circle"
+        android:text="Registrar Libro"
+        android:layout_below="@id/profileCard"
+        android:layout_toEndOf="@+id/tvBooksTitle"
+        android:layout_marginTop="22dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp" />
+
+    <!-- Lista de Libros -->
+
     <TextView
         android:id="@+id/tvBooksTitle"
         android:layout_width="wrap_content"
@@ -121,61 +143,79 @@
         android:layout_below="@id/profileCard"
         android:layout_alignParentStart="true"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="25dp"
         android:fontFamily="@font/poppins_semibold"
         android:text="Tus Libros"
         android:textSize="22sp"
         android:textStyle="bold" />
 
-    <!-- Botón registrar libro -->
-    <ImageView
-        android:id="@+id/btnRegisterBook"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/add_circle"
-        android:layout_below="@id/profileCard"
-        android:layout_toEndOf="@id/tvBooksTitle"
-        android:layout_marginTop="19dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="8dp" />
-
-    <!-- RecyclerView de libros del usuario -->
-    <androidx.recyclerview.widget.RecyclerView
+    <ScrollView
         android:id="@+id/booksScroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/tvBooksTitle"
-        android:layout_marginHorizontal="12dp"
-        android:layout_alignBottom="@id/buttonContainer"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp" />
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_below="@id/tvBooksTitle">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:src="@drawable/mock_book_1"
+                android:scaleType="centerCrop"/>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="110dp"
+                android:src="@drawable/mock_book_2"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="8dp"/>
+        </LinearLayout>
+    </ScrollView>
 
     <!-- Contenedor de botones inferiores -->
     <LinearLayout
         android:id="@+id/buttonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@id/booksScroll"
+        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="60dp"
-        android:orientation="horizontal"
-        android:gravity="start">
+        android:orientation="vertical">
 
-
-
-        <Button
-            android:id="@+id/btnSearchHiddenBook"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Buscar Libro Oculto"
-            android:backgroundTint="@color/green"
-            android:textColor="@android:color/white"
-            android:padding="8dp"
-            android:minHeight="48dp"/>
+            android:orientation="horizontal"
+            android:gravity="start">
+
+            <Button
+                android:id="@+id/btnRegisterHiddenBook"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Registrar Libro Oculto"
+                android:backgroundTint="@color/green"
+                android:textColor="@android:color/white"
+                android:padding="8dp"
+                android:minHeight="48dp"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btnSearchHiddenBook"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Buscar Libro Oculto"
+                android:backgroundTint="@color/green"
+                android:textColor="@android:color/white"
+                android:padding="8dp"
+                android:minHeight="48dp"/>
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Menú inferior -->

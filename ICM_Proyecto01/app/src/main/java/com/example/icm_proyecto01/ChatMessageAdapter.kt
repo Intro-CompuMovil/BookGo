@@ -1,4 +1,4 @@
-package com.example.icm_proyecto01.adapter
+package com.example.icm_proyecto01
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
