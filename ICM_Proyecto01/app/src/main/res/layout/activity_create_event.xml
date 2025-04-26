@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -30,103 +29,95 @@
         app:layout_constraintTop_toTopOf="@id/btnBack"
         android:layout_marginStart="12dp" />
 
-    <!-- Scroll principal con campos -->
-    <ScrollView
-        android:id="@+id/scrollContent"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+    <!-- Campos de texto y botones -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
-        app:layout_constraintBottom_toTopOf="@id/btnCreateEvent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/etEventName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="20dp">
+            android:hint="Nombre del Evento"
+            android:padding="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"/>
 
-            <!-- Nombre del evento -->
+        <!-- Fecha -->
+        <Button
+            android:id="@+id/btnSelectDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Fecha"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/tvSelectedDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha: No seleccionada"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Hora -->
+        <Button
+            android:id="@+id/btnSelectTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Hora"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"/>
+
+        <TextView
+            android:id="@+id/tvSelectedTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hora: No seleccionada"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Descripción -->
+        <EditText
+            android:id="@+id/etEventDescription"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:hint="Descripción del Evento"
+            android:padding="12dp"
+            android:gravity="top"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Mapa con búsqueda -->
+        <RelativeLayout
+            android:id="@+id/mapContainer"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_marginBottom="20dp">
+
+            <org.osmdroid.views.MapView
+                android:id="@+id/osmMap"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
             <EditText
-                android:id="@+id/etEventName"
+                android:id="@+id/searchAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nombre del Evento"
+                android:hint="Buscar dirección..."
+                android:imeOptions="actionSend"
+                android:inputType="text"
+                android:layout_margin="16dp"
                 android:padding="12dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"/>
-
-            <!-- Fecha -->
-            <Button
-                android:id="@+id/btnSelectDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Seleccionar Fecha"
-                android:layout_marginBottom="4dp"
-                android:backgroundTint="@color/green"
-                android:textColor="@android:color/white"/>
-
-            <TextView
-                android:id="@+id/tvSelectedDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Fecha: No seleccionada"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Hora -->
-            <Button
-                android:id="@+id/btnSelectTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Seleccionar Hora"
-                android:layout_marginBottom="4dp"
-                android:backgroundTint="@color/green"
-                android:textColor="@android:color/white"/>
-
-            <TextView
-                android:id="@+id/tvSelectedTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hora: No seleccionada"
-                android:layout_marginBottom="12dp"/>
-
-            <!-- Descripción -->
-            <EditText
-                android:id="@+id/etEventDescription"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:hint="Descripción del Evento"
-                android:padding="12dp"
-                android:gravity="top"
-                android:layout_marginBottom="16dp"/>
-
-            <!-- Mapa con búsqueda -->
-            <RelativeLayout
-                android:id="@+id/mapContainer"
-                android:layout_width="match_parent"
-                android:layout_height="400dp"
-                android:layout_marginBottom="20dp">
-
-                <org.osmdroid.views.MapView
-                    android:id="@+id/osmMap"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <EditText
-                    android:id="@+id/searchAddress"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Buscar dirección..."
-                    android:imeOptions="actionSend"
-                    android:inputType="text"
-                    android:layout_margin="16dp"
-                    android:padding="12dp"
-                    android:background="@drawable/round_corners"
-                    android:elevation="6dp" />
-            </RelativeLayout>
-
-        </LinearLayout>
-    </ScrollView>
+                android:background="@drawable/round_corners"
+                android:elevation="6dp" />
+        </RelativeLayout>
+    </LinearLayout>
 
     <!-- Botón fijo abajo -->
     <Button
