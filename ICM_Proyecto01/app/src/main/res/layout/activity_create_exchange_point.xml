@@ -16,7 +16,8 @@
         android:src="@drawable/ic_back_arrow"
         android:contentDescription="Volver"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="12dp"/>
 
     <!-- Título -->
     <TextView
@@ -31,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@id/btnBack"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"/>
 
     <!-- Formulario de información -->
     <LinearLayout
@@ -40,8 +41,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="12dp"
-        android:background="@color/neutralGray"
-        android:elevation="4dp"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,63 +57,58 @@
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:textStyle="bold" />
-
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/tvEstadoLibro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Estado: No seleccionado"
-            android:layout_marginBottom="12dp" />
-
-
-
+            android:layout_marginBottom="12dp"/>
 
         <Button
             android:id="@+id/btnSelectDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/green"
-            android:text="Seleccionar Fecha" />
+            android:text="Seleccionar Fecha"/>
 
         <TextView
             android:id="@+id/tvSelectedDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Fecha: No seleccionada"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="12dp"/>
 
         <Button
             android:id="@+id/btnSelectTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Seleccionar Hora"
-            android:backgroundTint="@color/green" />
+            android:backgroundTint="@color/green"/>
 
         <TextView
             android:id="@+id/tvSelectedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hora: No seleccionada" />
+            android:text="Hora: No seleccionada"/>
     </LinearLayout>
 
     <!-- Mapa -->
     <RelativeLayout
         android:id="@+id/mapContainer"
         android:layout_width="0dp"
-        android:layout_height="300dp"
+        android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/container"
+        app:layout_constraintBottom_toTopOf="@id/btnConfirm"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="8dp">
+        android:layout_margin="12dp">
 
         <org.osmdroid.views.MapView
             android:id="@+id/osmMap"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"/>
 
         <EditText
             android:id="@+id/searchAddress"
@@ -126,7 +120,7 @@
             android:layout_margin="16dp"
             android:padding="12dp"
             android:background="@drawable/round_corners"
-            android:elevation="6dp" />
+            android:elevation="6dp"/>
     </RelativeLayout>
 
     <!-- Botón confirmar -->
@@ -138,8 +132,7 @@
         android:backgroundTint="@color/green"
         android:text="Confirmar Intercambio"
         android:textColor="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/mapContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
+        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
