@@ -67,11 +67,6 @@ class ProfileActivity : AppCompatActivity() {
         }
 
 
-
-        binding.btnSearchHiddenBook.setOnClickListener {
-            startActivity(Intent(this, SearchHiddenBookActivity::class.java))
-        }
-
         binding.profileImage.setOnClickListener {
             if (checkCameraPermission()) openCamera()
             else requestCameraPermission()
@@ -93,7 +88,7 @@ class ProfileActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_messages -> {
-                    startActivity(Intent(this, MessagesActivity::class.java))
+                    startActivity(Intent(this, SearchHiddenBookActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true

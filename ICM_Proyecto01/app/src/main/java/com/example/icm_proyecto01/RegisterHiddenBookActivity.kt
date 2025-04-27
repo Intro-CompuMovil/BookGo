@@ -53,7 +53,6 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         roadManager = OSRMRoadManager(this, "ANDROID")
 
-        // Obtener datos del intent
         val bookTitle = intent.getStringExtra("titulo") ?: ""
         val bookAuthor = intent.getStringExtra("autor") ?: ""
         val bookGenre = intent.getStringExtra("genero") ?: ""
@@ -147,6 +146,7 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
                     position = currentLocation
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     title = "Mi ubicación"
+                    icon = ContextCompat.getDrawable(this@RegisterHiddenBookActivity, R.drawable.ic_my_location)
                 }
                 osmMap.overlays.add(markerActual)
                 osmMap.invalidate()
@@ -167,6 +167,7 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
                 position = punto
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 title = direccion.getAddressLine(0)
+                icon = ContextCompat.getDrawable(this@RegisterHiddenBookActivity, R.drawable.ic_oculto)
             }
             osmMap.overlays.add(markerDestino)
             osmMap.controller.setCenter(punto)

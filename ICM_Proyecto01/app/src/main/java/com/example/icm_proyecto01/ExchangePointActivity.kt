@@ -43,6 +43,7 @@ class ExchangePointActivity : AppCompatActivity() {
     private var currentLocation: GeoPoint? = null
     private var puntoDestino: GeoPoint? = null
     private var markerDestino: Marker? = null
+    private var markerActual: Marker? = null
     private var roadOverlay: Polyline? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,15 +79,13 @@ class ExchangePointActivity : AppCompatActivity() {
 
         libroSeleccionado = intent.getSerializableExtra("libroSeleccionado") as? UserBook
 
-        // Mostrar datos del punto
         binding.tvPuntoDireccion.text = direccion
-        binding.tvFechaHora.text = "$fecha - $hora"
+        binding.tvFecha.text = fecha
+        binding.tvHora.text = hora
 
-        // Mostrar datos del libro
         val titulo = libroSeleccionado?.titulo ?: tituloLibro
         val estado = libroSeleccionado?.estado ?: estadoLibro
         val portada = libroSeleccionado?.portadaUrl ?: portadaUrl
-
         binding.tvLibroSeleccionado.text = titulo
         binding.tvEstadoSeleccionado.text = "Estado: $estado"
 
@@ -144,6 +143,21 @@ class ExchangePointActivity : AppCompatActivity() {
                     osmMap.overlays.add(markerDestino)
 
                     currentLocation?.let { drawRoute(it, destino) }
+                    osmMap.invalidate()
+                }
+            }
+
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                location?.let {
+                    currentLocation = GeoPoint(it.latitude, it.longitude)
+
+                    markerActual = Marker(osmMap).apply {
+                        position = currentLocation
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        title = "Tu ubicación"
+                        icon = ContextCompat.getDrawable(this@ExchangePointActivity, R.drawable.ic_my_location)
+                    }
+                    osmMap.overlays.add(markerActual)
                     osmMap.invalidate()
                 }
             }

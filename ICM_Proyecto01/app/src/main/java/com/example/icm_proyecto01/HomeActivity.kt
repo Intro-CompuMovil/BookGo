@@ -121,7 +121,7 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_messages -> {
-                    val intent = Intent(this, MessagesActivity::class.java)
+                    val intent = Intent(this, SearchHiddenBookActivity::class.java)
                     intent.putExtra("userName", userName)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
@@ -316,8 +316,8 @@ class HomeActivity : AppCompatActivity() {
         if (!resultados.isNullOrEmpty()) {
             val direccion = resultados[0]
             val punto = GeoPoint(direccion.latitude, direccion.longitude)
-            colocarMarcador(punto, direccion.getAddressLine(0))
-            currentLocation?.let { drawRoute(it, punto) }
+            //colocarMarcador(punto, direccion.getAddressLine(0))
+            //currentLocation?.let { drawRoute(it, punto) }
             osmMap.controller.setCenter(punto)
         } else {
             Toast.makeText(this, "Dirección no encontrada", Toast.LENGTH_SHORT).show()
@@ -398,6 +398,7 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             obtenerUbicacion()
@@ -411,11 +412,13 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        osmMap.onPause()
     }
 
     override fun onResume() {
         super.onResume()
         binding.osmMap.onResume()
+        osmMap.onResume()
 
         val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
         if (uiManager.nightMode == UiModeManager.MODE_NIGHT_YES) {

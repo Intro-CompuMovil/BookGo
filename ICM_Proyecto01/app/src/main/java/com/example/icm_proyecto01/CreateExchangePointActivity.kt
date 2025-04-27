@@ -71,8 +71,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
 
 
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateExchangePointBinding.inflate(layoutInflater)
@@ -211,7 +209,8 @@ class CreateExchangePointActivity : AppCompatActivity() {
                 markerActual = Marker(osmMap).apply {
                     position = currentLocation
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    title = "Mi ubicación"
+                    title = "Tu ubicación"
+                    icon = ContextCompat.getDrawable(this@CreateExchangePointActivity, R.drawable.ic_my_location)
                 }
                 osmMap.overlays.add(markerActual)
                 osmMap.invalidate()
@@ -232,6 +231,7 @@ class CreateExchangePointActivity : AppCompatActivity() {
                 position = punto
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 title = direccion.getAddressLine(0)
+                icon = ContextCompat.getDrawable(this@CreateExchangePointActivity, R.drawable.ic_exchange_point)
             }
             osmMap.overlays.add(markerDestino)
             osmMap.controller.setCenter(punto)

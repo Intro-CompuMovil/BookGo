@@ -7,6 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityExchangeSummaryBinding
 import com.example.icm_proyecto01.model.UserBook
 import com.squareup.picasso.Picasso
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
 
 class ExchangeSummaryActivity : AppCompatActivity() {
 
@@ -43,7 +46,7 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         // Libro ofrecido por el usuario
         if (userBook != null) {
             binding.tvBookUserTitle.text = userBook.titulo
-            binding.tvBookUserAuthor.text = "Autor: ${userBook.autor}"
+            //binding.tvBookUserAuthor.text = "Autor: ${userBook.autor}"
             binding.tvBookUserGenre.text = "Género: ${userBook.genero}"
             binding.tvBookUserState.text = "Estado: ${userBook.estado}"
 
@@ -56,19 +59,17 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         }
 
         binding.btnConfirmExchange.setOnClickListener {
-            val lat = intent.getDoubleExtra("lat", 0.0)
-            val lon = intent.getDoubleExtra("lon", 0.0)
+            val direccion = intent.getStringExtra("direccion") ?: "Sin dirección"
+            val direccionCodificada = URLEncoder.encode(direccion, StandardCharsets.UTF_8.toString())
+            val uri = "https://www.google.com/maps/search/?api=1&query=$direccionCodificada"
 
-            val intent = Intent(this, ExchangeRouteActivity::class.java).apply {
-                putExtra("titulo", tituloIntercambio)
-                putExtra("direccion", direccion)
-                putExtra("fecha", fecha)
-                putExtra("hora", hora)
-                putExtra("lat", lat)
-                putExtra("lon", lon)
+            val intentWeb = Intent(this, ExchangeWebRouteActivity::class.java).apply {
+                putExtra("url", uri)
             }
-            startActivity(intent)
+            startActivity(intentWeb)
         }
+
+
 
 
         binding.btnBack.setOnClickListener { finish() }

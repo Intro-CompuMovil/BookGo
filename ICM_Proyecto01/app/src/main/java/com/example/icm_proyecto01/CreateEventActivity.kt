@@ -11,6 +11,7 @@ import android.location.Location
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -48,19 +49,12 @@ class CreateEventActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         geocoder = Geocoder(this, Locale.getDefault())
 
-        setupMap()
-        setupListeners()
+        iniciarMapa()
 
         pedirPermisosUbicacion()
-    }
 
-    private fun setupMap() {
-        val map = binding.osmMap
-        map.setMultiTouchControls(true)
-        map.controller.setZoom(16.0)
-    }
 
-    private fun setupListeners() {
+
         binding.btnBack.setOnClickListener { finish() }
 
         binding.btnSelectDate.setOnClickListener {
@@ -91,6 +85,13 @@ class CreateEventActivity : AppCompatActivity() {
         }
     }
 
+    private fun iniciarMapa() {
+        val map = binding.osmMap
+        map.setMultiTouchControls(true)
+        map.controller.setZoom(16.0)
+    }
+
+
     private fun pedirPermisosUbicacion() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
@@ -101,6 +102,7 @@ class CreateEventActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun obtenerUbicacionActual() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
@@ -112,6 +114,7 @@ class CreateEventActivity : AppCompatActivity() {
                     position = currentLocation
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     title = "Mi ubicación"
+                    icon = ContextCompat.getDrawable(this@CreateEventActivity, R.drawable.ic_my_location)
                 }
                 binding.osmMap.overlays.add(markerActual)
                 binding.osmMap.invalidate()
@@ -124,6 +127,7 @@ class CreateEventActivity : AppCompatActivity() {
                     selectedAddress = addr?.firstOrNull()?.getAddressLine(0) ?: "Ubicación actual"
                 } catch (_: Exception) {
                     selectedAddress = "Ubicación actual"
+
                 }
             }
         }
@@ -141,6 +145,7 @@ class CreateEventActivity : AppCompatActivity() {
                 position = punto
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 title = direccion.getAddressLine(0)
+                icon = ContextCompat.getDrawable(this@CreateEventActivity, R.drawable.ic_event_point)
             }
             binding.osmMap.overlays.add(markerDestino)
             binding.osmMap.controller.animateTo(punto)
@@ -196,6 +201,7 @@ class CreateEventActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             obtenerUbicacionActual()
