@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/containerRewards"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white">
 
+    <!-- Encabezado -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,14 +31,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Recompensas"
-            android:layout_margin="12dp"
             android:fontFamily="@font/poppins_bold"
             android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_centerInParent="true"/>
-
+            android:layout_centerInParent="true"
+            android:layout_margin="12dp"/>
     </RelativeLayout>
 
+    <!-- Contenido -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -44,25 +46,26 @@
         android:paddingHorizontal="16dp">
 
         <LinearLayout
+            android:id="@+id/scrollRewardsContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingVertical="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="12dp"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Intercambios"
-                    android:fontFamily="@font/poppins_regular"
-                    android:textSize="14sp"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"/>
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -77,8 +80,7 @@
                     android:layout_height="wrap_content"
                     android:text="3/4"
                     android:textSize="14sp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"/>
+                    android:layout_marginTop="8dp"/>
 
                 <ProgressBar
                     android:id="@+id/progressBar1"
@@ -88,7 +90,7 @@
                     android:max="100"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:progressDrawable="@drawable/progress_bar_custom"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="6dp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -96,16 +98,15 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="12dp"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Eventos"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/poppins_regular"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"/>
+                    android:fontFamily="@font/poppins_bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -120,18 +121,34 @@
                     android:layout_height="wrap_content"
                     android:text="1/2"
                     android:textSize="14sp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"/>
+                    android:layout_marginTop="8dp"/>
 
                 <SeekBar
                     android:id="@+id/seekBar2"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:max="2"
                     android:progress="1"
                     android:thumbTint="@color/green"
                     android:progressTint="@color/green"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="6dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="12dp">
+                <TextView
+                    android:id="@+id/tvSteps"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pasos dados: 0"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:fontFamily="@font/poppins_regular"
+                    android:layout_marginTop="8dp"/>
             </LinearLayout>
 
         </LinearLayout>
