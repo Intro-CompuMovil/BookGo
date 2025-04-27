@@ -27,8 +27,7 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         val fecha = intent.getStringExtra("fecha") ?: "-"
         val hora = intent.getStringExtra("hora") ?: "-"
         val estadoLibroDisponible = intent.getStringExtra("estadoLibroDisponible") ?: "-"
-        val portadaLibroDisponible = intent.getStringExtra("portadaLibroDisponible") ?: ""
-
+        val portadaLibroDisponible = intent.getStringExtra("portadaUrl") ?: ""
 
         binding.tvBookExchangeTitle.text = tituloIntercambio
         binding.tvBookExchangeState.text = "Estado: $estadoLibroDisponible"

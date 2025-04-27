@@ -1,5 +1,6 @@
 package com.example.icm_proyecto01
 
+import UserRepository
 import android.Manifest
 import android.app.Activity
 import android.content.Intent
@@ -14,18 +15,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_CAMERA
 import com.example.icm_proyecto01.adapters.UserBooksAdapter
 import com.example.icm_proyecto01.databinding.ActivityProfileBinding
 import com.example.icm_proyecto01.model.UserBook
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.io.File
 import java.io.FileOutputStream
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-
 class ProfileActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityProfileBinding
+    private lateinit var database: DatabaseReference
+    private lateinit var userRepository: UserRepository
 
     private var fromExchange: Boolean = false
     private var exchangeData: Bundle? = null
@@ -35,22 +40,36 @@ class ProfileActivity : AppCompatActivity() {
         cargarLibrosUsuario()
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Verifica si viene desde punto de intercambio
+        database = FirebaseDatabase.getInstance().reference
+
         fromExchange = intent.getBooleanExtra("fromExchange", false)
-        exchangeData = intent.extras  // contiene lat, lon, direccion, etc.
+        exchangeData = intent.extras
 
-        val userName = intent.getStringExtra("userName") ?: "Jane Doe"
-        binding.tvUserName.text = userName
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val uid = currentUser?.uid
 
-        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
-        val savedImageUri = sharedPref.getString("profileImageUri", null)
+        if (uid != null) {
+            database.child("Users").child(uid).get().addOnSuccessListener { dataSnapshot ->
+                if (dataSnapshot.exists()) {
+                    val userName = dataSnapshot.child("name").value.toString()
+                    val email = dataSnapshot.child("email").value.toString()
+                    val profilePicUrl = dataSnapshot.child("profilePictureUrl").value.toString()
+
+                    binding.tvUserName.text = userName
+                    binding.tvUserEmail.text = email
+                    Glide.with(this)
+                        .load(profilePicUrl)
+                        .into(binding.profileImage)
+                }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         binding.btnLogout.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
@@ -59,17 +78,8 @@ class ProfileActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
-        savedImageUri?.let {
-            binding.profileImage.setImageURI(Uri.parse(it))
-        }
-
-        cargarLibrosUsuario()
-
         binding.tvEditProfile.setOnClickListener {
-            startActivity(Intent(this, EditProfileActivity::class.java).apply {
-                putExtra("userName", userName)
-            })
+            startActivity(Intent(this, EditProfileActivity::class.java))
         }
 
         binding.btnRegisterBook.setOnClickListener {
@@ -79,7 +89,6 @@ class ProfileActivity : AppCompatActivity() {
         binding.btnRewards.setOnClickListener {
             startActivity(Intent(this, RewardsActivity::class.java))
         }
-
 
         binding.profileImage.setOnClickListener {
             if (checkCameraPermission()) openCamera()
@@ -111,56 +120,47 @@ class ProfileActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        cargarLibrosUsuario()
     }
 
     private fun cargarLibrosUsuario() {
-        val sharedPref = getSharedPreferences("UserBooks", MODE_PRIVATE)
-        val allBooks = sharedPref.all
-        val userBooks = mutableListOf<UserBook>()
+        val repository = UserRepository()
 
-        for ((_, value) in allBooks) {
-            val data = value as? String ?: continue
-            val parts = data.split("|").map { it.trim() }
+        repository.fetchUserBooks { userBooks ->
+            if (userBooks.isNotEmpty()) {
+                val adapter = if (fromExchange) {
+                    UserBooksAdapter(userBooks) { selectedBook ->
+                        val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
+                            putExtra("selectedBook", selectedBook)
+                            putExtra("titulo", exchangeData?.getString("titulo"))
+                            putExtra("direccion", exchangeData?.getString("direccion"))
+                            putExtra("fecha", exchangeData?.getString("fecha"))
+                            putExtra("hora", exchangeData?.getString("hora"))
+                            putExtra("lat", exchangeData?.getDouble("lat") ?: 0.0)
+                            putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
+                            putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
+                        }
+                        startActivity(intent)
+                        finish()
+                    }
+                } else {
+                    UserBooksAdapter(userBooks) { libroSeleccionado ->
+                        val intent = Intent(this, BookDetailActivity::class.java).apply {
+                            putExtra("book", libroSeleccionado)
+                        }
+                        startActivity(intent)
+                    }
+                }
 
-            if (parts.size >= 5) {
-                val book = UserBook(
-                    titulo = parts[0],
-                    autor = parts[1],
-                    genero = parts[2],
-                    estado = parts[3],
-                    portadaUrl = parts[4]
-                )
-                userBooks.add(book)
+                binding.booksScroll.layoutManager = LinearLayoutManager(this)
+                binding.booksScroll.adapter = adapter
+            } else {
+                Toast.makeText(this, "No tienes libros aún", Toast.LENGTH_SHORT).show()
             }
         }
-
-        val adapter = if (fromExchange) {
-            UserBooksAdapter(userBooks) { selectedBook ->
-                val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
-                    putExtra("selectedBook", selectedBook)
-                    putExtra("titulo", exchangeData?.getString("titulo"))
-                    putExtra("direccion", exchangeData?.getString("direccion"))
-                    putExtra("fecha", exchangeData?.getString("fecha"))
-                    putExtra("hora", exchangeData?.getString("hora"))
-                    putExtra("lat", exchangeData?.getDouble("lat") ?: 0.0)
-                    putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
-                }
-                startActivity(intent)
-                finish()  // vuelve al flujo principal
-            }
-        } else {
-            UserBooksAdapter(userBooks) { libroSeleccionado ->
-                val intent = Intent(this, BookDetailActivity::class.java).apply {
-                    putExtra("book", libroSeleccionado)
-                }
-                startActivity(intent)
-
-            }
-        }
-
-        binding.booksScroll.layoutManager = LinearLayoutManager(this)
-        binding.booksScroll.adapter = adapter
     }
+
 
     private fun checkCameraPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -213,8 +213,4 @@ class ProfileActivity : AppCompatActivity() {
             .putString("profileImageUri", imageUri.toString())
             .apply()
     }
-
-
-
-
 }

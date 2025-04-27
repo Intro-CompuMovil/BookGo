@@ -1,5 +1,6 @@
 package com.example.icm_proyecto01
 
+import UserRepository
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +14,7 @@ import com.example.icm_proyecto01.model.UserBook
 class SelectUserBookActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySelectUserBookBinding
+    private lateinit var userRepository: UserRepository
     private val userBooks = mutableListOf<UserBook>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,48 +34,46 @@ class SelectUserBookActivity : AppCompatActivity() {
         val estadoLibroDisponible = intent.getStringExtra("estadoLibroDisponible")
         val portadaLibroDisponible = intent.getStringExtra("portadaLibroDisponible")
 
+        // 🚀 Load books using UserRepository
+        val repository = UserRepository()
+        repository.fetchUserBooks { userBooks ->
 
-        // Cargar libros del usuario
-        val sharedPref = getSharedPreferences("UserBooks", MODE_PRIVATE)
-        for ((_, value) in sharedPref.all) {
-            val data = value as? String ?: continue
-            val parts = data.split("|").map { it.trim() }
-            if (parts.size >= 5) {
-                val book = UserBook(parts[0], parts[1], parts[2], parts[3], parts[4])
-                userBooks.add(book)
+            if (userBooks.isEmpty()) {
+                Toast.makeText(this, "No tienes libros para seleccionar.", Toast.LENGTH_SHORT).show()
+                return@fetchUserBooks
             }
-        }
 
-        val adapter = UserBooksAdapter(userBooks) { selectedBook ->
+            val adapter = UserBooksAdapter(userBooks) { selectedBook ->
 
-            if (from == "createExchange") {
-                val resultIntent = Intent().apply {
-                    putExtra("selectedBookTitle", selectedBook.titulo)
-                    putExtra("selectedBookState", selectedBook.estado)
-                    putExtra("selectedBookCoverUrl", selectedBook.portadaUrl ?: "")
+                if (from == "createExchange") {
+                    val resultIntent = Intent().apply {
+                        putExtra("selectedBookTitle", selectedBook.titulo)
+                        putExtra("selectedBookState", selectedBook.estado)
+                        putExtra("selectedBookCoverUrl", selectedBook.portadaUrl ?: "")
+                    }
+                    setResult(Activity.RESULT_OK, resultIntent)
+                    finish()
+
+                } else {
+                    val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
+                        putExtra("selectedBook", selectedBook)
+                        putExtra("titulo", exchangeTitulo)
+                        putExtra("direccion", exchangeDireccion)
+                        putExtra("fecha", exchangeFecha)
+                        putExtra("hora", exchangeHora)
+                        putExtra("lat", exchangeLat)
+                        putExtra("lon", exchangeLon)
+                        putExtra("estadoLibroDisponible", estadoLibroDisponible)
+                        putExtra("portadaLibroDisponible", portadaLibroDisponible)
+                    }
+                    startActivity(intent)
+                    finish()
                 }
-                setResult(Activity.RESULT_OK, resultIntent)
-                finish()
-
-            } else {
-                val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
-                    putExtra("selectedBook", selectedBook)
-                    putExtra("titulo", exchangeTitulo)
-                    putExtra("direccion", exchangeDireccion)
-                    putExtra("fecha", exchangeFecha)
-                    putExtra("hora", exchangeHora)
-                    putExtra("lat", exchangeLat)
-                    putExtra("lon", exchangeLon)
-                    putExtra("estadoLibroDisponible", estadoLibroDisponible)
-                    putExtra("portadaLibroDisponible", portadaLibroDisponible)
-                }
-
-                startActivity(intent)
-                finish()
             }
-        }
 
-        binding.rvUserBooks.layoutManager = LinearLayoutManager(this)
-        binding.rvUserBooks.adapter = adapter
+            binding.rvUserBooks.layoutManager = LinearLayoutManager(this)
+            binding.rvUserBooks.adapter = adapter
+        }
     }
+
 }
