@@ -56,6 +56,24 @@ class HomeActivity : AppCompatActivity() {
     private var roadOverlay: Polyline? = null
     private var userName: String? = null
 
+    private lateinit var sensorManager: SensorManager
+    private var stepSensor: Sensor? = null
+    private var stepCount: Int = 0
+    private var isStepSensorActive: Boolean = false
+
+    private val sensorListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
+                stepCount = event.values[0].toInt()
+                // Guardar el recuento para RewardsActivity
+                val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
+                sharedPref.edit().putInt("steps", stepCount).apply()
+            }
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -68,6 +86,7 @@ class HomeActivity : AppCompatActivity() {
         geocoder = Geocoder(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         roadManager = OSRMRoadManager(this, "ANDROID")
+
 
         inicializarMapa()
         pedirPermisos()
@@ -86,7 +105,6 @@ class HomeActivity : AppCompatActivity() {
 
             osmMap.invalidate()
         }
-
 
 
         binding.searchAddress.setOnEditorActionListener { _, actionId, _ ->
@@ -280,16 +298,23 @@ class HomeActivity : AppCompatActivity() {
 
 
     private fun pedirPermisos() {
+        val permisos = mutableListOf<String>()
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                1
-            )
+            permisos.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+            permisos.add(Manifest.permission.ACTIVITY_RECOGNITION)
+        }
+
+        if (permisos.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, permisos.toTypedArray(), 1)
         } else {
             obtenerUbicacion()
+            activarSensorDePasos()
         }
     }
+
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun obtenerUbicacion() {
@@ -328,16 +353,14 @@ class HomeActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(binding.searchAddress.windowToken, 0)
     }
 
-    private fun colocarMarcador(punto: GeoPoint, titulo: String) {
-        marker?.let { osmMap.overlays.remove(it) }
-        marker = Marker(osmMap).apply {
-            position = punto
-            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-            this.title = titulo
-            icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_exchange_point)
+    //para podometro
+
+
+    private fun activarSensorDePasos() {
+        stepSensor?.let {
+            sensorManager.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
+            isStepSensorActive = true
         }
-        osmMap.overlays.add(marker)
-        osmMap.invalidate()
     }
 
 
@@ -399,32 +422,67 @@ class HomeActivity : AppCompatActivity() {
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            obtenerUbicacion()
-        } else {
-            Toast.makeText(this, "Permiso de ubicación requerido para mapas", Toast.LENGTH_SHORT).show()
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty()) {
+                var permisoUbicacionConcedido = false
+                var permisoActividadConcedido = false
+
+                for (i in permissions.indices) {
+                    when (permissions[i]) {
+                        Manifest.permission.ACCESS_FINE_LOCATION -> {
+                            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                                permisoUbicacionConcedido = true
+                            }
+                        }
+                        Manifest.permission.ACTIVITY_RECOGNITION -> {
+                            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                                permisoActividadConcedido = true
+                            }
+                        }
+                    }
+                }
+
+                if (permisoUbicacionConcedido) {
+                    obtenerUbicacion()
+                } else {
+                    Toast.makeText(this, "Permiso de ubicación requerido para mapas", Toast.LENGTH_SHORT).show()
+                }
+
+                if (permisoActividadConcedido) {
+                    activarSensorDePasos()
+                } else {
+                    Toast.makeText(this, "Permiso de actividad física requerido para contar pasos", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
 
 
+
+
     override fun onPause() {
         super.onPause()
+        osmMap.onPause()
+        if (isStepSensorActive) {
+            sensorManager.unregisterListener(sensorListener)
+        }
         osmMap.onPause()
     }
 
     override fun onResume() {
         super.onResume()
+        if (isStepSensorActive) {
+            activarSensorDePasos()
+        }
         binding.osmMap.onResume()
         osmMap.onResume()
-
         val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
         if (uiManager.nightMode == UiModeManager.MODE_NIGHT_YES) {
             binding.osmMap.overlayManager.tilesOverlay.setColorFilter(TilesOverlay.INVERT_COLORS)
         }
-
         cargarPuntosDeIntercambio()
         mostrarLibrosOcultos()
     }
