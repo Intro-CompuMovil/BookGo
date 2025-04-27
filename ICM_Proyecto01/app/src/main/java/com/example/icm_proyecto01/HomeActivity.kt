@@ -121,7 +121,7 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_messages -> {
-                    val intent = Intent(this, MessagesActivity::class.java)
+                    val intent = Intent(this, SearchHiddenBookActivity::class.java)
                     intent.putExtra("userName", userName)
                     startActivity(intent)
                     overridePendingTransition(0, 0)

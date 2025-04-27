@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".ProfileActivity">
 
-    <!-- Encabezado -->
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
@@ -26,7 +25,6 @@
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 
-    <!-- Tarjeta de perfil -->
     <androidx.cardview.widget.CardView
         android:id="@+id/profileCard"
         android:layout_width="match_parent"
@@ -113,7 +111,6 @@
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Título sección libros -->
     <TextView
         android:id="@+id/tvBooksTitle"
         android:layout_width="wrap_content"
@@ -127,7 +124,6 @@
         android:textSize="22sp"
         android:textStyle="bold" />
 
-    <!-- Botón registrar libro -->
     <ImageView
         android:id="@+id/btnRegisterBook"
         android:layout_width="wrap_content"
@@ -140,7 +136,6 @@
         android:focusable="true"
         android:padding="8dp" />
 
-    <!-- RecyclerView de libros del usuario -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/booksScroll"
         android:layout_width="match_parent"
@@ -152,7 +147,6 @@
         android:paddingBottom="8dp" />
 
 
-    <!-- Contenedor de botones inferiores -->
     <LinearLayout
         android:id="@+id/buttonContainer"
         android:layout_width="match_parent"
@@ -162,21 +156,8 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="60dp"
         android:orientation="horizontal"
-        android:gravity="start">
+        android:gravity="start"/>
 
-
-
-        <Button
-            android:id="@+id/btnSearchHiddenBook"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Buscar Libro Oculto"
-            android:backgroundTint="@color/green"
-            android:textColor="@android:color/white"
-            android:padding="8dp"
-            android:minHeight="48dp"/>
-    </LinearLayout>
 
     <!-- Menú inferior -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

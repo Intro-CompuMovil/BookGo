@@ -38,13 +38,11 @@ class ExploreActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Botón para crear un nuevo evento
         binding.btnCreateEvent.setOnClickListener {
             val intent = Intent(this, CreateEventActivity::class.java)
             startActivity(intent)
         }
 
-        // Configuración del menú inferior usando binding
         binding.bottomNavigation.selectedItemId = R.id.nav_explore
 
         binding.bottomNavigation.setOnItemSelectedListener { item ->
@@ -58,7 +56,7 @@ class ExploreActivity : AppCompatActivity() {
                 R.id.nav_explore -> true
 
                 R.id.nav_messages -> {
-                    startActivity(Intent(this, MessagesActivity::class.java)) // Aún no implementado
+                    startActivity(Intent(this, SearchHiddenBookActivity::class.java))
                     overridePendingTransition(0, 0)
                     true
                 }

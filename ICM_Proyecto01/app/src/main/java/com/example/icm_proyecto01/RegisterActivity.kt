@@ -13,13 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_CAMERA
+import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_GALLERY
 import com.example.icm_proyecto01.databinding.ActivityRegisterBinding
 import java.io.File
 import java.io.FileOutputStream
-import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_CAMERA
-import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_GALLERY
-
-
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
@@ -31,18 +29,33 @@ class RegisterActivity : AppCompatActivity() {
 
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         val savedImageUri = sharedPref.getString("profileImageUri", null)
-
-        if (savedImageUri != null) {
-            binding.ivProfilePicture.setImageURI(Uri.parse(savedImageUri))
+        savedImageUri?.let { uriString ->
+            try {
+                val inputStream = contentResolver.openInputStream(Uri.parse(uriString))
+                val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
+                binding.ivProfilePicture.setImageBitmap(bitmap)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
 
-        binding.btnSelectImageR.setOnClickListener {
+
+        binding.btnSelectImage.setOnClickListener {
             if (checkGalleryPermission()) {
                 openGallery()
             } else {
                 requestGalleryPermission()
             }
         }
+
+        binding.btnTakePhoto.setOnClickListener {
+            if (checkCameraPermission()) {
+                openCamera()
+            } else {
+                requestCameraPermission()
+            }
+        }
+
         binding.btnRegister.setOnClickListener {
             val userText = binding.etNewUserName.text.toString()
             val emailText = binding.etEmail.text.toString()
@@ -71,9 +84,8 @@ class RegisterActivity : AppCompatActivity() {
                 putString("Password", passwordText)
             }
 
-
             val i = Intent(this, HomeActivity::class.java)
-            i.putExtra("paquete",caja)
+            i.putExtra("paquete", caja)
             startActivity(i)
             finish()
         }
@@ -101,7 +113,6 @@ class RegisterActivity : AppCompatActivity() {
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), PERMISSION_CAMERA)
     }
 
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -109,21 +120,18 @@ class RegisterActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openGallery()
                 } else {
-                    // Si el permiso de la galería es denegado, solicita el de la cámara
-                    requestCameraPermission()
+                    Toast.makeText(this, "Permiso de galería denegado", Toast.LENGTH_SHORT).show()
                 }
             }
             PERMISSION_CAMERA -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openCamera()
                 } else {
-                    // Si el usuario rechaza ambos permisos, mostrar mensaje
-                    Toast.makeText(this, "No se concedieron permisos para seleccionar imagen", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
-
 
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -133,11 +141,6 @@ class RegisterActivity : AppCompatActivity() {
                 saveImageUri(it)
             }
         }
-    }
-
-    private fun openGallery() {
-        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        galleryLauncher.launch(galleryIntent)
     }
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -150,11 +153,15 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
+    private fun openGallery() {
+        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galleryLauncher.launch(galleryIntent)
+    }
+
     private fun openCamera() {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraLauncher.launch(cameraIntent)
     }
-
 
     private fun saveImageToStorage(bitmap: Bitmap) {
         val file = File(getExternalFilesDir(null), "profile_image.jpg")

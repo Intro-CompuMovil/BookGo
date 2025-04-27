@@ -30,6 +30,9 @@
         android:theme="@style/Theme.ICM_Proyecto01"
         tools:targetApi="31">
         <activity
+            android:name=".ExchangeWebRouteActivity"
+            android:exported="false" />
+        <activity
             android:name=".ExchangeRouteActivity"
             android:exported="false" />
         <activity
@@ -115,6 +118,16 @@
         <activity
             android:name=".BookSearchActivity"
             android:exported="true" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.icm_proyecto01.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

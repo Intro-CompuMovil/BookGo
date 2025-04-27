@@ -79,15 +79,13 @@ class ExchangePointActivity : AppCompatActivity() {
 
         libroSeleccionado = intent.getSerializableExtra("libroSeleccionado") as? UserBook
 
-        // Mostrar datos del punto
         binding.tvPuntoDireccion.text = direccion
-        binding.tvFechaHora.text = "$fecha - $hora"
+        binding.tvFecha.text = fecha
+        binding.tvHora.text = hora
 
-        // Mostrar datos del libro
         val titulo = libroSeleccionado?.titulo ?: tituloLibro
         val estado = libroSeleccionado?.estado ?: estadoLibro
         val portada = libroSeleccionado?.portadaUrl ?: portadaUrl
-
         binding.tvLibroSeleccionado.text = titulo
         binding.tvEstadoSeleccionado.text = "Estado: $estado"
 
