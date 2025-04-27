@@ -60,8 +60,10 @@ class HomeActivity : AppCompatActivity() {
     private var stepSensor: Sensor? = null
     private var stepCount: Int = 0
     private var isStepSensorActive: Boolean = false
+
     private val sensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent?) {
+            if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
                 stepCount = event.values[0].toInt()
                 // Guardar el recuento para RewardsActivity
                 val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
