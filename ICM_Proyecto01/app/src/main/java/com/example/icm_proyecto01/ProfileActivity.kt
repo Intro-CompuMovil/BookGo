@@ -21,6 +21,9 @@ import com.example.icm_proyecto01.model.UserBook
 import java.io.File
 import java.io.FileOutputStream
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
 
@@ -31,6 +34,8 @@ class ProfileActivity : AppCompatActivity() {
         super.onResume()
         cargarLibrosUsuario()
     }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +51,15 @@ class ProfileActivity : AppCompatActivity() {
 
         val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
         val savedImageUri = sharedPref.getString("profileImageUri", null)
+
+        binding.btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        }
+
+
         savedImageUri?.let {
             binding.profileImage.setImageURI(Uri.parse(it))
         }

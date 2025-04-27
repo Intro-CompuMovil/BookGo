@@ -1,4 +1,7 @@
 pluginManagement {
+    plugins {
+        id("com.google.gms.google-services") version "4.4.1" // 🔥 Added plugin here
+    }
     repositories {
         google {
             content {
@@ -11,6 +14,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -23,4 +27,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "ICM_Proyecto01"
 include(":app")
- 

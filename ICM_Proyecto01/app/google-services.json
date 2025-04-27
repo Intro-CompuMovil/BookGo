@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "200475008433",
+    "project_id": "bookgo-64f45",
+    "storage_bucket": "bookgo-64f45.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:200475008433:android:2b1566459bbce9ab643190",
+        "android_client_info": {
+          "package_name": "com.example.icm_proyecto01"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCImcIvZP3tFZJDg19HCdimt4N3ySW1Kk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
