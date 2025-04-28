@@ -21,21 +21,21 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Libros
+        val userProfilePicUrl = intent.getStringExtra("userProfilePicUrl") ?: ""
         val userBook = intent.getSerializableExtra("selectedBook") as? UserBook
         val tituloIntercambio = intent.getStringExtra("titulo") ?: "Sin título"
         val direccion = intent.getStringExtra("direccion") ?: "Sin dirección"
         val fecha = intent.getStringExtra("fecha") ?: "-"
         val hora = intent.getStringExtra("hora") ?: "-"
         val estadoLibroDisponible = intent.getStringExtra("estadoLibroDisponible") ?: "-"
-        val portadaLibroDisponible = intent.getStringExtra("portadaUrl") ?: ""
 
         binding.tvBookExchangeTitle.text = tituloIntercambio
         binding.tvBookExchangeState.text = "Estado: $estadoLibroDisponible"
         binding.tvExchangeLocation.text = direccion
         binding.tvExchangeDateTime.text = "$fecha - $hora"
 
-        if (portadaLibroDisponible.isNotEmpty() && portadaLibroDisponible != "null") {
-            Picasso.get().load(portadaLibroDisponible)
+        if (userProfilePicUrl.isNotEmpty() && userProfilePicUrl != "null") {
+            Picasso.get().load(userProfilePicUrl)
                 .placeholder(R.drawable.default_book)
                 .into(binding.bookImageExchange)
         } else {

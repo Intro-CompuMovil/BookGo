@@ -1,5 +1,7 @@
 package com.example.icm_proyecto01
 
+import UserRepository
+import ExchangePointRepository
 import android.Manifest
 import android.app.Activity
 import android.app.UiModeManager
@@ -13,6 +15,7 @@ import android.hardware.SensorManager
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -41,6 +44,18 @@ import com.squareup.picasso.Picasso
 import org.osmdroid.api.IMapController
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.*
+
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import kotlin.math.log
 
 class HomeActivity : AppCompatActivity() {
 
@@ -50,11 +65,13 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var geocoder: Geocoder
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var roadManager: RoadManager
+    private lateinit var locationCallback: LocationCallback
 
     private var currentLocation: GeoPoint? = null
-    private var marker: Marker? = null
     private var roadOverlay: Polyline? = null
     private var userName: String? = null
+    private var marker: Marker? = null
+
 
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
@@ -85,6 +102,18 @@ class HomeActivity : AppCompatActivity() {
         userName = getSharedPreferences("UserProfile", MODE_PRIVATE).getString("userName", "Jane Doe")
         geocoder = Geocoder(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+                for (location in locationResult.locations) {
+                    actualizarUbicacionEnMapa(location)
+                }
+            }
+        }
+
+
         roadManager = OSRMRoadManager(this, "ANDROID")
 
 
@@ -92,6 +121,7 @@ class HomeActivity : AppCompatActivity() {
         pedirPermisos()
 
         cargarPuntosDeIntercambio()
+        Log.d("PuntoIntercambio", "se llamo a punto")
         cargarEventosEnMapa()
         mostrarLibrosOcultos()
 
@@ -159,6 +189,18 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun iniciarActualizacionesDeUbicacion() {
+        val locationRequest = com.google.android.gms.location.LocationRequest.Builder(
+            com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY,
+            5000 // cada 5 segundos
+        ).build()
+
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
+    }
+
+
+
     private fun inicializarMapa() {
         osmMap = findViewById(R.id.osmMap)
         osmMap.setTileSource(TileSourceFactory.MAPNIK)
@@ -166,6 +208,7 @@ class HomeActivity : AppCompatActivity() {
         osmMap.setBuiltInZoomControls(true)
 
     }
+
 
 
     //Para el evento
@@ -201,82 +244,103 @@ class HomeActivity : AppCompatActivity() {
         osmMap.invalidate()
     }
 
-
     //Para el intercambio
     private fun cargarPuntosDeIntercambio() {
-        val sharedPref = getSharedPreferences("ExchangePoints", MODE_PRIVATE)
-        val points = sharedPref.getStringSet("points", null)
+        val exchangePointRepository = ExchangePointRepository(this)
+        Log.d("PrimerLog", "llamado a puntoIntercambio")
+        exchangePointRepository.sincronizarPuntosDeFirebase { points ->
+            Log.d("PrimerLog", "llamado a $points")
+            // Verificamos si los puntos existen
+            if (points.isNotEmpty()) {
+                Log.d("PrimerLog", "no esta empty $points")
+                binding.puntosCercanosContainer.removeAllViews()
 
-        if (points != null) {
-            binding.puntosCercanosContainer.removeAllViews()
-
-            for (punto in points) {
-                val datos = punto.split("|")
-                if (datos.size >= 5) {
-                    val tituloLibro = datos[0]
-                    val fecha = datos[1]
-                    val hora = datos[2]
-                    val lat = datos[3].toDoubleOrNull()
-                    val lon = datos[4].toDoubleOrNull()
-                    val estadoLibro = if (datos.size >= 6) datos[5] else "No disponible"
-                    val portadaUrl = if (datos.size >= 7) datos[6] else ""
-
-
-
-                    val direccion = obtenerDireccionDesdeGeoPoint(lat, lon)
-
-                    val cardView = layoutInflater.inflate(R.layout.item_exchange_point_home, binding.puntosCercanosContainer, false)
-
-                    val tvLocation = cardView.findViewById<TextView>(R.id.tvLocation)
-                    val tvDescription = cardView.findViewById<TextView>(R.id.tvDescription)
-                    val tvDateTime = cardView.findViewById<TextView>(R.id.tvDateTime)
-
-                    tvLocation.text = direccion
-                    tvDescription.text = "Libro: $tituloLibro\nEstado: $estadoLibro"
-                    tvDateTime.text = "$fecha - $hora"
+                for (punto in points) {
+                    val datos = punto.split("|")
+                    if (datos.size >= 5) {
+                        Log.d("PuntoIntercambio", "datos = $datos")
+                        val tituloLibro = datos[0]
+                        Log.d("PuntoIntercambio:", "Titulo $tituloLibro" )
+                        val fecha = datos[1]
+                        val hora = datos[2]
+                        val lat = datos[3].toDoubleOrNull()
+                        val lon = datos[4].toDoubleOrNull()
+                        Log.d("PuntoIntercambio:", "Lon $lon" )
+                        val estadoLibro = if (datos.size >= 6) datos[5] else "No disponible"
+                        val portadaUrl = if (datos.size >= 7) datos[6] else ""
 
 
-                    val imgCover = cardView.findViewById<ImageView>(R.id.imgBookCover)
-                    if (portadaUrl.isNotEmpty()) {
-                        Picasso.get().load(portadaUrl).placeholder(R.drawable.default_book).into(imgCover)
-                    } else {
-                        imgCover.setImageResource(R.drawable.default_book)
-                    }
+
+                            val direccion = obtenerDireccionDesdeGeoPoint(lat, lon)
+
+                            val cardView = layoutInflater.inflate(
+                                R.layout.item_exchange_point_home,
+                                binding.puntosCercanosContainer,
+                                false
+                            )
+
+                            val tvLocation = cardView.findViewById<TextView>(R.id.tvLocation)
+                            val tvDescription =
+                                cardView.findViewById<TextView>(R.id.tvDescription)
+                            val tvDateTime = cardView.findViewById<TextView>(R.id.tvDateTime)
+
+                            tvLocation.text = direccion
+                            tvDescription.text = "Libro: $tituloLibro\nEstado: $estadoLibro"
+                            tvDateTime.text = "$fecha - $hora"
 
 
-                    cardView.setOnClickListener {
-                        if (lat != null && lon != null) {
-                            val intent = Intent(this, ExchangePointActivity::class.java).apply {
-                                putExtra("titulo", tituloLibro)
-                                putExtra("direccion", direccion)
-                                putExtra("fecha", fecha)
-                                putExtra("hora", hora)
-                                putExtra("lat", lat)
-                                putExtra("lon", lon)
-                                putExtra("estadoLibro", estadoLibro)
-                                putExtra("portadaUrl", portadaUrl)
+                            val imgCover = cardView.findViewById<ImageView>(R.id.imgBookCover)
+                            if (portadaUrl.isNotEmpty()) {
+                                Picasso.get().load(portadaUrl)
+                                    .placeholder(R.drawable.default_book).into(imgCover)
+                            } else {
+                                imgCover.setImageResource(R.drawable.default_book)
                             }
-                            startActivity(intent)
 
+
+                            cardView.setOnClickListener {
+                                if (lat != null && lon != null) {
+                                    Log.d("PuntoIntercambio", "lon y lat no null")
+                                    val intent =
+                                        Intent(this, ExchangePointActivity::class.java).apply {
+                                            putExtra("titulo", tituloLibro)
+                                            putExtra("direccion", direccion)
+                                            putExtra("fecha", fecha)
+                                            putExtra("hora", hora)
+                                            putExtra("lat", lat)
+                                            putExtra("lon", lon)
+                                            Log.d("PuntoIntercambio", "puso lon")
+                                            putExtra("estadoLibro", estadoLibro)
+                                            putExtra("portadaUrl", portadaUrl)
+                                        }
+                                    startActivity(intent)
+
+                                }
+                            }
+
+                            binding.puntosCercanosContainer.addView(cardView)
+
+                            if (lat != null && lon != null) {
+                                val marcador = Marker(osmMap).apply {
+                                    Log.d("PuntoIntercambioOSM", "Lon en OSM=$lon")
+                                    position = GeoPoint(lat, lon)
+                                    title = "$tituloLibro\n$direccion\n$fecha $hora"
+                                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                    icon = ContextCompat.getDrawable(
+                                        this@HomeActivity,
+                                        R.drawable.ic_exchange_point
+                                    )
+                                }
+                                osmMap.overlays.add(marcador)
+                            }
                         }
+
                     }
-
-                    binding.puntosCercanosContainer.addView(cardView)
-
-                    if (lat != null && lon != null) {
-                        val marcador = Marker(osmMap).apply {
-                            position = GeoPoint(lat, lon)
-                            title = "$tituloLibro\n$direccion\n$fecha $hora"
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                            icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_exchange_point)
-                        }
-                        osmMap.overlays.add(marcador)
-                    }
-                }
-
+                    osmMap.invalidate()
+            }else{
+                Log.d("PrimerLog", "si esta empty $points")
             }
 
-            osmMap.invalidate()
         }
     }
 
@@ -295,6 +359,26 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun actualizarUbicacionEnMapa(location: Location) {
+        val geoPoint = GeoPoint(location.latitude, location.longitude)
+
+        if (marker == null) {
+            marker = Marker(osmMap).apply {
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                icon = ContextCompat.getDrawable(osmMap.context, R.drawable.ic_my_location)
+                title = "Mi ubicación"
+            }
+            osmMap.overlays.add(marker)
+        }
+
+        marker?.position = geoPoint
+        osmMap.controller.setCenter(geoPoint)
+        osmMap.invalidate()
+    }
+
+
+
+
 
 
     private fun pedirPermisos() {
@@ -312,6 +396,8 @@ class HomeActivity : AppCompatActivity() {
         } else {
             obtenerUbicacion()
             activarSensorDePasos()
+            iniciarActualizacionesDeUbicacion()
+
         }
     }
 
@@ -324,16 +410,22 @@ class HomeActivity : AppCompatActivity() {
                 osmMap.controller.setZoom(16.0)
                 osmMap.controller.setCenter(currentLocation)
 
-                val markerUbicacion = Marker(osmMap)
-                markerUbicacion.position = currentLocation
-                markerUbicacion.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                markerUbicacion.title = "Mi ubicación"
-                markerUbicacion.icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_my_location)
-                osmMap.overlays.add(markerUbicacion)
+                if (marker == null) {
+                    marker = Marker(osmMap).apply {
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        icon = ContextCompat.getDrawable(osmMap.context, R.drawable.ic_my_location)
+                        title = "Mi ubicación"
+                    }
+                    osmMap.overlays.add(marker)
+                }
+
+                marker?.position = currentLocation
+
                 osmMap.invalidate()
             }
         }
     }
+
 
     private fun buscarDireccion(query: String) {
         if (query.isBlank()) return
@@ -486,5 +578,11 @@ class HomeActivity : AppCompatActivity() {
         cargarPuntosDeIntercambio()
         mostrarLibrosOcultos()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
 
 }
