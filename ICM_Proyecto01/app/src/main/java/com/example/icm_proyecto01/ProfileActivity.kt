@@ -59,23 +59,28 @@ class ProfileActivity : AppCompatActivity() {
                     val userName = dataSnapshot.child("name").value.toString()
                     val email = dataSnapshot.child("email").value.toString()
                     val profilePicUrl = dataSnapshot.child("profilePictureUrl").value.toString()
+                    val expValue = dataSnapshot.child("readerLvl").getValue(Int::class.java) ?: 0
+
+                    val readerLevel = when {
+                        expValue < 100 -> 1
+                        expValue < 1000 -> 2
+                        else -> 3
+                    }
 
                     binding.tvUserName.text = userName
                     binding.tvUserEmail.text = email
+                    binding.tvUserLevel.text = "Nivel de lector: $readerLevel"
+
                     Glide.with(this)
                         .load(profilePicUrl)
+                        .placeholder(R.drawable.icono_perfil)
+                        .error(R.drawable.icono_perfil)
                         .into(binding.profileImage)
                 }
             }.addOnFailureListener {
                 Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
             }
-        }
 
-        binding.btnLogout.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
         }
 
         binding.tvEditProfile.setOnClickListener {

@@ -3,7 +3,6 @@ package com.example.icm_proyecto01
 import android.Manifest
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
@@ -18,8 +17,8 @@ import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.databinding.ActivityCreateEventBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import org.json.JSONArray
-import org.json.JSONObject
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
@@ -50,38 +49,18 @@ class CreateEventActivity : AppCompatActivity() {
         geocoder = Geocoder(this, Locale.getDefault())
 
         iniciarMapa()
-
         pedirPermisosUbicacion()
 
-
-
         binding.btnBack.setOnClickListener { finish() }
-
-        binding.btnSelectDate.setOnClickListener {
-            val cal = Calendar.getInstance()
-            DatePickerDialog(this, { _, y, m, d ->
-                binding.tvSelectedDate.text = "Fecha: $d/${m + 1}/$y"
-            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-        }
-
-        binding.btnSelectTime.setOnClickListener {
-            val cal = Calendar.getInstance()
-            TimePickerDialog(this, { _, h, m ->
-                binding.tvSelectedTime.text = "Hora: $h:$m"
-            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
-        }
-
-        binding.btnCreateEvent.setOnClickListener {
-            createEvent()
-        }
+        binding.btnSelectDate.setOnClickListener { abrirSelectorFecha() }
+        binding.btnSelectTime.setOnClickListener { abrirSelectorHora() }
+        binding.btnCreateEvent.setOnClickListener { createEvent() }
 
         binding.searchAddress.setOnEditorActionListener { v, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
                 buscarDireccion(v.text.toString().trim())
                 true
-            } else {
-                false
-            }
+            } else false
         }
     }
 
@@ -90,7 +69,6 @@ class CreateEventActivity : AppCompatActivity() {
         map.setMultiTouchControls(true)
         map.controller.setZoom(16.0)
     }
-
 
     private fun pedirPermisosUbicacion() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -127,7 +105,6 @@ class CreateEventActivity : AppCompatActivity() {
                     selectedAddress = addr?.firstOrNull()?.getAddressLine(0) ?: "Ubicación actual"
                 } catch (_: Exception) {
                     selectedAddress = "Ubicación actual"
-
                 }
             }
         }
@@ -159,6 +136,20 @@ class CreateEventActivity : AppCompatActivity() {
         }
     }
 
+    private fun abrirSelectorFecha() {
+        val cal = Calendar.getInstance()
+        DatePickerDialog(this, { _, y, m, d ->
+            binding.tvSelectedDate.text = "Fecha: $d/${m + 1}/$y"
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+    }
+
+    private fun abrirSelectorHora() {
+        val cal = Calendar.getInstance()
+        TimePickerDialog(this, { _, h, m ->
+            binding.tvSelectedTime.text = "Hora: $h:$m"
+        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+    }
+
     private fun createEvent() {
         val name = binding.etEventName.text.toString().trim()
         val date = binding.tvSelectedDate.text.toString().replace("Fecha: ", "").trim()
@@ -170,35 +161,34 @@ class CreateEventActivity : AppCompatActivity() {
         ) {
             Toast.makeText(this, "Por favor, completa todos los campos y selecciona ubicación", Toast.LENGTH_SHORT).show()
         } else {
-            saveEventToJSON(name, selectedAddress, "$date - $time", description, selectedLat!!, selectedLon!!)
-            Toast.makeText(this, "Evento creado con éxito", Toast.LENGTH_SHORT).show()
-            binding.btnCreateEvent.postDelayed({
-                startActivity(Intent(this, ExploreActivity::class.java))
-                finish()
-            }, 1000)
+            guardarEventoEnFirebase(name, selectedAddress, "$date - $time", description, selectedLat!!, selectedLon!!)
         }
     }
 
-    private fun saveEventToJSON(name: String, location: String, date: String, description: String, lat: Double, lon: Double) {
-        val sharedPreferences = getSharedPreferences("EventsData", Context.MODE_PRIVATE)
-        val eventsJsonString = sharedPreferences.getString("events", "[]")
-        val eventsArray = JSONArray(eventsJsonString)
+    private fun guardarEventoEnFirebase(name: String, location: String, date: String, description: String, lat: Double, lon: Double) {
+        val database = FirebaseDatabase.getInstance().reference
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val userId = currentUser?.uid ?: "spagZw9k5cNfsMUeA5moorwddj72" // si no logueado, usar el default
 
-        val newEvent = JSONObject().apply {
-            put("name", name)
-            put("location", location)
-            put("date", date)
-            put("description", description)
-            put("lat", lat)
-            put("lon", lon)
-        }
+        val newEvent = mapOf(
+            "userId" to userId,
+            "name" to name,
+            "location" to location,
+            "date" to date,
+            "description" to description,
+            "lat" to lat,
+            "lon" to lon
+        )
 
-        eventsArray.put(newEvent)
-
-        with(sharedPreferences.edit()) {
-            putString("events", eventsArray.toString())
-            apply()
-        }
+        database.child("Events").push().setValue(newEvent)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Evento creado exitosamente", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, ExploreActivity::class.java))
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al crear evento", Toast.LENGTH_SHORT).show()
+            }
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
