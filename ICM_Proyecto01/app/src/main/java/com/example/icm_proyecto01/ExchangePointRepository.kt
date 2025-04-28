@@ -34,8 +34,6 @@ class ExchangePointRepository(private val context: Context) {
 
                     Log.d("Firebase", "Procesando punto: libroId=$idLibro, receiverId=$receiverId, estado=$state")
 
-                    // Asegúrate de que el punto de intercambio pertenece al usuario actual
-                    if (receiverId == uid) {
                         val date = pointSnapshot.child("date").value.toString()
                         val lat = pointSnapshot.child("lat").getValue(Double::class.java) ?: 0.0
                         val lon = pointSnapshot.child("lon").getValue(Double::class.java) ?: 0.0
@@ -67,9 +65,6 @@ class ExchangePointRepository(private val context: Context) {
                                 onPointsFetched(pointsSet)
                             }
                         }
-                    } else {
-                        Log.d("Firebase", "Punto no pertenece al usuario actual, receiverId=$receiverId")
-                    }
                 }
             }
 
