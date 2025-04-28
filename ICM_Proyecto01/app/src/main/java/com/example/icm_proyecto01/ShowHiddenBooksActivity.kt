@@ -37,12 +37,16 @@ class ShowHiddenBooksActivity : AppCompatActivity() {
             val bookTitle = bookData[0]
             val bookAuthor = bookData[1]
             val bookGenre = bookData[2]
-            val bookCoverUrl = bookData.getOrNull(3) ?: ""
+            val bookCoverUrl = bookData.getOrNull(3) ?: ""  // Si no hay URL, asigna cadena vacía
+
+            // Generar un id único para cada libro, puedes usar el índice de la lista o cualquier otro valor
+            val bookId = entry.key // O cualquier otra lógica para generar un id
 
             // Crear un objeto Book y añadirlo a la lista
-            val book = Book(bookTitle, bookAuthor, bookGenre, bookCoverUrl)
+            val book = Book(bookId, bookTitle, bookAuthor, bookGenre, bookCoverUrl)
             hiddenBooks.add(book)
         }
+
 
         // Configurar el adaptador
         adapter = BookSearchAdapter(hiddenBooks) { selectedBook ->
