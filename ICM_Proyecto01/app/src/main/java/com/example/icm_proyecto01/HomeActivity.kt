@@ -56,6 +56,9 @@ import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import kotlin.math.log
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 
 class HomeActivity : AppCompatActivity() {
 
@@ -372,7 +375,6 @@ class HomeActivity : AppCompatActivity() {
         }
 
         marker?.position = geoPoint
-        osmMap.controller.setCenter(geoPoint)
         osmMap.invalidate()
     }
 
@@ -496,10 +498,6 @@ class HomeActivity : AppCompatActivity() {
 
 
 
-
-
-
-
     private fun drawRoute(inicio: GeoPoint, destino: GeoPoint) {
         roadOverlay?.let { osmMap.overlays.remove(it) }
 
@@ -553,8 +551,6 @@ class HomeActivity : AppCompatActivity() {
 
 
 
-
-
     override fun onPause() {
         super.onPause()
         osmMap.onPause()
@@ -583,6 +579,9 @@ class HomeActivity : AppCompatActivity() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
+
+
+}
 
 
 }

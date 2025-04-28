@@ -7,15 +7,12 @@
     tools:context=".SearchHiddenBookActivity"
     android:background="@android:color/white">
 
-    <!-- Imagen simulando realidad aumentada -->
-    <ImageView
-        android:id="@+id/imgBookPlaceholder"
+    <!-- Vista previa de la cámara (reemplaza la imagen) -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="16dp"
-        android:scaleType="fitXY"
-
-        android:src="@drawable/biblioteca"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/btnFoundBook"
         app:layout_constraintStart_toStartOf="parent"
