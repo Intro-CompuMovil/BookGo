@@ -41,6 +41,9 @@ import com.squareup.picasso.Picasso
 import org.osmdroid.api.IMapController
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 
 class HomeActivity : AppCompatActivity() {
 
@@ -50,11 +53,13 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var geocoder: Geocoder
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var roadManager: RoadManager
+    private lateinit var locationCallback: LocationCallback
 
     private var currentLocation: GeoPoint? = null
-    private var marker: Marker? = null
     private var roadOverlay: Polyline? = null
     private var userName: String? = null
+    private var marker: Marker? = null
+
 
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
@@ -85,6 +90,18 @@ class HomeActivity : AppCompatActivity() {
         userName = getSharedPreferences("UserProfile", MODE_PRIVATE).getString("userName", "Jane Doe")
         geocoder = Geocoder(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+                for (location in locationResult.locations) {
+                    actualizarUbicacionEnMapa(location)
+                }
+            }
+        }
+
+
         roadManager = OSRMRoadManager(this, "ANDROID")
 
 
@@ -158,6 +175,18 @@ class HomeActivity : AppCompatActivity() {
 
 
     }
+
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+    private fun iniciarActualizacionesDeUbicacion() {
+        val locationRequest = com.google.android.gms.location.LocationRequest.Builder(
+            com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY,
+            5000 // cada 5 segundos
+        ).build()
+
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
+    }
+
+
 
     private fun inicializarMapa() {
         osmMap = findViewById(R.id.osmMap)
@@ -295,6 +324,26 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    private fun actualizarUbicacionEnMapa(location: Location) {
+        val geoPoint = GeoPoint(location.latitude, location.longitude)
+
+        if (marker == null) {
+            marker = Marker(osmMap).apply {
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                icon = ContextCompat.getDrawable(osmMap.context, R.drawable.ic_my_location)
+                title = "Mi ubicación"
+            }
+            osmMap.overlays.add(marker)
+        }
+
+        marker?.position = geoPoint
+        osmMap.controller.setCenter(geoPoint)
+        osmMap.invalidate()
+    }
+
+
+
+
 
 
     private fun pedirPermisos() {
@@ -312,6 +361,8 @@ class HomeActivity : AppCompatActivity() {
         } else {
             obtenerUbicacion()
             activarSensorDePasos()
+            iniciarActualizacionesDeUbicacion()
+
         }
     }
 
@@ -324,16 +375,22 @@ class HomeActivity : AppCompatActivity() {
                 osmMap.controller.setZoom(16.0)
                 osmMap.controller.setCenter(currentLocation)
 
-                val markerUbicacion = Marker(osmMap)
-                markerUbicacion.position = currentLocation
-                markerUbicacion.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                markerUbicacion.title = "Mi ubicación"
-                markerUbicacion.icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_my_location)
-                osmMap.overlays.add(markerUbicacion)
+                if (marker == null) {
+                    marker = Marker(osmMap).apply {
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        icon = ContextCompat.getDrawable(osmMap.context, R.drawable.ic_my_location)
+                        title = "Mi ubicación"
+                    }
+                    osmMap.overlays.add(marker)
+                }
+
+                marker?.position = currentLocation
+
                 osmMap.invalidate()
             }
         }
     }
+
 
     private fun buscarDireccion(query: String) {
         if (query.isBlank()) return
@@ -486,5 +543,11 @@ class HomeActivity : AppCompatActivity() {
         cargarPuntosDeIntercambio()
         mostrarLibrosOcultos()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
 
 }
