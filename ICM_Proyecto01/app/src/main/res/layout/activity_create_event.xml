@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -16,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:padding="8dp" />
 
-    <!-- Título -->
+    <!-- Título centrado -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
@@ -25,9 +26,11 @@
         android:textSize="22sp"
         android:textStyle="bold"
         android:fontFamily="@font/poppins_bold"
-        app:layout_constraintStart_toEndOf="@id/btnBack"
-        app:layout_constraintTop_toTopOf="@id/btnBack"
-        android:layout_marginStart="12dp" />
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        android:layout_marginTop="12dp" />
 
     <!-- Campos de texto y botones -->
     <LinearLayout
@@ -40,6 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- EditText para el nombre del evento con estilo bonito -->
         <EditText
             android:id="@+id/etEventName"
             android:layout_width="match_parent"
@@ -47,9 +51,11 @@
             android:hint="Nombre del Evento"
             android:padding="12dp"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/round_corners"
+            android:elevation="4dp" />
 
-        <!-- Fecha -->
+        <!-- Botón Seleccionar Fecha -->
         <Button
             android:id="@+id/btnSelectDate"
             android:layout_width="match_parent"
@@ -59,14 +65,16 @@
             android:backgroundTint="@color/green"
             android:textColor="@android:color/white"/>
 
+        <!-- TextView para la fecha seleccionada centrado -->
         <TextView
             android:id="@+id/tvSelectedDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Fecha: No seleccionada"
+            android:gravity="center"
             android:layout_marginBottom="12dp" />
 
-        <!-- Hora -->
+        <!-- Botón Seleccionar Hora -->
         <Button
             android:id="@+id/btnSelectTime"
             android:layout_width="match_parent"
@@ -76,14 +84,16 @@
             android:backgroundTint="@color/green"
             android:textColor="@android:color/white"/>
 
+        <!-- TextView para la hora seleccionada centrado -->
         <TextView
             android:id="@+id/tvSelectedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hora: No seleccionada"
+            android:gravity="center"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Descripción -->
+        <!-- EditText para la descripción con estilo bonito -->
         <EditText
             android:id="@+id/etEventDescription"
             android:layout_width="match_parent"
@@ -91,7 +101,9 @@
             android:hint="Descripción del Evento"
             android:padding="12dp"
             android:gravity="top"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/round_corners"
+            android:elevation="4dp"/>
 
         <!-- Mapa con búsqueda -->
         <RelativeLayout
