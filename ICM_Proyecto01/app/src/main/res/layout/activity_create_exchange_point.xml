@@ -44,20 +44,18 @@
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="12dp">
+        android:layout_margin="12dp"
+        android:gravity="center">
 
-        <TextView
+        <!-- Botón para seleccionar libro -->
+        <Button
             android:id="@+id/tvSelectedBook"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Libro no seleccionado"
-            android:textColor="@color/green"
-            android:padding="8dp"
-            android:textSize="16sp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:textStyle="bold"/>
+            android:text="Seleccionar Libro"
+            android:backgroundTint="@color/green"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="12dp"/>
 
         <TextView
             android:id="@+id/tvEstadoLibro"
@@ -68,10 +66,11 @@
 
         <Button
             android:id="@+id/btnSelectDate"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/green"
-            android:text="Seleccionar Fecha"/>
+            android:text="Seleccionar Fecha"
+            android:layout_marginBottom="12dp"/>
 
         <TextView
             android:id="@+id/tvSelectedDate"
@@ -82,10 +81,11 @@
 
         <Button
             android:id="@+id/btnSelectTime"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Seleccionar Hora"
-            android:backgroundTint="@color/green"/>
+            android:backgroundTint="@color/green"
+            android:layout_marginBottom="12dp"/>
 
         <TextView
             android:id="@+id/tvSelectedTime"
