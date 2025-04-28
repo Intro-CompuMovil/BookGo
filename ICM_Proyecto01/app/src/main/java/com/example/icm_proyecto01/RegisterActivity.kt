@@ -1,145 +1,127 @@
 package com.example.icm_proyecto01
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_CAMERA
-import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_GALLERY
 import com.example.icm_proyecto01.databinding.ActivityRegisterBinding
+import com.example.icm_proyecto01.helpers.StorageHelper
+import com.example.icm_proyecto01.model.User
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import java.io.File
 import java.io.FileOutputStream
 
 class RegisterActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityRegisterBinding
+    private lateinit var auth: FirebaseAuth
+    private var selectedImageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
-        val savedImageUri = sharedPref.getString("profileImageUri", null)
-        savedImageUri?.let { uriString ->
-            try {
-                val inputStream = contentResolver.openInputStream(Uri.parse(uriString))
-                val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
-                binding.ivProfilePicture.setImageBitmap(bitmap)
-            } catch (e: Exception) {
-                e.printStackTrace()
+        auth = FirebaseAuth.getInstance()
+
+        binding.btnRegister.setOnClickListener {
+            val nombre = binding.etNewUserName.text.toString().trim()
+            val email = binding.etEmail.text.toString().trim()
+            val password = binding.etPassword.text.toString().trim()
+            val repetirPassword = binding.etRepetirPassword.text.toString().trim()
+
+            if (nombre.isEmpty() || email.isEmpty() || password.isEmpty() || repetirPassword.isEmpty()) {
+                Toast.makeText(this, "Por favor llena todos los campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, "Correo inválido", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (password != repetirPassword) {
+                Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            registrarUsuario(nombre, email, password)
         }
 
-
         binding.btnSelectImage.setOnClickListener {
-            if (checkGalleryPermission()) {
-                openGallery()
-            } else {
-                requestGalleryPermission()
-            }
+            abrirGaleria()
         }
 
         binding.btnTakePhoto.setOnClickListener {
-            if (checkCameraPermission()) {
-                openCamera()
-            } else {
-                requestCameraPermission()
-            }
-        }
-
-        binding.btnRegister.setOnClickListener {
-            val userText = binding.etNewUserName.text.toString()
-            val emailText = binding.etEmail.text.toString()
-            val passwordText = binding.etPassword.text.toString()
-            val repetirPasswordText = binding.etRepetirPassword.text.toString()
-
-            if (userText.isBlank() || emailText.isBlank() || passwordText.isBlank() || repetirPasswordText.isBlank()) {
-                Toast.makeText(this, "Por favor ingrese todos los datos", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            if (passwordText != repetirPasswordText) {
-                Toast.makeText(this, "Las contraseñas no coinciden. Inténtelo de nuevo", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
-            with(sharedPref.edit()) {
-                putString("userName", userText)
-                apply()
-            }
-
-            val caja = Bundle().apply {
-                putString("userName", userText)
-                putString("Email", emailText)
-                putString("Password", passwordText)
-            }
-
-            val i = Intent(this, HomeActivity::class.java)
-            i.putExtra("paquete", caja)
-            startActivity(i)
-            finish()
+            abrirCamara()
         }
 
         binding.tvGoToLogin.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
     }
 
-    private fun checkGalleryPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun checkCameraPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestGalleryPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_GALLERY)
-    }
-
-    private fun requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), PERMISSION_CAMERA)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            PERMISSION_GALLERY -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openGallery()
+    private fun registrarUsuario(nombre: String, email: String, password: String) {
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) {
+                        if (selectedImageUri != null) {
+                            StorageHelper.uploadProfileImage(uid, selectedImageUri!!,
+                                onSuccess = { urlImagen ->
+                                    guardarEnDatabase(uid, nombre, email, password, urlImagen)
+                                },
+                                onFailure = {
+                                    Toast.makeText(this, "Error subiendo imagen", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        } else {
+                            guardarEnDatabase(uid, nombre, email, password, "")
+                        }
+                    }
                 } else {
-                    Toast.makeText(this, "Permiso de galería denegado", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Error al registrar usuario: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                 }
             }
-            PERMISSION_CAMERA -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openCamera()
-                } else {
-                    Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show()
-                }
+    }
+
+    private fun guardarEnDatabase(uid: String, nombre: String, email: String, password: String, fotoUrl: String) {
+        val database = FirebaseDatabase.getInstance().reference
+        val user = User(
+            uid = uid,
+            nombre = nombre,
+            correo = email,
+            contraseña = password,
+            fotoPerfilUrl = fotoUrl,
+            readerLvl = 0,
+            libros = emptyList()
+        )
+
+        database.child("Users").child(uid).setValue(user)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Usuario registrado correctamente", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, HomeActivity::class.java)
+                startActivity(intent)
+                finish()
             }
-        }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al guardar en base de datos", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private val galleryLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val imageUri: Uri? = result.data?.data
-            imageUri?.let {
-                binding.ivProfilePicture.setImageURI(it)
-                saveImageUri(it)
-            }
+            selectedImageUri = result.data?.data
+            binding.ivProfilePicture.setImageURI(selectedImageUri)
         }
     }
 
@@ -147,33 +129,23 @@ class RegisterActivity : AppCompatActivity() {
         if (result.resultCode == Activity.RESULT_OK) {
             val imageBitmap = result.data?.extras?.get("data") as? Bitmap
             imageBitmap?.let {
-                binding.ivProfilePicture.setImageBitmap(it)
-                saveImageToStorage(it)
+                val file = File(cacheDir, "${System.currentTimeMillis()}.jpg")
+                FileOutputStream(file).use { output ->
+                    it.compress(Bitmap.CompressFormat.JPEG, 100, output)
+                }
+                selectedImageUri = Uri.fromFile(file)
+                binding.ivProfilePicture.setImageURI(selectedImageUri)
             }
         }
     }
 
-    private fun openGallery() {
-        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        galleryLauncher.launch(galleryIntent)
+    private fun abrirGaleria() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galleryLauncher.launch(intent)
     }
 
-    private fun openCamera() {
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        cameraLauncher.launch(cameraIntent)
-    }
-
-    private fun saveImageToStorage(bitmap: Bitmap) {
-        val file = File(getExternalFilesDir(null), "profile_image.jpg")
-        FileOutputStream(file).use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-        }
-        saveImageUri(Uri.fromFile(file))
-    }
-
-    private fun saveImageUri(uri: Uri) {
-        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE).edit()
-        sharedPref.putString("profileImageUri", uri.toString())
-        sharedPref.apply()
+    private fun abrirCamara() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraLauncher.launch(intent)
     }
 }

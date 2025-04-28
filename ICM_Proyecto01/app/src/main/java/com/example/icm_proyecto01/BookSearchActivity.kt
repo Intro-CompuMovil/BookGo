@@ -25,15 +25,14 @@ class BookSearchActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         adapter = BookSearchAdapter(bookList) { selectedBook ->
-            // Aquí se maneja el click de un libro seleccionado (ej: pasar a pantalla de registro)
             val intent = Intent(this, AddBookFromApiActivity::class.java).apply {
+                putExtra("bookId", selectedBook.id) // AÑADIMOS ID DEL LIBRO
                 putExtra("title", selectedBook.titulo)
                 putExtra("author", selectedBook.autor)
                 putExtra("genre", selectedBook.genero)
                 putExtra("image", selectedBook.portadaUrl)
             }
             startActivity(intent)
-
         }
 
         binding.rvBookResults.layoutManager = LinearLayoutManager(this)
@@ -77,7 +76,9 @@ class BookSearchActivity : AppCompatActivity() {
                         val rawThumbnail = imageLinks?.optString("thumbnail") ?: ""
                         val thumbnail = rawThumbnail.replace("http://", "https://")
 
-                        val book = Book(title, authors, category, thumbnail)
+                        val id = item.optString("id", "")
+                        val book = Book(id, title, authors, category, thumbnail)
+
                         bookList.add(book)
 
                     }

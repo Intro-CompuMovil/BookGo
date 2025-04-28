@@ -75,6 +75,7 @@ dependencies {
 
     // Agrega la dependencia para Firebase Realtime Database
     implementation("com.google.firebase:firebase-database")
+    implementation(libs.firebase.storage.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
