@@ -34,8 +34,6 @@ class SelectExchangePointActivity : AppCompatActivity() {
             finish()
         }
 
-
-
         cargarPuntosDesdeSharedPreferences()
     }
 

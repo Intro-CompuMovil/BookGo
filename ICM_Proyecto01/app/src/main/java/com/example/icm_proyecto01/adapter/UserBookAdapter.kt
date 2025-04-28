@@ -26,12 +26,13 @@ class UserBooksAdapter(
             tvTitle.text = book.titulo
             tvAuthor.text = book.autor
             tvGenre.text = book.genero
-            tvState.text = "Estado: ${book.estado}"
+            tvState.text = book.estado  // Solo muestra el estado directamente
 
             if (book.portadaUrl.isNotEmpty()) {
                 Picasso.get()
                     .load(book.portadaUrl)
-                    .placeholder(R.drawable.default_book)
+                    .placeholder(R.drawable.default_book) // mientras carga
+                    .error(R.drawable.default_book)       // si falla
                     .into(imgCover)
             } else {
                 imgCover.setImageResource(R.drawable.default_book)

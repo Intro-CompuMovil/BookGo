@@ -125,32 +125,15 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun cargarLibrosUsuario() {
-        val repository = UserRepository()
+        val repository = UserRepository(this)  // 👈 le pasas el Context (this)
 
         repository.fetchUserBooks { userBooks ->
             if (userBooks.isNotEmpty()) {
-                val adapter = if (fromExchange) {
-                    UserBooksAdapter(userBooks) { selectedBook ->
-                        val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
-                            putExtra("selectedBook", selectedBook)
-                            putExtra("titulo", exchangeData?.getString("titulo"))
-                            putExtra("direccion", exchangeData?.getString("direccion"))
-                            putExtra("fecha", exchangeData?.getString("fecha"))
-                            putExtra("hora", exchangeData?.getString("hora"))
-                            putExtra("lat", exchangeData?.getDouble("lat") ?: 0.0)
-                            putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
-                            putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
-                        }
-                        startActivity(intent)
-                        finish()
+                val adapter = UserBooksAdapter(userBooks) { libroSeleccionado ->
+                    val intent = Intent(this, BookDetailActivity::class.java).apply {
+                        putExtra("book", libroSeleccionado)
                     }
-                } else {
-                    UserBooksAdapter(userBooks) { libroSeleccionado ->
-                        val intent = Intent(this, BookDetailActivity::class.java).apply {
-                            putExtra("book", libroSeleccionado)
-                        }
-                        startActivity(intent)
-                    }
+                    startActivity(intent)
                 }
 
                 binding.booksScroll.layoutManager = LinearLayoutManager(this)
@@ -160,6 +143,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
     }
+
 
 
     private fun checkCameraPermission(): Boolean {
