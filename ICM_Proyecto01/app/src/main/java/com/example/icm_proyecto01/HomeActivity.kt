@@ -337,7 +337,6 @@ class HomeActivity : AppCompatActivity() {
         }
 
         marker?.position = geoPoint
-      //  osmMap.controller.setCenter(geoPoint)
         osmMap.invalidate()
     }
 
