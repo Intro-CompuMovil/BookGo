@@ -1,6 +1,5 @@
 package com.example.icm_proyecto01
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -8,12 +7,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.icm_proyecto01.adapter.EventAdapter
 import com.example.icm_proyecto01.databinding.ActivityExploreBinding
 import com.example.icm_proyecto01.model.Event
-import org.json.JSONArray
+import com.google.firebase.database.*
 
 class ExploreActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityExploreBinding
     private lateinit var eventList: MutableList<Event>
+    private lateinit var database: DatabaseReference
     private var userName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,30 +21,18 @@ class ExploreActivity : AppCompatActivity() {
         binding = ActivityExploreBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Recuperar el nombre de usuario desde SharedPreferences
-        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
-        userName = sharedPref.getString("userName", "Jane Doe")
+        database = FirebaseDatabase.getInstance().reference
+        userName = getSharedPreferences("UserProfile", MODE_PRIVATE).getString("userName", "Jane Doe")
+        eventList = mutableListOf()
 
-        eventList = loadEventsFromJSON().toMutableList()
+        cargarEventos()
 
         binding.rvEvents.layoutManager = LinearLayoutManager(this)
-        binding.rvEvents.adapter = EventAdapter(eventList) { selectedEvent ->
-            val intent = Intent(this, EventDetailActivity::class.java).apply {
-                putExtra("EVENT_NAME", selectedEvent.name)
-                putExtra("EVENT_LOCATION", selectedEvent.location)
-                putExtra("EVENT_DATE", selectedEvent.date)
-                putExtra("EVENT_DESCRIPTION", selectedEvent.description)
-            }
-            startActivity(intent)
-        }
-
         binding.btnCreateEvent.setOnClickListener {
-            val intent = Intent(this, CreateEventActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, CreateEventActivity::class.java))
         }
 
         binding.bottomNavigation.selectedItemId = R.id.nav_explore
-
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
@@ -54,7 +42,6 @@ class ExploreActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_explore -> true
-
                 R.id.nav_messages -> {
                     startActivity(Intent(this, ShowHiddenBooksActivity::class.java))
                     overridePendingTransition(0, 0)
@@ -73,28 +60,30 @@ class ExploreActivity : AppCompatActivity() {
         }
     }
 
-    // se tiene esta lógica para leer los eventos del archivo .json, pero no se implementa de modo que se puedan crear eventos de acuerdo al flujo
-    private fun loadEventsFromJSON(): List<Event> {
-        val eventList = mutableListOf<Event>()
-        val sharedPreferences = getSharedPreferences("EventsData", Context.MODE_PRIVATE)
-        val eventsJsonString = sharedPreferences.getString("events", "[]") ?: "[]"
+    private fun cargarEventos() {
+        database.child("Events").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                eventList.clear()
 
-        try {
-            val eventsArray = JSONArray(eventsJsonString)
+                for (eventSnapshot in snapshot.children) {
+                    val event = eventSnapshot.getValue(Event::class.java)
+                    event?.let { eventList.add(it) }
+                }
 
-            for (i in 0 until eventsArray.length()) {
-                val jsonObject = eventsArray.getJSONObject(i)
-                val event = Event(
-                    name = jsonObject.getString("name"),
-                    location = jsonObject.getString("location"),
-                    date = jsonObject.getString("date"),
-                    description = jsonObject.getString("description")
-                )
-                eventList.add(event)
+                binding.rvEvents.adapter = EventAdapter(eventList) { selectedEvent ->
+                    val intent = Intent(this@ExploreActivity, EventDetailActivity::class.java).apply {
+                        putExtra("EVENT_NAME", selectedEvent.name)
+                        putExtra("EVENT_LOCATION", selectedEvent.location)
+                        putExtra("EVENT_DATE", selectedEvent.date)
+                        putExtra("EVENT_DESCRIPTION", selectedEvent.description)
+                    }
+                    startActivity(intent)
+                }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return eventList
+
+            override fun onCancelled(error: DatabaseError) {
+                // Manejar error
+            }
+        })
     }
 }

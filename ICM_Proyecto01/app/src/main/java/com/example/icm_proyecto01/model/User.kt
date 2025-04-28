@@ -8,5 +8,6 @@ data class User(
     val correo: String,
     val contraseña: String,
     val fotoPerfilUrl: String,
-    val libros: List<UserBook> = emptyList() // ✅ Colección de libros del usuario
+    val readerLvl: Int = 0,
+    val libros: List<UserBook> = emptyList()
 ) : Serializable

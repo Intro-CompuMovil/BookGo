@@ -44,7 +44,7 @@
         android:id="@+id/profileContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:gravity="center"
         android:padding="20dp"
         app:layout_constraintTop_toBottomOf="@id/header"
@@ -53,33 +53,35 @@
 
         <ImageView
             android:id="@+id/profileImage"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:src="@drawable/icono_perfil"
             android:scaleType="centerCrop"
-            android:layout_marginEnd="16dp"/>
+            android:padding="4dp"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="12dp">
 
-            <Button
+            <ImageView
                 android:id="@+id/btnChooseGallery"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Abrir Galería"
-                android:backgroundTint="@color/green"
-                android:textColor="@android:color/white"/>
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/gallery"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Galería"
+                android:layout_marginEnd="16dp"/>
 
-            <Button
+            <ImageView
                 android:id="@+id/btnTakePhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tomar Foto"
-                android:backgroundTint="@color/green"
-                android:textColor="@android:color/white"
-                android:layout_marginTop="8dp"/>
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/camera"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Tomar foto"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -107,20 +109,11 @@
             android:hint="Correo electrónico"
             android:inputType="textEmailAddress"
             android:textSize="16sp"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:enabled="false"/>
 
-        <EditText
-            android:id="@+id/etUserPassword"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:padding="12dp"
-            android:hint="Nueva contraseña"
-            android:inputType="textPassword"
-            android:textSize="16sp"
-            android:layout_marginTop="8dp"/>
     </LinearLayout>
 
-    <!-- Botón para guardar cambios -->
     <Button
         android:id="@+id/btnSaveProfile"
         android:layout_width="wrap_content"
@@ -133,5 +126,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cerrar Sesión"
+        android:backgroundTint="@color/red"
+        android:textColor="@android:color/white"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/btnSaveProfile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

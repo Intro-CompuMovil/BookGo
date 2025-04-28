@@ -35,7 +35,7 @@ class SelectUserBookActivity : AppCompatActivity() {
         val portadaLibroDisponible = intent.getStringExtra("portadaLibroDisponible")
 
         // 🚀 Load books using UserRepository
-        val repository = UserRepository()
+        val repository = UserRepository(this)
         repository.fetchUserBooks { userBooks ->
 
             if (userBooks.isEmpty()) {

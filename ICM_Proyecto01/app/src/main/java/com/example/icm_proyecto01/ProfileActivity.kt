@@ -59,23 +59,28 @@ class ProfileActivity : AppCompatActivity() {
                     val userName = dataSnapshot.child("name").value.toString()
                     val email = dataSnapshot.child("email").value.toString()
                     val profilePicUrl = dataSnapshot.child("profilePictureUrl").value.toString()
+                    val expValue = dataSnapshot.child("readerLvl").getValue(Int::class.java) ?: 0
+
+                    val readerLevel = when {
+                        expValue < 100 -> 1
+                        expValue < 1000 -> 2
+                        else -> 3
+                    }
 
                     binding.tvUserName.text = userName
                     binding.tvUserEmail.text = email
+                    binding.tvUserLevel.text = "Nivel de lector: $readerLevel"
+
                     Glide.with(this)
                         .load(profilePicUrl)
+                        .placeholder(R.drawable.icono_perfil)
+                        .error(R.drawable.icono_perfil)
                         .into(binding.profileImage)
                 }
             }.addOnFailureListener {
                 Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
             }
-        }
 
-        binding.btnLogout.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
         }
 
         binding.tvEditProfile.setOnClickListener {
@@ -125,32 +130,15 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun cargarLibrosUsuario() {
-        val repository = UserRepository()
+        val repository = UserRepository(this)  // 👈 le pasas el Context (this)
 
         repository.fetchUserBooks { userBooks ->
             if (userBooks.isNotEmpty()) {
-                val adapter = if (fromExchange) {
-                    UserBooksAdapter(userBooks) { selectedBook ->
-                        val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
-                            putExtra("selectedBook", selectedBook)
-                            putExtra("titulo", exchangeData?.getString("titulo"))
-                            putExtra("direccion", exchangeData?.getString("direccion"))
-                            putExtra("fecha", exchangeData?.getString("fecha"))
-                            putExtra("hora", exchangeData?.getString("hora"))
-                            putExtra("lat", exchangeData?.getDouble("lat") ?: 0.0)
-                            putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
-                            putExtra("lon", exchangeData?.getDouble("lon") ?: 0.0)
-                        }
-                        startActivity(intent)
-                        finish()
+                val adapter = UserBooksAdapter(userBooks) { libroSeleccionado ->
+                    val intent = Intent(this, BookDetailActivity::class.java).apply {
+                        putExtra("book", libroSeleccionado)
                     }
-                } else {
-                    UserBooksAdapter(userBooks) { libroSeleccionado ->
-                        val intent = Intent(this, BookDetailActivity::class.java).apply {
-                            putExtra("book", libroSeleccionado)
-                        }
-                        startActivity(intent)
-                    }
+                    startActivity(intent)
                 }
 
                 binding.booksScroll.layoutManager = LinearLayoutManager(this)
@@ -160,6 +148,7 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
     }
+
 
 
     private fun checkCameraPermission(): Boolean {
