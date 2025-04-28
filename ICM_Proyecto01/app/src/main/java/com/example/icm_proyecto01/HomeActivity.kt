@@ -579,6 +579,3 @@ class HomeActivity : AppCompatActivity() {
 
 
 }
-
-
-}
