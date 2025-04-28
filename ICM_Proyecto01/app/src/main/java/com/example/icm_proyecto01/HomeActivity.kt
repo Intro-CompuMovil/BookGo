@@ -337,7 +337,6 @@ class HomeActivity : AppCompatActivity() {
         }
 
         marker?.position = geoPoint
-        osmMap.controller.setCenter(geoPoint)
         osmMap.invalidate()
     }
 
@@ -461,10 +460,6 @@ class HomeActivity : AppCompatActivity() {
 
 
 
-
-
-
-
     private fun drawRoute(inicio: GeoPoint, destino: GeoPoint) {
         roadOverlay?.let { osmMap.overlays.remove(it) }
 
@@ -515,8 +510,6 @@ class HomeActivity : AppCompatActivity() {
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-
-
 
 
 
