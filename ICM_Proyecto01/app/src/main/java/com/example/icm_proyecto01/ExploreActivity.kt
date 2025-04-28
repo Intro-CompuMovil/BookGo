@@ -56,7 +56,7 @@ class ExploreActivity : AppCompatActivity() {
                 R.id.nav_explore -> true
 
                 R.id.nav_messages -> {
-                    startActivity(Intent(this, SearchHiddenBookActivity::class.java))
+                    startActivity(Intent(this, ShowHiddenBooksActivity::class.java))
                     overridePendingTransition(0, 0)
                     true
                 }
