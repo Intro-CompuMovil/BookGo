@@ -41,6 +41,9 @@ import org.osmdroid.bonuspack.routing.RoadManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.squareup.picasso.Picasso
+import org.json.JSONArray
+import org.json.JSONObject
+
 import org.osmdroid.api.IMapController
 import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
@@ -209,40 +212,70 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
+    private fun cargarEventosDesdeFirebase(onEventosListos: (JSONArray) -> Unit) {
+        val eventosRef = FirebaseDatabase.getInstance().getReference("Events")
+
+        eventosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val eventosList = mutableListOf<JSONObject>()
+
+                for (eventoSnapshot in snapshot.children) {
+                    try {
+                        val eventoObj = JSONObject()
+
+                        eventoObj.put("name", eventoSnapshot.child("name").getValue(String::class.java) ?: "Evento")
+                        eventoObj.put("location", eventoSnapshot.child("location").getValue(String::class.java) ?: "Dirección desconocida")
+                        eventoObj.put("date", eventoSnapshot.child("date").getValue(String::class.java) ?: "")
+                        eventoObj.put("lat", eventoSnapshot.child("lat").getValue(Double::class.java) ?: Double.NaN)
+                        eventoObj.put("lon", eventoSnapshot.child("lon").getValue(Double::class.java) ?: Double.NaN)
+
+                        eventosList.add(eventoObj)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                val eventosArray = JSONArray(eventosList)
+                onEventosListos(eventosArray)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Error al cargar eventos: ${error.message}")
+            }
+        })
+    }
 
 
     //Para el evento
     private fun cargarEventosEnMapa() {
-        val sharedPrefs = getSharedPreferences("EventsData", MODE_PRIVATE)
-        val eventosString = sharedPrefs.getString("events", "[]")
+        cargarEventosDesdeFirebase { eventosArray ->
+            try {
+                for (i in 0 until eventosArray.length()) {
+                    val evento = eventosArray.getJSONObject(i)
+                    val lat = evento.optDouble("lat", Double.NaN)
+                    val lon = evento.optDouble("lon", Double.NaN)
+                    val nombre = evento.optString("name", "Evento")
+                    val direccion = evento.optString("location", "Dirección desconocida")
+                    val fechaHora = evento.optString("date", "")
 
-        try {
-            val eventosArray = org.json.JSONArray(eventosString)
-
-            for (i in 0 until eventosArray.length()) {
-                val evento = eventosArray.getJSONObject(i)
-                val lat = evento.optDouble("lat", Double.NaN)
-                val lon = evento.optDouble("lon", Double.NaN)
-                val nombre = evento.optString("name", "Evento")
-                val direccion = evento.optString("location", "Dirección desconocida")
-                val fechaHora = evento.optString("date", "")
-
-                if (!lat.isNaN() && !lon.isNaN()) {
-                    val marcadorEvento = Marker(osmMap).apply {
-                        position = GeoPoint(lat, lon)
-                        title = "$nombre\n$direccion\n$fechaHora"
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_event_point)
+                    if (!lat.isNaN() && !lon.isNaN()) {
+                        val marcadorEvento = Marker(osmMap).apply {
+                            position = GeoPoint(lat, lon)
+                            title = "$nombre\n$direccion\n$fechaHora"
+                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_event_point)
+                        }
+                        osmMap.overlays.add(marcadorEvento)
                     }
-                    osmMap.overlays.add(marcadorEvento)
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
 
-        osmMap.invalidate()
+            osmMap.invalidate()
+        }
     }
+
 
     //Para el intercambio
     private fun cargarPuntosDeIntercambio() {

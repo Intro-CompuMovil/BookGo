@@ -87,7 +87,8 @@ class ExchangePointRepository(private val context: Context) {
                     Log.d("Firebase", "Id Punto Intercambio = $idPuntoIntercambio")
                     val receiverId = pointSnapshot.child("receiverUserId").value.toString()
                     val exchangerId = pointSnapshot.child("exchangeUserId").value.toString()
-                    if (exchangerId != FirebaseAuth.getInstance().currentUser?.uid && receiverId == "") {
+                    val uid = FirebaseAuth.getInstance().currentUser?.uid
+                    Log.d("Pruebas", "exchangerId = $exchangerId , current = $uid, receiverId = $receiverId")
                         val idLibro = pointSnapshot.child("Book").child("id").value.toString()
                         val state = pointSnapshot.child("Book").child("state").value.toString()
 
@@ -106,22 +107,26 @@ class ExchangePointRepository(private val context: Context) {
                         // Llamada a la API de Google Books para obtener detalles del libro
                         fetchBookFromGoogleApi(idLibro, pointSnapshot) { book ->
                             book?.let {
-                                val idPunto = idPuntoIntercambio
-                                Log.d("Firebase", "Id Punto para array = $idPunto")
-                                val portadaUrl = it.portadaUrl
-                                val fecha = date.split(" ")[0]
-                                val hora =
-                                    if (date.contains("-")) date.split("-").getOrNull(1)?.trim()
-                                        ?: "00:00" else "00:00"
+                                if (exchangerId != uid && receiverId.isNullOrEmpty()) {
+                                    val idPunto = idPuntoIntercambio
+                                    Log.d("Firebase", "Id Punto para array = $idPunto")
+                                    val portadaUrl = it.portadaUrl
+                                    val fecha = date.split(" ")[0]
+                                    val hora =
+                                        if (date.contains("-")) date.split("-").getOrNull(1)?.trim()
+                                            ?: "00:00" else "00:00"
 
-                                // Formateamos el punto para agregarlo al set
-                                val puntoFormateado =
-                                    "${it.titulo}|$fecha|$hora|$lat|$lon|$state|$portadaUrl|$idPunto"
-                                Log.d("Firebase", "Punto formateado: $puntoFormateado")
+                                    // Formateamos el punto para agregarlo al set
+                                    val puntoFormateado =
+                                        "${it.titulo}|$fecha|$hora|$lat|$lon|$state|$portadaUrl|$idPunto"
+                                    Log.d("Firebase", "Punto formateado: $puntoFormateado")
 
-                                // Agregamos el punto formateado al conjunto
-                                pointsSet.add(puntoFormateado)
-                            }
+                                    // Agregamos el punto formateado al conjunto
+                                    pointsSet.add(puntoFormateado)
+                                } else {
+                                    Log.d("Firebase", "Punto descartado por condición")
+                                }
+                        }
 
                             // Aumentamos el contador de puntos cargados
                             puntosCargados++
@@ -137,7 +142,6 @@ class ExchangePointRepository(private val context: Context) {
                             }
                         }
                     }
-                }
             }
 
             override fun onCancelled(error: DatabaseError) {
