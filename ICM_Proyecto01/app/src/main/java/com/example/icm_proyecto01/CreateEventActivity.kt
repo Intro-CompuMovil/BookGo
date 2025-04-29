@@ -23,6 +23,12 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.Marker
 import java.util.*
+import org.osmdroid.bonuspack.routing.Road
+import org.osmdroid.bonuspack.routing.RoadManager
+import org.osmdroid.bonuspack.routing.RoadNode
+import org.osmdroid.bonuspack.routing.OSRMRoadManager
+import org.osmdroid.views.overlay.Polyline
+
 
 class CreateEventActivity : AppCompatActivity() {
 
@@ -33,6 +39,8 @@ class CreateEventActivity : AppCompatActivity() {
     private var selectedLat: Double? = null
     private var selectedLon: Double? = null
     private var selectedAddress: String = ""
+    private var roadOverlay: Polyline? = null
+
 
     private var markerActual: Marker? = null
     private var markerDestino: Marker? = null
@@ -126,6 +134,12 @@ class CreateEventActivity : AppCompatActivity() {
             }
             binding.osmMap.overlays.add(markerDestino)
             binding.osmMap.controller.animateTo(punto)
+
+            // CREAR RUTA
+            currentLocation?.let { origen ->
+                generarRuta(origen, punto)
+            }
+
             binding.osmMap.invalidate()
 
             selectedLat = punto.latitude
@@ -135,6 +149,27 @@ class CreateEventActivity : AppCompatActivity() {
             Toast.makeText(this, "Dirección no encontrada", Toast.LENGTH_SHORT).show()
         }
     }
+
+    private fun generarRuta(origen: GeoPoint, destino: GeoPoint) {
+        // Quitar ruta anterior si existe
+        roadOverlay?.let { binding.osmMap.overlays.remove(it) }
+
+        val roadManager = OSRMRoadManager(this, "AndroidApp")
+        val waypoints = arrayListOf<GeoPoint>()
+        waypoints.add(origen)
+        waypoints.add(destino)
+
+        Thread {
+            val road: Road = roadManager.getRoad(waypoints)
+
+            runOnUiThread {
+                roadOverlay = RoadManager.buildRoadOverlay(road)
+                binding.osmMap.overlays.add(roadOverlay)
+                binding.osmMap.invalidate()
+            }
+        }.start()
+    }
+
 
     private fun abrirSelectorFecha() {
         val cal = Calendar.getInstance()

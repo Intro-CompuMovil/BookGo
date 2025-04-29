@@ -116,7 +116,7 @@ class ProfileActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_messages -> {
-                    startActivity(Intent(this, SearchHiddenBookActivity::class.java))
+                    startActivity(Intent(this, ShowHiddenBooksActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true
