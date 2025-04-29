@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityExchangeSummaryBinding
 import com.example.icm_proyecto01.model.UserBook
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -28,6 +30,7 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         val fecha = intent.getStringExtra("fecha") ?: "-"
         val hora = intent.getStringExtra("hora") ?: "-"
         val estadoLibroDisponible = intent.getStringExtra("estadoLibroDisponible") ?: "-"
+        val idPunto = intent.getStringExtra("idPunto")
 
         binding.tvBookExchangeTitle.text = tituloIntercambio
         binding.tvBookExchangeState.text = "Estado: $estadoLibroDisponible"
@@ -58,15 +61,31 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         }
 
         binding.btnConfirmExchange.setOnClickListener {
-            val direccion = intent.getStringExtra("direccion") ?: "Sin dirección"
-            val direccionCodificada = URLEncoder.encode(direccion, StandardCharsets.UTF_8.toString())
-            val uri = "https://www.google.com/maps/search/?api=1&query=$direccionCodificada"
+            val idPunto = intent.getStringExtra("idPunto")
+            val userBook = intent.getSerializableExtra("selectedBook") as? UserBook
 
-            val intentWeb = Intent(this, ExchangeWebRouteActivity::class.java).apply {
-                putExtra("url", uri)
+            if (idPunto != null && userBook != null) {
+                val databaseRef = FirebaseDatabase.getInstance().reference.child("ExchangePoints").child(idPunto)
+
+                val updates = mapOf(
+                    "BookExchange/id" to userBook.id,
+                    "BookExchange/state" to userBook.estado,
+                    "receiverUserId" to FirebaseAuth.getInstance().currentUser?.uid
+                )
+
+                databaseRef.updateChildren(updates)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Intercambio confirmado exitosamente", Toast.LENGTH_SHORT).show()
+                        finish() // o puedes navegar a otra pantalla si quieres
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al confirmar intercambio: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+            } else {
+                Toast.makeText(this, "No se pudo confirmar el intercambio", Toast.LENGTH_SHORT).show()
             }
-            startActivity(intentWeb)
         }
+
 
 
 

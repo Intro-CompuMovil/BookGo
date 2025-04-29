@@ -1,6 +1,7 @@
 package com.example.icm_proyecto01
 
 import android.Manifest
+import android.util.Log
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -31,6 +32,11 @@ import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
 import java.util.*
 
+
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+
+
 class CreateExchangePointActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateExchangePointBinding
@@ -50,6 +56,7 @@ class CreateExchangePointActivity : AppCompatActivity() {
     private var selectedBookTitle: String? = null
     private var selectedBookState: String? = null
     private var selectedBookCoverUrl: String? = null
+    private var selectedBookId: String? = null
 
 
     private val selectBookLauncher = registerForActivityResult(
@@ -57,6 +64,7 @@ class CreateExchangePointActivity : AppCompatActivity() {
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val data = result.data
+            selectedBookId = data?.getStringExtra("selectedBookId")
             selectedBookTitle = data?.getStringExtra("selectedBookTitle")
             selectedBookState = data?.getStringExtra("selectedBookState")
             selectedBookCoverUrl = data?.getStringExtra("selectedBookCoverUrl")
@@ -66,10 +74,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
             binding.tvEstadoLibro.text = "Estado: ${selectedBookState ?: "-"}"
         }
     }
-
-
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -139,47 +143,84 @@ class CreateExchangePointActivity : AppCompatActivity() {
 
 
         binding.btnConfirm.setOnClickListener {
+            Log.d("CreateExchange", "Confirm button clicked")
+
+            val bookId = selectedBookId ?: ""
             val bookTitle = selectedBookTitle ?: ""
+            val bookState = selectedBookState ?: ""
+            val address = binding.searchAddress.text.toString()
             val date = binding.tvSelectedDate.text.toString()
             val time = binding.tvSelectedTime.text.toString()
 
-            if (selectedBookTitle.isNullOrEmpty() || selectedBookState.isNullOrEmpty() ||
+            Log.d("CreateExchange", "Selected bookId: $bookId")
+            Log.d("CreateExchange", "Selected bookTitle: $bookTitle")
+            Log.d("CreateExchange", "Selected bookState: $bookState")
+            Log.d("CreateExchange", "Address: $address")
+            Log.d("CreateExchange", "Date: $date")
+            Log.d("CreateExchange", "Time: $time")
+
+            if (bookId.isBlank() || bookState.isBlank() ||
                 date == "Fecha: No seleccionada" || time == "Hora: No seleccionada" || puntoSeleccionado == null
             ) {
                 Toast.makeText(this, "Por favor, completa todos los campos y selecciona un libro", Toast.LENGTH_SHORT).show()
+                Log.e("CreateExchange", "Missing required data, cannot continue")
                 return@setOnClickListener
             }
 
-
-            val sharedPrefExchange = getSharedPreferences("ExchangePoints", MODE_PRIVATE)
-            val editor = sharedPrefExchange.edit()
-
-            val portadaUrlFinal = if (selectedBookCoverUrl != null && selectedBookCoverUrl != "null") selectedBookCoverUrl else ""
-            val punto = "$selectedBookTitle|$date|$time|${puntoSeleccionado!!.latitude}|${puntoSeleccionado!!.longitude}|$selectedBookState|$portadaUrlFinal"
-
-
-
-            val existingPoints = sharedPrefExchange.getStringSet("points", mutableSetOf()) ?: mutableSetOf()
-            existingPoints.add(punto)
-            editor.putStringSet("points", existingPoints)
-            editor.apply()
-
-            Toast.makeText(this, "Punto de intercambio creado!", Toast.LENGTH_SHORT).show()
-
-            val sharedPrefUser = getSharedPreferences("UserProfile", MODE_PRIVATE)
-            with(sharedPrefUser.edit()) {
-                putString("userName", userName ?: "Jane Doe")
-                apply()
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            if (userId == null) {
+                Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
+                Log.e("CreateExchange", "User not authenticated")
+                return@setOnClickListener
             }
 
-            val intent = Intent(this, HomeActivity::class.java)
-            intent.putExtra("userName", userName ?: "Jane Doe")
-            intent.putExtra("focusLat", puntoSeleccionado!!.latitude)
-            intent.putExtra("focusLon", puntoSeleccionado!!.longitude)
-            startActivity(intent)
-            finish()
+            val cleanedDate = date.replace("Fecha: ", "").trim()
+            val cleanedTime = time.replace("Hora: ", "").trim()
+            val fechaCompleta = "$cleanedDate - $cleanedTime"
 
+
+            val exchangePoint = hashMapOf(
+                "Book" to hashMapOf(
+                    "id" to bookId,
+                    "state" to bookState
+                ),
+                "BookReceiver" to hashMapOf(
+                    "id" to "",
+                    "state" to ""
+                ),
+
+                "address" to address,
+                "date" to fechaCompleta,
+                "exchangeUserId" to userId,
+                "lat" to puntoSeleccionado!!.latitude,
+                "lon" to puntoSeleccionado!!.longitude,
+                "receiverUserId" to ""
+            )
+
+            Log.d("CreateExchange", "ExchangePoint to save: $exchangePoint")
+
+            val dbRef = FirebaseDatabase.getInstance().reference
+            val newExchangePointRef = dbRef.child("ExchangePoints").push()
+
+            newExchangePointRef.setValue(exchangePoint)
+                .addOnSuccessListener {
+                    Log.i("CreateExchange", "Exchange point successfully created in database")
+                    Toast.makeText(this, "Punto de intercambio creado!", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, HomeActivity::class.java)
+                    intent.putExtra("userName", userName ?: "Jane Doe")
+                    intent.putExtra("focusLat", puntoSeleccionado!!.latitude)
+                    intent.putExtra("focusLon", puntoSeleccionado!!.longitude)
+                    startActivity(intent)
+                    finish()
+                }
+                .addOnFailureListener { e ->
+                    Log.e("CreateExchange", "Error al crear punto de intercambio: ${e.message}")
+                    Toast.makeText(this, "Error al crear punto de intercambio: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
         }
+
+
+
     }
 
 

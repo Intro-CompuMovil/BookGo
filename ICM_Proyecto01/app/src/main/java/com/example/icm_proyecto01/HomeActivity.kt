@@ -268,6 +268,7 @@ class HomeActivity : AppCompatActivity() {
                         Log.d("PuntoIntercambio:", "Lon $lon" )
                         val estadoLibro = if (datos.size >= 6) datos[5] else "No disponible"
                         val portadaUrl = if (datos.size >= 7) datos[6] else ""
+                        val idPunto = if (datos.size >= 8) datos[7] else "404"
 
 
 
@@ -312,6 +313,7 @@ class HomeActivity : AppCompatActivity() {
                                             Log.d("PuntoIntercambio", "puso lon")
                                             putExtra("estadoLibro", estadoLibro)
                                             putExtra("portadaUrl", portadaUrl)
+                                            putExtra("idPunto", idPunto)
                                         }
                                     startActivity(intent)
 

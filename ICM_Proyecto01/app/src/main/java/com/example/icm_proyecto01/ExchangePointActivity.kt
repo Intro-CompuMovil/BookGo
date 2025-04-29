@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
@@ -76,6 +77,8 @@ class ExchangePointActivity : AppCompatActivity() {
         val hora = intent.getStringExtra("hora") ?: "-"
         val estadoLibro = intent.getStringExtra("estadoLibro") ?: "No disponible"
         val portadaUrl = intent.getStringExtra("portadaUrl") ?: ""
+        val idPunto = intent.getStringExtra("idPunto")
+        Log.d("ExchangePoint", "IdPunto = $idPunto")
 
         libroSeleccionado = intent.getSerializableExtra("libroSeleccionado") as? UserBook
 
@@ -111,6 +114,7 @@ class ExchangePointActivity : AppCompatActivity() {
                 putExtra("lon", lon)
                 putExtra("estadoLibroDisponible", estado)
                 putExtra("portadaLibroDisponible", portada)
+                putExtra("idPunto", idPunto)
             }
             startActivity(intent)
         }
