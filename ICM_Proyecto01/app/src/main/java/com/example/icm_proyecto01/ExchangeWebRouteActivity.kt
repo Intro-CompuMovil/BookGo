@@ -20,7 +20,7 @@ class ExchangeWebRouteActivity : AppCompatActivity() {
             binding.webView.apply {
                 webViewClient = WebViewClient()
                 settings.javaScriptEnabled = true
-                loadUrl(url) // <<=== usa el que te pasaron correctamente codificado
+                loadUrl(url)
             }
         }
     }

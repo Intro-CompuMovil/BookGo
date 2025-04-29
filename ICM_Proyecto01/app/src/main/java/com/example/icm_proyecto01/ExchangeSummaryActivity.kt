@@ -76,7 +76,8 @@ class ExchangeSummaryActivity : AppCompatActivity() {
                 databaseRef.updateChildren(updates)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Intercambio confirmado exitosamente", Toast.LENGTH_SHORT).show()
-                        finish() // o puedes navegar a otra pantalla si quieres
+                        val intent = Intent(this, HomeActivity::class.java)
+                        startActivity(intent)
                     }
                     .addOnFailureListener { e ->
                         Toast.makeText(this, "Error al confirmar intercambio: ${e.message}", Toast.LENGTH_LONG).show()
