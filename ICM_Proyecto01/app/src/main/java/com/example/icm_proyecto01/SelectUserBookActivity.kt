@@ -4,6 +4,7 @@ import UserRepository
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,11 +31,13 @@ class SelectUserBookActivity : AppCompatActivity() {
         val exchangeHora = intent.getStringExtra("hora")
         val exchangeLat = intent.getDoubleExtra("lat", 0.0)
         val exchangeLon = intent.getDoubleExtra("lon", 0.0)
+        val idPunto = intent.getStringExtra("idPunto")
+        Log.d("SelectUser", "IdPunto = $idPunto")
 
         val estadoLibroDisponible = intent.getStringExtra("estadoLibroDisponible")
         val portadaLibroDisponible = intent.getStringExtra("portadaLibroDisponible")
 
-        // 🚀 Load books using UserRepository
+        // Load books using UserRepository
         val repository = UserRepository(this)
         repository.fetchUserBooks { userBooks ->
 
@@ -47,6 +50,7 @@ class SelectUserBookActivity : AppCompatActivity() {
 
                 if (from == "createExchange") {
                     val resultIntent = Intent().apply {
+                        putExtra("selectedBookId", selectedBook.id)
                         putExtra("selectedBookTitle", selectedBook.titulo)
                         putExtra("selectedBookState", selectedBook.estado)
                         putExtra("selectedBookCoverUrl", selectedBook.portadaUrl ?: "")
@@ -56,6 +60,7 @@ class SelectUserBookActivity : AppCompatActivity() {
 
                 } else {
                     val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
+                        putExtra("selectedBookId", selectedBook.id)
                         putExtra("selectedBook", selectedBook)
                         putExtra("titulo", exchangeTitulo)
                         putExtra("direccion", exchangeDireccion)
@@ -65,6 +70,7 @@ class SelectUserBookActivity : AppCompatActivity() {
                         putExtra("lon", exchangeLon)
                         putExtra("estadoLibroDisponible", estadoLibroDisponible)
                         putExtra("portadaLibroDisponible", portadaLibroDisponible)
+                        putExtra("idPunto", idPunto)
                     }
                     startActivity(intent)
                     finish()
