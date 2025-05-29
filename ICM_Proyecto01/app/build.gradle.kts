@@ -62,6 +62,7 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.4.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
+    implementation(libs.firebase.messaging.ktx)
 
     //camaraX
     val camerax_version = "1.1.0-beta01"

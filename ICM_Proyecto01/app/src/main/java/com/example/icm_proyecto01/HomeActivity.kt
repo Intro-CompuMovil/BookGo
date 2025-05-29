@@ -1,9 +1,7 @@
 package com.example.icm_proyecto01
 
-import UserRepository
 import ExchangePointRepository
 import android.Manifest
-import android.app.Activity
 import android.app.UiModeManager
 import android.content.Context
 import android.content.Intent
@@ -14,9 +12,9 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
@@ -28,8 +26,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.databinding.ActivityHomeBinding
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.*
 import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -37,28 +33,19 @@ import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
-import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.squareup.picasso.Picasso
 import org.json.JSONArray
 import org.json.JSONObject
-
-import org.osmdroid.api.IMapController
-import org.osmdroid.views.overlay.Polygon
 import org.osmdroid.views.overlay.TilesOverlay
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 
-import com.android.volley.Request
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
-import kotlin.math.log
+import com.example.icm_proyecto01.notifications.ExchangeNotificationManager
 import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 
 class HomeActivity : AppCompatActivity() {
@@ -72,7 +59,6 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var locationCallback: LocationCallback
 
     private var currentLocation: GeoPoint? = null
-    private var roadOverlay: Polyline? = null
     private var userName: String? = null
     private var marker: Marker? = null
 
@@ -128,7 +114,8 @@ class HomeActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
 
-
+        escucharNuevasOfertasDeIntercambio()
+        ExchangeNotificationManager.startListening(this)
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -228,12 +215,11 @@ class HomeActivity : AppCompatActivity() {
     private fun iniciarActualizacionesDeUbicacion() {
         val locationRequest = com.google.android.gms.location.LocationRequest.Builder(
             com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY,
-            5000 // cada 5 segundos
+            5000
         ).build()
 
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
     }
-
 
 
     private fun inicializarMapa() {
@@ -443,10 +429,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-
-
-
-
     private fun pedirPermisos() {
         val permisos = mutableListOf<String>()
 
@@ -457,13 +439,20 @@ class HomeActivity : AppCompatActivity() {
             permisos.add(Manifest.permission.ACTIVITY_RECOGNITION)
         }
 
+        // Solo pedir POST_NOTIFICATIONS si estamos en Android 13 o superior
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permisos.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
         if (permisos.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, permisos.toTypedArray(), 1)
         } else {
             obtenerUbicacion()
             inicializarSensorDePasos()
             iniciarActualizacionesDeUbicacion()
-
+            ExchangeNotificationManager.startListening(this)
         }
     }
 
@@ -499,13 +488,10 @@ class HomeActivity : AppCompatActivity() {
         if (!resultados.isNullOrEmpty()) {
             val direccion = resultados[0]
             val punto = GeoPoint(direccion.latitude, direccion.longitude)
-            //colocarMarcador(punto, direccion.getAddressLine(0))
-            //currentLocation?.let { drawRoute(it, punto) }
             osmMap.controller.setCenter(punto)
         } else {
             Toast.makeText(this, "Dirección no encontrada", Toast.LENGTH_SHORT).show()
         }
-
         binding.searchAddress.text.clear()
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.searchAddress.windowToken, 0)
@@ -552,9 +538,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-
-
-
     //Para libros ocultos
     private fun mostrarLibroOculto(lat: Double, lon: Double, titulo: String, autor: String, instruccion: String) {
         val punto = GeoPoint(lat, lon)
@@ -595,17 +578,30 @@ class HomeActivity : AppCompatActivity() {
 
 
 
-    private fun drawRoute(inicio: GeoPoint, destino: GeoPoint) {
-        roadOverlay?.let { osmMap.overlays.remove(it) }
+    private fun escucharNuevasOfertasDeIntercambio() {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dbRef = FirebaseDatabase.getInstance().getReference("ExchangePoints")
 
-        GlobalScope.launch(Dispatchers.Main) {
-            val road: Road = withContext(Dispatchers.IO) {
-                roadManager.getRoad(arrayListOf(inicio, destino))
+        dbRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+
+            override fun onCancelled(error: DatabaseError) {}
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val creatorUserId = snapshot.child("creatorUserId").getValue(String::class.java)
+                val receiverUserId = snapshot.child("receiverUserId").getValue(String::class.java)
+
+                if (creatorUserId == currentUserId && !receiverUserId.isNullOrEmpty()) {
+                    ExchangeNotificationManager.sendNotification(
+                        this@HomeActivity,
+                        "¡Nuevo libro ofrecido!",
+                        "Un usuario ofreció un libro en tu punto de intercambio."
+                    )
+                }
             }
-            roadOverlay = RoadManager.buildRoadOverlay(road)
-            osmMap.overlays.add(roadOverlay)
-            osmMap.invalidate()
-        }
+        })
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
@@ -614,6 +610,7 @@ class HomeActivity : AppCompatActivity() {
             if (grantResults.isNotEmpty()) {
                 var permisoUbicacionConcedido = false
                 var permisoActividadConcedido = false
+                var permisoNotificacionesConcedido = false
 
                 for (i in permissions.indices) {
                     when (permissions[i]) {
@@ -625,6 +622,11 @@ class HomeActivity : AppCompatActivity() {
                         Manifest.permission.ACTIVITY_RECOGNITION -> {
                             if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                                 permisoActividadConcedido = true
+                            }
+                        }
+                        Manifest.permission.POST_NOTIFICATIONS -> {
+                            if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                                permisoNotificacionesConcedido = true
                             }
                         }
                     }
@@ -642,10 +644,16 @@ class HomeActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(this, "Permiso de actividad física requerido para contar pasos", Toast.LENGTH_SHORT).show()
                 }
+                if (permisoNotificacionesConcedido || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    ExchangeNotificationManager.startListening(this)
+                }
+
+
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
 
 
 
