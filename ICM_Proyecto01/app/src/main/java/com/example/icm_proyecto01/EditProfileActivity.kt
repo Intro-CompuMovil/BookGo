@@ -147,6 +147,7 @@ class EditProfileActivity : AppCompatActivity() {
             val database = FirebaseDatabase.getInstance().reference
             val updates = mutableMapOf<String, Any>("name" to newUserName)
 
+
             if (selectedImageUri != null) {
                 StorageHelper.uploadProfileImage(
                     userId, selectedImageUri!!,
