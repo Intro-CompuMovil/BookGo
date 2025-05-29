@@ -19,6 +19,7 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -162,6 +163,12 @@ class HomeActivity : AppCompatActivity() {
             osmMap.controller.setZoom(17.0)
 
             osmMap.invalidate()
+        }
+
+
+        findViewById<Button>(R.id.btnMyExchanges).setOnClickListener {
+            val intent = Intent(this, MyExchangesActivity::class.java)
+            startActivity(intent)
         }
 
 

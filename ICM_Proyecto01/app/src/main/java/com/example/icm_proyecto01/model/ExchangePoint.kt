@@ -1,14 +1,12 @@
 package com.example.icm_proyecto01.model
 
-import java.io.Serializable
-
 data class ExchangePoint(
-    val tituloLibro: String,
-    val fecha: String,
-    val hora: String,
-    val lat: Double,
-    val lon: Double,
-    val estadoLibro: String,
-    val portadaUrl: String,
-    val direccion : String
+    var tituloLibro: String = "",
+    var estadoLibro: String = "",
+    var fecha: String = "",
+    var hora: String = "",
+    var lat: Double = 0.0,
+    var lon: Double = 0.0,
+    var portadaUrl: String = "",
+    var direccion: String = ""
 )
