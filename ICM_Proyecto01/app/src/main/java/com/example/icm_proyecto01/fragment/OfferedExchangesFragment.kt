@@ -12,7 +12,6 @@ import com.example.icm_proyecto01.model.ExchangePoint
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
-
 class OfferedExchangesFragment : Fragment() {
 
     private lateinit var binding: FragmentOfferedExchangesBinding
@@ -46,7 +45,11 @@ class OfferedExchangesFragment : Fragment() {
                             val date = point.child("date").value.toString().split("-")
                             val lat = point.child("lat").getValue(Double::class.java) ?: 0.0
                             val lon = point.child("lon").getValue(Double::class.java) ?: 0.0
-                            val address = point.child("address").value.toString()
+
+                            // ✅ Dirección preferida: resolvedAddress > address > fallback
+                            val address = point.child("resolvedAddress").value?.toString()
+                                ?: point.child("address").value?.toString()
+                                ?: "Dirección no disponible"
 
                             val fecha = date.getOrNull(0)?.trim() ?: "-"
                             val hora = date.getOrNull(1)?.trim() ?: "-"
@@ -66,7 +69,6 @@ class OfferedExchangesFragment : Fragment() {
                                 )
                                 adapter.notifyItemInserted(offeredList.size - 1)
                             }
-
                         }
                     }
                 }
@@ -74,7 +76,6 @@ class OfferedExchangesFragment : Fragment() {
                 override fun onCancelled(error: DatabaseError) {}
             })
     }
-
 
     private fun fetchBookFromGoogleApi(bookId: String, callback: (String, String) -> Unit) {
         val url = "https://www.googleapis.com/books/v1/volumes/$bookId"
@@ -100,8 +101,4 @@ class OfferedExchangesFragment : Fragment() {
 
         requestQueue.add(request)
     }
-
 }
-
-
-

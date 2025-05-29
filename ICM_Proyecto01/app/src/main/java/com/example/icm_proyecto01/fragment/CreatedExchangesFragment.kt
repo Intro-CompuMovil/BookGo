@@ -36,18 +36,19 @@ class CreatedExchangesFragment : Fragment() {
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     exchangeList.clear()
-                    snapshot.children.forEach {
-                        // NO usar getValue porque ExchangePoint no es 1:1 con Firebase
-                        val raw = it.child("Book")
+                    snapshot.children.forEach { point ->
+                        val raw = point.child("Book")
                         val bookId = raw.child("id").value.toString()
                         val state = raw.child("state").value.toString()
-                        val portadaUrl = "" // puedes traerla con la Google Books API si lo necesitas
-                        val dateTime = it.child("date").value.toString().split("-")
-                        val lat = it.child("lat").getValue(Double::class.java) ?: 0.0
-                        val lon = it.child("lon").getValue(Double::class.java) ?: 0.0
-                        val address = it.child("address").value.toString()
+                        val dateTime = point.child("date").value.toString().split("-")
+                        val lat = point.child("lat").getValue(Double::class.java) ?: 0.0
+                        val lon = point.child("lon").getValue(Double::class.java) ?: 0.0
 
-                        val tituloFake = "ID: $bookId" // si quieres mostrar algo por ahora
+                        // ✅ Dirección real si existe
+                        val address = point.child("resolvedAddress").value?.toString()
+                            ?: point.child("address").value?.toString()
+                            ?: "Dirección no disponible"
+
                         val fecha = dateTime.getOrNull(0)?.trim() ?: "-"
                         val hora = dateTime.getOrNull(1)?.trim() ?: "-"
 
@@ -66,7 +67,6 @@ class CreatedExchangesFragment : Fragment() {
                             )
                             adapter.notifyItemInserted(exchangeList.size - 1)
                         }
-
                     }
                     adapter.notifyDataSetChanged()
                 }
@@ -74,7 +74,6 @@ class CreatedExchangesFragment : Fragment() {
                 override fun onCancelled(error: DatabaseError) {}
             })
     }
-
 
     private fun fetchBookFromGoogleApi(bookId: String, callback: (String, String) -> Unit) {
         val url = "https://www.googleapis.com/books/v1/volumes/$bookId"
@@ -100,5 +99,4 @@ class CreatedExchangesFragment : Fragment() {
 
         requestQueue.add(request)
     }
-
 }

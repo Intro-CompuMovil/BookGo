@@ -148,14 +148,14 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val bookId = selectedBookId ?: ""
             val bookTitle = selectedBookTitle ?: ""
             val bookState = selectedBookState ?: ""
-            val address = binding.searchAddress.text.toString()
+            val addressInput = binding.searchAddress.text.toString()
             val date = binding.tvSelectedDate.text.toString()
             val time = binding.tvSelectedTime.text.toString()
 
             Log.d("CreateExchange", "Selected bookId: $bookId")
             Log.d("CreateExchange", "Selected bookTitle: $bookTitle")
             Log.d("CreateExchange", "Selected bookState: $bookState")
-            Log.d("CreateExchange", "Address: $address")
+            Log.d("CreateExchange", "Address Input: $addressInput")
             Log.d("CreateExchange", "Date: $date")
             Log.d("CreateExchange", "Time: $time")
 
@@ -178,6 +178,13 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val cleanedTime = time.replace("Hora: ", "").trim()
             val fechaCompleta = "$cleanedDate - $cleanedTime"
 
+            // 👉 Obtener dirección real con Geocoder
+            val resolvedAddress = try {
+                val addresses = geocoder.getFromLocation(puntoSeleccionado!!.latitude, puntoSeleccionado!!.longitude, 1)
+                addresses?.firstOrNull()?.getAddressLine(0) ?: "Dirección no disponible"
+            } catch (e: Exception) {
+                "Dirección no disponible"
+            }
 
             val exchangePoint = hashMapOf(
                 "Book" to hashMapOf(
@@ -188,8 +195,8 @@ class CreateExchangePointActivity : AppCompatActivity() {
                     "id" to "",
                     "state" to ""
                 ),
-
-                "address" to address,
+                "address" to addressInput, // dirección que el usuario escribió
+                "resolvedAddress" to resolvedAddress, // dirección real obtenida
                 "date" to fechaCompleta,
                 "exchangeUserId" to userId,
                 "lat" to puntoSeleccionado!!.latitude,
@@ -218,6 +225,7 @@ class CreateExchangePointActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error al crear punto de intercambio: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
+
 
 
 
