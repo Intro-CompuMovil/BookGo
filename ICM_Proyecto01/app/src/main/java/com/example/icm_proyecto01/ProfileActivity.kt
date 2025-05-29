@@ -19,18 +19,22 @@ import com.bumptech.glide.Glide
 import com.example.icm_proyecto01.Miscellaneous.Companion.PERMISSION_CAMERA
 import com.example.icm_proyecto01.adapters.UserBooksAdapter
 import com.example.icm_proyecto01.databinding.ActivityProfileBinding
-import com.example.icm_proyecto01.model.UserBook
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.io.File
 import java.io.FileOutputStream
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+
 
 class ProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileBinding
     private lateinit var database: DatabaseReference
-    private lateinit var userRepository: UserRepository
+    private var nivelAnterior: Int = -1
+
 
     private var fromExchange: Boolean = false
     private var exchangeData: Bundle? = null
@@ -39,6 +43,8 @@ class ProfileActivity : AppCompatActivity() {
         super.onResume()
         cargarLibrosUsuario()
     }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,34 +59,52 @@ class ProfileActivity : AppCompatActivity() {
         val currentUser = FirebaseAuth.getInstance().currentUser
         val uid = currentUser?.uid
 
-        if (uid != null) {
-            database.child("Users").child(uid).get().addOnSuccessListener { dataSnapshot ->
-                if (dataSnapshot.exists()) {
-                    val userName = dataSnapshot.child("name").value.toString()
-                    val email = dataSnapshot.child("email").value.toString()
-                    val profilePicUrl = dataSnapshot.child("profilePictureUrl").value.toString()
-                    val expValue = dataSnapshot.child("readerLvl").getValue(Int::class.java) ?: 0
 
-                    val readerLevel = when {
-                        expValue < 100 -> 1
-                        expValue < 1000 -> 2
-                        else -> 3
+
+        if (uid != null) {
+            database.child("Users").child(uid)
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            val userName = dataSnapshot.child("name").value.toString()
+                            val email = dataSnapshot.child("email").value.toString()
+                            val profilePicUrl = dataSnapshot.child("profilePictureUrl").value.toString()
+                            val expValue = dataSnapshot.child("readerLvl").getValue(Int::class.java) ?: 0
+
+                            val readerLevel = when {
+                                expValue < 100 -> 1
+                                expValue < 1000 -> 2
+                                else -> 3
+                            }
+
+                            if (nivelAnterior != -1 && readerLevel > nivelAnterior) {
+                                Toast.makeText(this@ProfileActivity, "🎉 ¡Subiste a nivel $readerLevel!", Toast.LENGTH_LONG).show()
+                            }
+
+                            nivelAnterior = readerLevel
+
+
+                            binding.tvUserLevel.text = "Nivel de lector: $readerLevel"
+
+                            binding.tvUserName.text = userName
+                            binding.tvUserEmail.text = email
+
+
+                            if (!this@ProfileActivity.isFinishing && !this@ProfileActivity.isDestroyed) {
+                                Glide.with(this@ProfileActivity)
+                                    .load(profilePicUrl)
+                                    .placeholder(R.drawable.icono_perfil)
+                                    .error(R.drawable.icono_perfil)
+                                    .into(binding.profileImage)
+                            }
+
+                        }
                     }
 
-                    binding.tvUserName.text = userName
-                    binding.tvUserEmail.text = email
-                    binding.tvUserLevel.text = "Nivel de lector: $readerLevel"
-
-                    Glide.with(this)
-                        .load(profilePicUrl)
-                        .placeholder(R.drawable.icono_perfil)
-                        .error(R.drawable.icono_perfil)
-                        .into(binding.profileImage)
-                }
-            }.addOnFailureListener {
-                Toast.makeText(this, "Error al cargar datos", Toast.LENGTH_SHORT).show()
-            }
-
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@ProfileActivity, "Error al escuchar datos", Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
 
         binding.tvEditProfile.setOnClickListener {
@@ -130,7 +154,7 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun cargarLibrosUsuario() {
-        val repository = UserRepository(this)  // 👈 le pasas el Context (this)
+        val repository = UserRepository(this)
 
         repository.fetchUserBooks { userBooks ->
             if (userBooks.isNotEmpty()) {

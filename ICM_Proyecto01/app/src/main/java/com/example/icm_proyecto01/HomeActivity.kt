@@ -78,21 +78,41 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
+    private var isStepSensorActive = false
+
     private var stepCount: Int = 0
-    private var isStepSensorActive: Boolean = false
+    private var lastMagnitude = 0.0
+    private var lastStepTime: Long = 0
+    private val stepInterval = 500
+    private val stepThreshold = 10.5 // ajustable
 
     private val sensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent?) {
-            if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
-                stepCount = event.values[0].toInt()
-                // Guardar el recuento para RewardsActivity
-                val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
-                sharedPref.edit().putInt("steps", stepCount).apply()
+            if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
+
+                val magnitude = Math.sqrt((x * x + y * y + z * z).toDouble())
+                val delta = magnitude - lastMagnitude
+                lastMagnitude = magnitude
+
+                val currentTime = System.currentTimeMillis()
+                if (delta > stepThreshold && currentTime - lastStepTime > stepInterval) {
+                    stepCount += 1
+                    lastStepTime = currentTime
+
+                    Log.d("StepCounter", "Paso detectado. Total: $stepCount")
+                    val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
+                    sharedPref.edit().putInt("steps", stepCount).apply()
+                    actualizarPasosEnFirebase(stepCount)
+                }
             }
         }
 
         override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,6 +125,8 @@ class HomeActivity : AppCompatActivity() {
         userName = getSharedPreferences("UserProfile", MODE_PRIVATE).getString("userName", "Jane Doe")
         geocoder = Geocoder(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+
 
 
         locationCallback = object : LocationCallback() {
@@ -122,6 +144,9 @@ class HomeActivity : AppCompatActivity() {
 
         inicializarMapa()
         pedirPermisos()
+        val permiso = ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
+        Log.d("Permiso", "ACTIVITY_RECOGNITION: $permiso")
+
 
         cargarPuntosDeIntercambio()
         Log.d("PuntoIntercambio", "se llamo a punto")
@@ -429,7 +454,7 @@ class HomeActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, permisos.toTypedArray(), 1)
         } else {
             obtenerUbicacion()
-            activarSensorDePasos()
+            inicializarSensorDePasos()
             iniciarActualizacionesDeUbicacion()
 
         }
@@ -479,15 +504,48 @@ class HomeActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(binding.searchAddress.windowToken, 0)
     }
 
-    //para podometro
+
+    private fun inicializarSensorDePasos() {
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        if (stepSensor != null) {
+            val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
+            stepCount = sharedPref.getInt("steps", 0)
+            Log.d("StepSensor", "Pasos cargados desde SharedPreferences: $stepCount")
+            activarSensorDePasos()
+        } else {
+            Toast.makeText(this, "Acelerómetro no disponible", Toast.LENGTH_LONG).show()
+        }
+    }
+
 
 
     private fun activarSensorDePasos() {
-        stepSensor?.let {
-            sensorManager.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_NORMAL)
+        if (stepSensor != null) {
+            sensorManager.registerListener(sensorListener, stepSensor, SensorManager.SENSOR_DELAY_UI)
             isStepSensorActive = true
+            Log.d("StepSensor", "Acelerómetro activado")
+        } else {
+            Toast.makeText(this, "Sensor no disponible", Toast.LENGTH_SHORT).show()
         }
     }
+
+
+    private fun actualizarPasosEnFirebase(nuevosPasos: Int) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
+        userRef.child("readerLvl").setValue(nuevosPasos)
+            .addOnSuccessListener {
+                Log.d("Firebase", "readerLvl actualizado correctamente: $nuevosPasos")
+            }
+            .addOnFailureListener {
+                Log.e("Firebase", "Error al actualizar readerLvl", it)
+            }
+    }
+
+
+
 
 
     //Para libros ocultos
@@ -572,7 +630,8 @@ class HomeActivity : AppCompatActivity() {
                 }
 
                 if (permisoActividadConcedido) {
-                    activarSensorDePasos()
+                    inicializarSensorDePasos()
+
                 } else {
                     Toast.makeText(this, "Permiso de actividad física requerido para contar pasos", Toast.LENGTH_SHORT).show()
                 }
