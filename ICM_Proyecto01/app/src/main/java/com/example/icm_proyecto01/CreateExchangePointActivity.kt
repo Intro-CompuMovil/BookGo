@@ -152,12 +152,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val date = binding.tvSelectedDate.text.toString()
             val time = binding.tvSelectedTime.text.toString()
 
-            Log.d("CreateExchange", "Selected bookId: $bookId")
-            Log.d("CreateExchange", "Selected bookTitle: $bookTitle")
-            Log.d("CreateExchange", "Selected bookState: $bookState")
-            Log.d("CreateExchange", "Address Input: $addressInput")
-            Log.d("CreateExchange", "Date: $date")
-            Log.d("CreateExchange", "Time: $time")
 
             if (bookId.isBlank() || bookState.isBlank() ||
                 date == "Fecha: No seleccionada" || time == "Hora: No seleccionada" || puntoSeleccionado == null
@@ -195,14 +189,16 @@ class CreateExchangePointActivity : AppCompatActivity() {
                     "id" to "",
                     "state" to ""
                 ),
-                "address" to addressInput, // dirección que el usuario escribió
-                "resolvedAddress" to resolvedAddress, // dirección real obtenida
+                "address" to addressInput,
+                "resolvedAddress" to resolvedAddress,
                 "date" to fechaCompleta,
                 "exchangeUserId" to userId,
+                "creatorUserId" to userId,
                 "lat" to puntoSeleccionado!!.latitude,
                 "lon" to puntoSeleccionado!!.longitude,
                 "receiverUserId" to ""
             )
+
 
             Log.d("CreateExchange", "ExchangePoint to save: $exchangePoint")
 

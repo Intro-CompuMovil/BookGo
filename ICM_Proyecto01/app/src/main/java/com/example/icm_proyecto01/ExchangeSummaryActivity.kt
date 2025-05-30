@@ -6,12 +6,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityExchangeSummaryBinding
 import com.example.icm_proyecto01.model.UserBook
+import com.example.icm_proyecto01.notifications.ExchangeNotificationManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-
 
 class ExchangeSummaryActivity : AppCompatActivity() {
 
@@ -22,7 +20,6 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         binding = ActivityExchangeSummaryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Libros
         val userProfilePicUrl = intent.getStringExtra("userProfilePicUrl") ?: ""
         val userBook = intent.getSerializableExtra("selectedBook") as? UserBook
         val tituloIntercambio = intent.getStringExtra("titulo") ?: "Sin título"
@@ -45,10 +42,8 @@ class ExchangeSummaryActivity : AppCompatActivity() {
             binding.bookImageExchange.setImageResource(R.drawable.default_book)
         }
 
-        // Libro ofrecido por el usuario
         if (userBook != null) {
             binding.tvBookUserTitle.text = userBook.titulo
-            //binding.tvBookUserAuthor.text = "Autor: ${userBook.autor}"
             binding.tvBookUserGenre.text = "Género: ${userBook.genero}"
             binding.tvBookUserState.text = "Estado: ${userBook.estado}"
 
@@ -63,35 +58,55 @@ class ExchangeSummaryActivity : AppCompatActivity() {
         binding.btnConfirmExchange.setOnClickListener {
             val idPunto = intent.getStringExtra("idPunto")
             val userBook = intent.getSerializableExtra("selectedBook") as? UserBook
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
 
-            if (idPunto != null && userBook != null) {
-                val databaseRef = FirebaseDatabase.getInstance().reference.child("ExchangePoints").child(idPunto)
+            if (idPunto != null && userBook != null && userId != null) {
+                val dbRef = FirebaseDatabase.getInstance().reference
+                val databaseRef = dbRef.child("ExchangePoints").child(idPunto)
 
-                val updates = mapOf(
-                    "BookExchange/id" to userBook.id,
-                    "BookExchange/state" to userBook.estado,
-                    "receiverUserId" to FirebaseAuth.getInstance().currentUser?.uid
-                )
+                databaseRef.child("creatorUserId").get().addOnSuccessListener { snapshot ->
+                    val creatorUserId = snapshot.getValue(String::class.java)
 
-                databaseRef.updateChildren(updates)
-                    .addOnSuccessListener {
-                        Toast.makeText(this, "Intercambio confirmado exitosamente", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this, HomeActivity::class.java)
-                        startActivity(intent)
+                    if (!creatorUserId.isNullOrEmpty() && creatorUserId != userId) {
+                        ExchangeNotificationManager.sendNotificationToUser(
+                            userId = creatorUserId,
+                            title = "Nuevo libro ofrecido",
+                            message = "Un usuario ha ofrecido un libro para tu punto de intercambio.",
+                            context = this
+                        )
                     }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error al confirmar intercambio: ${e.message}", Toast.LENGTH_LONG).show()
-                    }
-            } else {
-                Toast.makeText(this, "No se pudo confirmar el intercambio", Toast.LENGTH_SHORT).show()
+
+                    val updates = mapOf(
+                        "BookExchange/id" to userBook.id,
+                        "BookExchange/state" to userBook.estado,
+                        "receiverUserId" to userId
+                    )
+
+                    databaseRef.updateChildren(updates)
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                this,
+                                "Intercambio confirmado exitosamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            val intent = Intent(this, HomeActivity::class.java)
+                            startActivity(intent)
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                this,
+                                "Error al confirmar intercambio: ${e.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Error al consultar el creador del punto", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
 
-
-
-
         binding.btnBack.setOnClickListener { finish() }
+        }
     }
 
-}
