@@ -6,9 +6,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityExchangeSummaryBinding
 import com.example.icm_proyecto01.model.UserBook
-import com.example.icm_proyecto01.notifications.ExchangeNotificationManager
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.squareup.picasso.Picasso
 
 class ExchangeSummaryActivity : AppCompatActivity() {
@@ -22,47 +21,74 @@ class ExchangeSummaryActivity : AppCompatActivity() {
 
         val userProfilePicUrl = intent.getStringExtra("userProfilePicUrl") ?: ""
         val userBook = intent.getSerializableExtra("selectedBook") as? UserBook
-        val tituloIntercambio = intent.getStringExtra("titulo") ?: "Sin título"
+        val tituloIntercambio = intent.getStringExtra("libroOriginalTitulo") ?: "Sin título"
         val direccion = intent.getStringExtra("direccion") ?: "Sin dirección"
         val fecha = intent.getStringExtra("fecha") ?: "-"
         val hora = intent.getStringExtra("hora") ?: "-"
-        val estadoLibroDisponible = intent.getStringExtra("estadoLibroDisponible") ?: "-"
-        val idPunto = intent.getStringExtra("idPunto")
+        val estadoLibroDisponible = intent.getStringExtra("libroOriginalEstado") ?: "-"
+        val portadaLibroDisponible = intent.getStringExtra("libroOriginalPortada") ?: ""
+        val libroOfrecidoTitulo = intent.getStringExtra("libroOfrecidoTitulo")
+        val libroOfrecidoEstado = intent.getStringExtra("libroOfrecidoEstado")
+        val libroOfrecidoPortada = intent.getStringExtra("libroOfrecidoPortada")
+        val exchangePointId = intent.getStringExtra("exchangePointId") ?: ""
+        val receiverUserId = intent.getStringExtra("receiverUserId") ?: ""
 
         binding.tvBookExchangeTitle.text = tituloIntercambio
         binding.tvBookExchangeState.text = "Estado: $estadoLibroDisponible"
         binding.tvExchangeLocation.text = direccion
         binding.tvExchangeDateTime.text = "$fecha - $hora"
 
-        if (userProfilePicUrl.isNotEmpty() && userProfilePicUrl != "null") {
-            Picasso.get().load(userProfilePicUrl)
+        if (portadaLibroDisponible.isNotEmpty()) {
+            Picasso.get().load(portadaLibroDisponible)
                 .placeholder(R.drawable.default_book)
                 .into(binding.bookImageExchange)
         } else {
             binding.bookImageExchange.setImageResource(R.drawable.default_book)
         }
 
-        if (userBook != null) {
-            binding.tvBookUserTitle.text = userBook.titulo
-            binding.tvBookUserGenre.text = "Género: ${userBook.genero}"
-            binding.tvBookUserState.text = "Estado: ${userBook.estado}"
-
-            if (userBook.portadaUrl.isNotEmpty()) {
-                Picasso.get().load(userBook.portadaUrl).placeholder(R.drawable.default_book)
+        if (!libroOfrecidoTitulo.isNullOrBlank()) {
+            binding.tvBookUserTitle.text = libroOfrecidoTitulo
+            binding.tvBookUserState.text = "Estado: $libroOfrecidoEstado"
+            if (!libroOfrecidoPortada.isNullOrBlank()) {
+                Picasso.get().load(libroOfrecidoPortada)
+                    .placeholder(R.drawable.default_book)
                     .into(binding.bookImageUser)
             } else {
                 binding.bookImageUser.setImageResource(R.drawable.default_book)
             }
+        } else if (receiverUserId.isNotBlank() && exchangePointId.isNotBlank()) {
+            val dbRef = FirebaseDatabase.getInstance().reference
+            dbRef.child("UserBook").child(exchangePointId).child(receiverUserId)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val titulo = snapshot.child("titulo").getValue(String::class.java) ?: "Sin título"
+                        val estado = snapshot.child("estado").getValue(String::class.java) ?: "Desconocido"
+                        val portada = snapshot.child("portadaUrl").getValue(String::class.java) ?: ""
+
+                        binding.tvBookUserTitle.text = titulo
+                        binding.tvBookUserState.text = "Estado: $estado"
+                        if (portada.isNotBlank()) {
+                            Picasso.get().load(portada)
+                                .placeholder(R.drawable.default_book)
+                                .into(binding.bookImageUser)
+                        } else {
+                            binding.bookImageUser.setImageResource(R.drawable.default_book)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(this@ExchangeSummaryActivity, "Error al cargar el libro ofrecido", Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
 
         binding.btnConfirmExchange.setOnClickListener {
-            val idPunto = intent.getStringExtra("idPunto")
             val userBook = intent.getSerializableExtra("selectedBook") as? UserBook
             val userId = FirebaseAuth.getInstance().currentUser?.uid
 
-            if (idPunto != null && userBook != null && userId != null) {
+            if (exchangePointId.isNotEmpty() && userBook != null && userId != null) {
                 val dbRef = FirebaseDatabase.getInstance().reference
-                val databaseRef = dbRef.child("ExchangePoints").child(idPunto)
+                val databaseRef = dbRef.child("ExchangePoints").child(exchangePointId)
 
                 val offerData = mapOf(
                     "userId" to userId,
@@ -73,50 +99,29 @@ class ExchangeSummaryActivity : AppCompatActivity() {
                     "genero" to userBook.genero
                 )
 
-                val bookOffersRef = dbRef.child("BookOffers").child(idPunto).push()
+                val bookOffersRef = dbRef.child("BookOffers").child(exchangePointId).push()
 
                 bookOffersRef.setValue(offerData)
                     .addOnSuccessListener {
                         databaseRef.child("creatorUserId").get().addOnSuccessListener { snapshot ->
                             val creatorUserId = snapshot.getValue(String::class.java)
 
-                           
-                            val updates = mapOf(
-                                "receiverUserId" to userId
-                            )
-
+                            val updates = mapOf("receiverUserId" to userId)
                             databaseRef.updateChildren(updates)
                                 .addOnSuccessListener {
-                                    Toast.makeText(
-                                        this,
-                                        "Intercambio confirmado exitosamente",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    val intent = Intent(this, HomeActivity::class.java)
-                                    startActivity(intent)
+                                    Toast.makeText(this, "Intercambio confirmado exitosamente", Toast.LENGTH_SHORT).show()
+                                    startActivity(Intent(this, HomeActivity::class.java))
                                 }
-                                .addOnFailureListener { e ->
-                                    Toast.makeText(
-                                        this,
-                                        "Error al confirmar intercambio: ${e.message}",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                .addOnFailureListener {
+                                    Toast.makeText(this, "Error al confirmar intercambio", Toast.LENGTH_SHORT).show()
                                 }
 
                         }.addOnFailureListener {
-                            Toast.makeText(
-                                this,
-                                "Error al consultar el creador del punto",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(this, "Error al obtener datos del creador", Toast.LENGTH_SHORT).show()
                         }
                     }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(
-                            this,
-                            "Error al guardar la oferta: ${e.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error al guardar la oferta", Toast.LENGTH_SHORT).show()
                     }
             }
         }

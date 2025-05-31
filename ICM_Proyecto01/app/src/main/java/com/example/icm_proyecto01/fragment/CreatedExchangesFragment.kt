@@ -37,13 +37,15 @@ class CreatedExchangesFragment : Fragment() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     exchangeList.clear()
                     snapshot.children.forEach { point ->
-                        val pointId = point.key ?: return@forEach  // ID del nodo en Firebase
+                        val pointId = point.key ?: return@forEach
                         val raw = point.child("Book")
                         val bookId = raw.child("id").value.toString()
                         val state = raw.child("state").value.toString()
                         val dateTime = point.child("date").value.toString().split("-")
                         val lat = point.child("lat").getValue(Double::class.java) ?: 0.0
                         val lon = point.child("lon").getValue(Double::class.java) ?: 0.0
+                        val receiverUserId = point.child("receiverUserId").value?.toString() ?: ""
+
 
                         val address = point.child("resolvedAddress").value?.toString()
                             ?: point.child("address").value?.toString()
@@ -53,6 +55,8 @@ class CreatedExchangesFragment : Fragment() {
                         val hora = dateTime.getOrNull(1)?.trim() ?: "-"
 
                         fetchBookFromGoogleApi(bookId) { tituloLibro, portadaUrl ->
+                            val receiverUserId = point.child("receiverUserId").value?.toString() ?: ""
+
                             exchangeList.add(
                                 ExchangePoint(
                                     exchangePointId = pointId,
@@ -63,11 +67,13 @@ class CreatedExchangesFragment : Fragment() {
                                     lat = lat,
                                     lon = lon,
                                     portadaUrl = portadaUrl,
-                                    direccion = address
+                                    direccion = address,
+                                    receiverUserId = receiverUserId
                                 )
                             )
                             adapter.notifyItemInserted(exchangeList.size - 1)
                         }
+
                     }
                     adapter.notifyDataSetChanged()
                 }
