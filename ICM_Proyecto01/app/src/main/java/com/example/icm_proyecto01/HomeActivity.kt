@@ -115,6 +115,7 @@ class HomeActivity : AppCompatActivity() {
 
 
         escucharNuevasOfertasDeIntercambio()
+        escucharAceptacionDeMiOferta()
         ExchangeNotificationManager.startListening(this)
 
         locationCallback = object : LocationCallback() {
@@ -126,10 +127,7 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-
         roadManager = OSRMRoadManager(this, "ANDROID")
-
-
         inicializarMapa()
         pedirPermisos()
         val permiso = ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION)
@@ -252,7 +250,6 @@ class HomeActivity : AppCompatActivity() {
                         e.printStackTrace()
                     }
                 }
-
                 val eventosArray = JSONArray(eventosList)
                 onEventosListos(eventosArray)
             }
@@ -577,23 +574,36 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
+    private fun guardarUltimaNotificacion(tipo: String, id: String) {
+        val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+        prefs.edit().putString("last_$tipo", id).apply()
+    }
+
+    private fun ultimaNotificacion(tipo: String): String? {
+        val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+        return prefs.getString("last_$tipo", null)
+    }
+
+
 
     private fun escucharNuevasOfertasDeIntercambio() {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance().getReference("ExchangePoints")
 
         dbRef.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onChildRemoved(snapshot: DataSnapshot) {}
-
-            override fun onCancelled(error: DatabaseError) {}
-
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 val creatorUserId = snapshot.child("creatorUserId").getValue(String::class.java)
                 val receiverUserId = snapshot.child("receiverUserId").getValue(String::class.java)
+                val exchangeId = snapshot.key ?: return
 
-                if (creatorUserId == currentUserId && !receiverUserId.isNullOrEmpty()) {
+                if (
+                    creatorUserId == currentUserId &&
+                    !receiverUserId.isNullOrEmpty() &&
+                    receiverUserId != currentUserId &&
+                    ultimaNotificacion("oferta_recibida") != exchangeId
+                ) {
+                    guardarUltimaNotificacion("oferta_recibida", exchangeId)
+
                     ExchangeNotificationManager.sendNotification(
                         this@HomeActivity,
                         "¡Nuevo libro ofrecido!",
@@ -601,8 +611,51 @@ class HomeActivity : AppCompatActivity() {
                     )
                 }
             }
+
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
         })
     }
+
+
+
+    private fun escucharAceptacionDeMiOferta() {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dbRef = FirebaseDatabase.getInstance().getReference("ExchangePoints")
+
+        dbRef.addChildEventListener(object : ChildEventListener {
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val receiverUserId = snapshot.child("receiverUserId").getValue(String::class.java)
+                val bookReceiver = snapshot.child("BookReceiver")
+                val exchangeId = snapshot.key ?: return
+
+                if (
+                    receiverUserId == currentUserId &&
+                    bookReceiver.exists() &&
+                    ultimaNotificacion("oferta_aceptada") != exchangeId
+                ) {
+                    guardarUltimaNotificacion("oferta_aceptada", exchangeId)
+
+                    ExchangeNotificationManager.sendNotification(
+                        this@HomeActivity,
+                        "¡Tu oferta fue aceptada!",
+                        "El libro que ofreciste fue aceptado para el intercambio."
+                    )
+                }
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+
+
+
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -653,8 +706,6 @@ class HomeActivity : AppCompatActivity() {
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-
-
 
 
     override fun onPause() {

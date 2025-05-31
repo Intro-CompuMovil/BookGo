@@ -46,7 +46,6 @@ class OfferedExchangesFragment : Fragment() {
                             val lat = point.child("lat").getValue(Double::class.java) ?: 0.0
                             val lon = point.child("lon").getValue(Double::class.java) ?: 0.0
 
-                            // ✅ Dirección preferida: resolvedAddress > address > fallback
                             val address = point.child("resolvedAddress").value?.toString()
                                 ?: point.child("address").value?.toString()
                                 ?: "Dirección no disponible"
