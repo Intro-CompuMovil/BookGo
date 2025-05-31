@@ -3,6 +3,7 @@ package com.example.icm_proyecto01
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityEventDetailBinding
@@ -27,17 +28,17 @@ class EventDetailActivity : AppCompatActivity() {
         binding.tvEventDate.text = date
         binding.tvEventDescription.text = description
 
-        //saber si ya asistió al evento
         assistPref = getSharedPreferences("EventosAsistidos", MODE_PRIVATE)
         val isAssisting = assistPref.contains(name)
 
         if (isAssisting) {
             binding.btnAttend.text = "Desasistir"
+            binding.btnGoToEvent.visibility = View.VISIBLE
         } else {
             binding.btnAttend.text = "Asistir"
+            binding.btnGoToEvent.visibility = View.GONE
         }
 
-        //botón hace asistir o desasistir
         binding.btnAttend.setOnClickListener {
             val editor = assistPref.edit()
 
@@ -45,19 +46,21 @@ class EventDetailActivity : AppCompatActivity() {
                 editor.putBoolean(name, true).apply()
                 Toast.makeText(this, "¡Te has registrado en $name!", Toast.LENGTH_SHORT).show()
                 binding.btnAttend.text = "Desasistir"
+                binding.btnGoToEvent.visibility = View.VISIBLE
             } else {
                 editor.remove(name).apply()
                 Toast.makeText(this, "Has cancelado tu asistencia a $name", Toast.LENGTH_SHORT).show()
                 binding.btnAttend.text = "Asistir"
+                binding.btnGoToEvent.visibility = View.GONE
             }
 
-            // Opcional: Esperar 1 segundo y volver a la lista
-            binding.btnAttend.postDelayed({
-                val intent = Intent(this, ExploreActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                finish()
-            }, 1000)
+        }
+
+        binding.btnGoToEvent.setOnClickListener {
+            val intent = Intent(this, MapToEventActivity::class.java)
+            intent.putExtra("EVENT_NAME", name)
+            intent.putExtra("EVENT_LOCATION", location)
+            startActivity(intent)
         }
 
         binding.btnBack.setOnClickListener {
