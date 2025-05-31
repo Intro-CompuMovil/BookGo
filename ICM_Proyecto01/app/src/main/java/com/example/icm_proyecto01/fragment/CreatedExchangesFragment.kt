@@ -37,6 +37,7 @@ class CreatedExchangesFragment : Fragment() {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     exchangeList.clear()
                     snapshot.children.forEach { point ->
+                        val pointId = point.key ?: return@forEach  // ID del nodo en Firebase
                         val raw = point.child("Book")
                         val bookId = raw.child("id").value.toString()
                         val state = raw.child("state").value.toString()
@@ -44,7 +45,6 @@ class CreatedExchangesFragment : Fragment() {
                         val lat = point.child("lat").getValue(Double::class.java) ?: 0.0
                         val lon = point.child("lon").getValue(Double::class.java) ?: 0.0
 
-                        // ✅ Dirección real si existe
                         val address = point.child("resolvedAddress").value?.toString()
                             ?: point.child("address").value?.toString()
                             ?: "Dirección no disponible"
@@ -55,6 +55,7 @@ class CreatedExchangesFragment : Fragment() {
                         fetchBookFromGoogleApi(bookId) { tituloLibro, portadaUrl ->
                             exchangeList.add(
                                 ExchangePoint(
+                                    exchangePointId = pointId,
                                     tituloLibro = tituloLibro,
                                     estadoLibro = state,
                                     fecha = fecha,
@@ -74,6 +75,7 @@ class CreatedExchangesFragment : Fragment() {
                 override fun onCancelled(error: DatabaseError) {}
             })
     }
+
 
     private fun fetchBookFromGoogleApi(bookId: String, callback: (String, String) -> Unit) {
         val url = "https://www.googleapis.com/books/v1/volumes/$bookId"

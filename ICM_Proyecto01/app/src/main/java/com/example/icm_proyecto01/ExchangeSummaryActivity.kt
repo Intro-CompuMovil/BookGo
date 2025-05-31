@@ -64,49 +64,63 @@ class ExchangeSummaryActivity : AppCompatActivity() {
                 val dbRef = FirebaseDatabase.getInstance().reference
                 val databaseRef = dbRef.child("ExchangePoints").child(idPunto)
 
-                databaseRef.child("creatorUserId").get().addOnSuccessListener { snapshot ->
-                    val creatorUserId = snapshot.getValue(String::class.java)
+                val offerData = mapOf(
+                    "userId" to userId,
+                    "bookId" to userBook.id,
+                    "estado" to userBook.estado,
+                    "titulo" to userBook.titulo,
+                    "portadaUrl" to userBook.portadaUrl,
+                    "genero" to userBook.genero
+                )
 
-                    if (!creatorUserId.isNullOrEmpty() && creatorUserId != userId) {
-                        ExchangeNotificationManager.sendNotificationToUser(
-                            userId = creatorUserId,
-                            title = "Nuevo libro ofrecido",
-                            message = "Un usuario ha ofrecido un libro para tu punto de intercambio.",
-                            context = this
-                        )
-                    }
+                val bookOffersRef = dbRef.child("BookOffers").child(idPunto).push()
 
-                    val updates = mapOf(
-                        "BookExchange/id" to userBook.id,
-                        "BookExchange/state" to userBook.estado,
-                        "receiverUserId" to userId
-                    )
+                bookOffersRef.setValue(offerData)
+                    .addOnSuccessListener {
+                        databaseRef.child("creatorUserId").get().addOnSuccessListener { snapshot ->
+                            val creatorUserId = snapshot.getValue(String::class.java)
 
-                    databaseRef.updateChildren(updates)
-                        .addOnSuccessListener {
+                           
+                            val updates = mapOf(
+                                "receiverUserId" to userId
+                            )
+
+                            databaseRef.updateChildren(updates)
+                                .addOnSuccessListener {
+                                    Toast.makeText(
+                                        this,
+                                        "Intercambio confirmado exitosamente",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    val intent = Intent(this, HomeActivity::class.java)
+                                    startActivity(intent)
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(
+                                        this,
+                                        "Error al confirmar intercambio: ${e.message}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+
+                        }.addOnFailureListener {
                             Toast.makeText(
                                 this,
-                                "Intercambio confirmado exitosamente",
+                                "Error al consultar el creador del punto",
                                 Toast.LENGTH_SHORT
                             ).show()
-                            val intent = Intent(this, HomeActivity::class.java)
-                            startActivity(intent)
                         }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(
-                                this,
-                                "Error al confirmar intercambio: ${e.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                }.addOnFailureListener {
-                    Toast.makeText(this, "Error al consultar el creador del punto", Toast.LENGTH_SHORT).show()
-                }
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(
+                            this,
+                            "Error al guardar la oferta: ${e.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
             }
         }
 
-
         binding.btnBack.setOnClickListener { finish() }
-        }
     }
-
+}
