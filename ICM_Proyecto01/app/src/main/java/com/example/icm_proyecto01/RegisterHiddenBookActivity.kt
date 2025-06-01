@@ -9,12 +9,15 @@ import android.location.Location
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.databinding.ActivityRegisterHiddenBookBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
@@ -26,6 +29,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
+import java.util.UUID
 
 class RegisterHiddenBookActivity : AppCompatActivity() {
 
@@ -89,12 +93,14 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
 
         // Botón registrar libro oculto
         binding.btnRegisterBook.setOnClickListener {
-            val title = bookTitle.trim()
-            val author = bookAuthor.trim()
-            val genre = bookGenre.trim()
-            val state = bookState.trim()
+            val title = binding.etBookTitle.text.toString().trim()
+            val author = binding.etBookAuthor.text.toString().trim()
+            val genre = binding.etBookGenre.text.toString().trim()
+            val state = binding.etBookState.text.toString().trim()
             val location = binding.etBookLocation.text.toString().trim()
             val punto = puntoSeleccionado
+            val firebaseUserId = FirebaseAuth.getInstance().currentUser?.uid
+            val bookId = intent.getStringExtra("bookId") ?: UUID.randomUUID().toString()
 
             if (location.isEmpty()) {
                 Toast.makeText(this, "Ingresa una ubicación para el libro oculto", Toast.LENGTH_SHORT).show()
@@ -106,18 +112,45 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val sharedHidden = getSharedPreferences("HiddenBooks", Context.MODE_PRIVATE)
-            val editor = sharedHidden.edit()
-            val bookData = "$title | $author | $genre | $state | $portadaUrl | ${punto.latitude} | ${punto.longitude} | $location"
-            editor.putString(title, bookData)
-            editor.apply()
+            if (firebaseUserId == null) {
+                Toast.makeText(this, "Error: usuario no autenticado", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-            Toast.makeText(this, "Libro oculto registrado correctamente", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, ProfileActivity::class.java)
-            intent.putExtra("userName", userName)
-            startActivity(intent)
-            finish()
+            val hiddenBookData = mapOf(
+                "id" to bookId,
+                "title" to title,
+                "author" to author,
+                "genre" to genre,
+                "state" to state,
+                "imageUrl" to portadaUrl,
+                "hidden" to true,
+                "latitude" to punto.latitude,
+                "longitude" to punto.longitude,
+                "locationHint" to location,
+                "hiderUserId" to firebaseUserId,
+                "finderUserId" to null
+            )
+
+            val database = FirebaseDatabase.getInstance().reference
+            val userBookRef = database.child("Users").child(firebaseUserId.toString()).child("Books").child(bookId)
+            val hiddenBooksRef = database.child("HiddenBooks").child(bookId)
+
+            userBookRef.removeValue().addOnSuccessListener {
+                hiddenBooksRef.setValue(hiddenBookData).addOnSuccessListener {
+                    Toast.makeText(this, "Libro oculto correctamente", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, ProfileActivity::class.java)
+                    intent.putExtra("userName", userName)
+                    startActivity(intent)
+                    finish()
+                }.addOnFailureListener {
+                    Toast.makeText(this, "Error al registrar libro oculto en Firebase", Toast.LENGTH_SHORT).show()
+                }
+            }.addOnFailureListener {
+                Toast.makeText(this, "Error al remover el libro del perfil", Toast.LENGTH_SHORT).show()
+            }
         }
+
 
         binding.btnBack.setOnClickListener {
             val intent = Intent(this, ProfileActivity::class.java)
@@ -135,6 +168,7 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun obtenerUbicacionActual() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             location?.let {
@@ -191,6 +225,7 @@ class RegisterHiddenBookActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             obtenerUbicacionActual()

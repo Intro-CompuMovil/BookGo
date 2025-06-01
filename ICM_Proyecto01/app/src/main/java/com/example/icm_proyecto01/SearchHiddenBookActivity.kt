@@ -59,13 +59,6 @@ class SearchHiddenBookActivity : AppCompatActivity() {
             )
         }, ContextCompat.getMainExecutor(this))
 
-        // Botón: "Libro encontrado"
-        val btnFoundBook: Button = findViewById(R.id.btnFoundBook)
-        btnFoundBook.setOnClickListener {
-            Toast.makeText(this, "Libro encontrado", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, HomeActivity::class.java))
-            finish()
-        }
 
         // Botón: "Libro en AR"
         val btnViewAR: Button = findViewById(R.id.btnViewAR)

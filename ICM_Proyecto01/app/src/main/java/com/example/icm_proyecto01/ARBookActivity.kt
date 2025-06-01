@@ -1,9 +1,9 @@
 package com.example.icm_proyecto01
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -40,8 +40,7 @@ class ARBookActivity : AppCompatActivity() {
         }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
+            != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 0)
             return
         }
@@ -62,7 +61,6 @@ class ARBookActivity : AppCompatActivity() {
             .build()
             .thenAccept { renderable ->
                 val view: View = renderable.view
-
                 val titleText = view.findViewById<TextView>(R.id.bookTitle)
                 val imageView = view.findViewById<ImageView>(R.id.bookImage)
                 val btnPick = view.findViewById<Button>(R.id.btnPickBook)
@@ -94,24 +92,38 @@ class ARBookActivity : AppCompatActivity() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance().reference
 
-        val bookId = userBook!!.id
-        val userBookData = mapOf(
-            "id" to userBook!!.id,
-            "titulo" to userBook!!.titulo,
-            "autor" to userBook!!.autor,
-            "genero" to userBook!!.genero,
-            "estado" to userBook!!.estado,
-            "portadaUrl" to userBook!!.portadaUrl,
-            "hidden" to false,
-            "status" to "activo"
-        )
+        userBook!!.hidden = false
+        userBook!!.status = "activo"
+        dbRef.child("Books").child(userBook!!.id).child("hidden").setValue(false)
 
-        dbRef.child("Books").child(bookId).child("hidden").setValue(false)
-        dbRef.child("Users").child(uid).child("Books").child(bookId).setValue(userBookData)
-
-        Toast.makeText(this, "Libro agregado a tu colección", Toast.LENGTH_SHORT).show()
-        finish()
+        dbRef.child("Users").child(uid).child("Books").child(userBook!!.id).setValue(userBook)
+            .addOnSuccessListener {
+                registrarLibroEncontrado(userBook!!)
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al guardar el libro", Toast.LENGTH_SHORT).show()
+            }
     }
+
+
+    private fun registrarLibroEncontrado(userBook: UserBook) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dbRef = FirebaseDatabase.getInstance().reference
+        val hiddenBookRef = dbRef.child("HiddenBooks").child(userBook.id)
+
+        hiddenBookRef.child("finderUserId").setValue(currentUserId)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Libro agregado a tu colección", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, ProfileActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                finish()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al registrar el libro", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == 0 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

@@ -50,6 +50,15 @@
                 android:text="Género"
                 android:textSize="14sp"
                 android:paddingTop="4dp" />
+
+            <TextView
+                android:id="@+id/tvBookState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estado"
+                android:textSize="14sp"
+                android:paddingTop="4dp" />
         </LinearLayout>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

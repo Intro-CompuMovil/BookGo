@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.icm_proyecto01.adapters.OfferedExchangesAdapter
@@ -35,6 +36,15 @@ class OfferedExchangesFragment : Fragment() {
 
         dbRef.child("BookOffers").addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(bookOffersSnapshot: DataSnapshot) {
+                var totalOffersFound = 0
+                val totalExpected = contarTotalOfertasDelUsuario(bookOffersSnapshot, userId)
+
+                if (totalExpected == 0) {
+                    binding.tvEmptyMessage.visibility = View.VISIBLE
+                    Toast.makeText(requireContext(), "No has ofrecido libros para intercambiar", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
                 for (exchangeSnapshot in bookOffersSnapshot.children) {
                     val exchangePointId = exchangeSnapshot.key ?: continue
 
@@ -49,22 +59,16 @@ class OfferedExchangesFragment : Fragment() {
                             dbRef.child("ExchangePoints").child(exchangePointId)
                                 .addListenerForSingleValueEvent(object : ValueEventListener {
                                     override fun onDataChange(pointSnapshot: DataSnapshot) {
-                                        val receiverId =
-                                            pointSnapshot.child("receiverUserId").value.toString()
+                                        totalOffersFound++
+                                        val receiverId = pointSnapshot.child("receiverUserId").value.toString()
                                         val isAccepted = receiverId == userId
 
-                                        val date =
-                                            pointSnapshot.child("date").value.toString().split("-")
-                                        val lat =
-                                            pointSnapshot.child("lat").getValue(Double::class.java)
-                                                ?: 0.0
-                                        val lon =
-                                            pointSnapshot.child("lon").getValue(Double::class.java)
-                                                ?: 0.0
-                                        val address =
-                                            pointSnapshot.child("resolvedAddress").value?.toString()
-                                                ?: pointSnapshot.child("address").value?.toString()
-                                                ?: "Dirección no disponible"
+                                        val date = pointSnapshot.child("date").value.toString().split("-")
+                                        val lat = pointSnapshot.child("lat").getValue(Double::class.java) ?: 0.0
+                                        val lon = pointSnapshot.child("lon").getValue(Double::class.java) ?: 0.0
+                                        val address = pointSnapshot.child("resolvedAddress").value?.toString()
+                                            ?: pointSnapshot.child("address").value?.toString()
+                                            ?: "Dirección no disponible"
 
                                         val fecha = date.getOrNull(0)?.trim() ?: "-"
                                         val hora = date.getOrNull(1)?.trim() ?: "-"
@@ -83,22 +87,22 @@ class OfferedExchangesFragment : Fragment() {
                                                 receiverUserId = if (isAccepted) userId else ""
                                             )
                                         )
-                                        if (offeredList.size == contarTotalOfertasDelUsuario(
-                                                bookOffersSnapshot,
-                                                userId
-                                            )
-                                        ) {
+
+                                        if (totalOffersFound == totalExpected) {
                                             offeredList.sortByDescending { it.receiverUserId.isNotBlank() }
                                             adapter.notifyDataSetChanged()
+                                            binding.tvEmptyMessage.visibility =
+                                                if (offeredList.isEmpty()) View.VISIBLE else View.GONE
                                         }
-
                                     }
+
                                     override fun onCancelled(error: DatabaseError) {}
                                 })
                         }
                     }
                 }
             }
+
 
             override fun onCancelled(error: DatabaseError) {}
         })
