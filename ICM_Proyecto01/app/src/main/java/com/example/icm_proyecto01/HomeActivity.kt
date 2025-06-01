@@ -113,7 +113,8 @@ class HomeActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         escucharNuevasOfertasDeIntercambio()
-        escucharAceptacionDeMiOferta()
+        //PROVISIONAL para no solapar notificaciones
+        //escucharAceptacionDeMiOferta()
         ExchangeNotificationManager.startListening(this)
 
         locationCallback = object : LocationCallback() {
