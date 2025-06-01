@@ -33,6 +33,7 @@ class ExchangePointRepository(private val context: Context) {
                     val excluirPorBookReceiver = !bookReceiverId.isNullOrBlank()
                     val excluirPorCreador = creatorUserId == currentUserId
 
+
                     if (excluirPorBookReceiver || excluirPorCreador) {
                         puntosCargados++
                         if (puntosCargados == puntosProcesados) {
@@ -55,6 +56,8 @@ class ExchangePointRepository(private val context: Context) {
                     val date = pointSnapshot.child("date").getValue(String::class.java) ?: "Fecha desconocida"
                     val lat = pointSnapshot.child("lat").getValue(Double::class.java) ?: 0.0
                     val lon = pointSnapshot.child("lon").getValue(Double::class.java) ?: 0.0
+                    val receiverUserId = pointSnapshot.child("receiverUserId").getValue(String::class.java) ?: ""
+
 
                     fetchBookFromGoogleApi(idLibro, pointSnapshot) { book ->
                         book?.let {
@@ -63,7 +66,8 @@ class ExchangePointRepository(private val context: Context) {
                             val hora = if (date.contains("-")) date.split("-").getOrNull(1)?.trim() ?: "00:00" else "00:00"
 
                             val puntoFormateado =
-                                "${it.titulo}|$fecha|$hora|$lat|$lon|$state|$portadaUrl|$idPunto"
+                                "${it.titulo}|$fecha|$hora|$lat|$lon|$state|$portadaUrl|$idPunto|$receiverUserId"
+
                             pointsSet.add(puntoFormateado)
                         }
 

@@ -317,10 +317,9 @@ class HomeActivity : AppCompatActivity() {
                         val estadoLibro = if (datos.size >= 6) datos[5] else "No disponible"
                         val portadaUrl = if (datos.size >= 7) datos[6] else ""
                         val idPunto = if (datos.size >= 8) datos[7] else "404"
+                        val receiverUserId = if (datos.size >= 9) datos[8] else ""
 
-
-
-                            val direccion = obtenerDireccionDesdeGeoPoint(lat, lon)
+                        val direccion = obtenerDireccionDesdeGeoPoint(lat, lon)
 
                             val cardView = layoutInflater.inflate(
                                 R.layout.item_exchange_point_home,

@@ -9,7 +9,8 @@ data class ExchangePoint(
     val lat: Double = 0.0,
     val lon: Double = 0.0,
     val portadaUrl: String = "",
-    val direccion: String = ""
+    val direccion: String = "",
+    val receiverUserId: String = ""
 )
 
 
