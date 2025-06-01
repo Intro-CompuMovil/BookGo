@@ -71,7 +71,11 @@ class CreatedExchangesFragment : Fragment() {
                                     receiverUserId = receiverUserId
                                 )
                             )
-                            adapter.notifyItemInserted(exchangeList.size - 1)
+                            if (exchangeList.size == snapshot.childrenCount.toInt()) {
+                                // ✅ Ordenar: los aceptados primero
+                                exchangeList.sortByDescending { it.receiverUserId.isNotBlank() }
+                                adapter.notifyDataSetChanged()
+                            }
                         }
 
                     }
