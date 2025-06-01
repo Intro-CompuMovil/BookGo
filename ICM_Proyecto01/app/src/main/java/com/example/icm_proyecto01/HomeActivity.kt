@@ -372,8 +372,6 @@ class HomeActivity : AppCompatActivity() {
                                 startActivity(intent)
                             }
                         }
-
-                        // Agregar marcador al mapa
                         if (lat != null && lon != null) {
                             val marcador = Marker(osmMap).apply {
                                 position = GeoPoint(lat, lon)
@@ -385,8 +383,6 @@ class HomeActivity : AppCompatActivity() {
                         }
                     }
                 }
-
-                // ✅ Agrega los cardViews en orden: urgentes primero
                 for (v in vistasUrgentes) binding.puntosCercanosContainer.addView(v)
                 for (v in vistasNormales) binding.puntosCercanosContainer.addView(v)
 
@@ -451,7 +447,6 @@ class HomeActivity : AppCompatActivity() {
             permisos.add(Manifest.permission.ACTIVITY_RECOGNITION)
         }
 
-        // Solo pedir POST_NOTIFICATIONS si estamos en Android 13 o superior
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {

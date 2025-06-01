@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.databinding.ActivityCreateExchangePointBinding
+import com.example.icm_proyecto01.model.UserBook
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.*
@@ -59,6 +60,7 @@ class CreateExchangePointActivity : AppCompatActivity() {
     private var selectedBookId: String? = null
 
 
+
     private val selectBookLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -94,12 +96,24 @@ class CreateExchangePointActivity : AppCompatActivity() {
         userName = sharedPref.getString("userName", "Jane Doe")
 
 
+        intent.getSerializableExtra("selectedBook")?.let { serializable ->
+            val book = serializable as UserBook
+            selectedBookId = book.id
+            selectedBookTitle = book.titulo
+            selectedBookState = book.estado
+            selectedBookCoverUrl = book.portadaUrl
+
+            binding.tvSelectedBook.text = selectedBookTitle ?: "Libro no seleccionado"
+            binding.tvEstadoLibro.text = "Estado: ${selectedBookState ?: "-"}"
+        }
+
+
         binding.tvSelectedBook.setOnClickListener {
+
             val intent = Intent(this, SelectUserBookActivity::class.java)
             intent.putExtra("from", "createExchange")
             selectBookLauncher.launch(intent)
         }
-
 
 
         binding.btnBack.setOnClickListener{
@@ -172,7 +186,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val cleanedTime = time.replace("Hora: ", "").trim()
             val fechaCompleta = "$cleanedDate - $cleanedTime"
 
-            // 👉 Obtener dirección real con Geocoder
             val resolvedAddress = try {
                 val addresses = geocoder.getFromLocation(puntoSeleccionado!!.latitude, puntoSeleccionado!!.longitude, 1)
                 addresses?.firstOrNull()?.getAddressLine(0) ?: "Dirección no disponible"
@@ -199,9 +212,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
                 "receiverUserId" to ""
             )
 
-
-            Log.d("CreateExchange", "ExchangePoint to save: $exchangePoint")
-
             val dbRef = FirebaseDatabase.getInstance().reference
             val newExchangePointRef = dbRef.child("ExchangePoints").push()
 
@@ -221,9 +231,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error al crear punto de intercambio: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
-
-
-
 
     }
 
