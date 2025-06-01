@@ -7,16 +7,31 @@
     tools:context=".SearchHiddenBookActivity"
     android:background="@android:color/white">
 
-    <!-- Vista previa de la cámara (reemplaza la imagen) -->
+    <!-- Vista previa de la cámara -->
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="16dp"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnViewAR"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Botón para ver el libro en AR -->
+    <Button
+        android:id="@+id/btnViewAR"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Libro en AR"
+
+        android:textColor="@android:color/white"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="12dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@id/btnFoundBook"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Botón para confirmar que el libro fue encontrado -->
     <Button
@@ -28,9 +43,9 @@
         android:textColor="@android:color/white"
         android:paddingHorizontal="32dp"
         android:paddingVertical="12dp"
+        android:layout_marginBottom="35dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="32dp"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

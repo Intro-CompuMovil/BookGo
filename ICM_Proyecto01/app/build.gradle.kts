@@ -2,7 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
 }
+
 
 android {
     namespace = "com.example.icm_proyecto01"
@@ -70,6 +72,17 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:$camerax_version")
     implementation("androidx.camera:camera-view:$camerax_version")
     implementation(libs.guava)
+
+    //ARCore
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation ("androidx.core:core:1.15.0")
+
+    // ARCore + Sceneform (AndroidX compatible, mantenido por la comunidad)
+    implementation("com.gorisse.thomas.sceneform:sceneform:1.21.0")
+
+    // Glide para cargar imágenes desde URL como textura
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    kapt("com.github.bumptech.glide:compiler:4.15.1")
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))
