@@ -86,6 +86,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCS-p4yFNFLYzE4LlcXlnHIMIuDWIGcDv0" />
 
+        <meta-data
+            android:name="com.google.ar.core"
+            android:value="required" />
+
         <activity
             android:name=".MessagesActivity"
             android:exported="false" />

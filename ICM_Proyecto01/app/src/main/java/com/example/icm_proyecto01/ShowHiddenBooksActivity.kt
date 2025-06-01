@@ -33,7 +33,7 @@ class ShowHiddenBooksActivity : AppCompatActivity() {
             val bookTitle = bookData[0]
             val bookAuthor = bookData[1]
             val bookGenre = bookData[2]
-            val bookCoverUrl = bookData.getOrNull(3) ?: ""
+            val bookCoverUrl = bookData.getOrNull(4) ?: ""
             val bookId = entry.key
 
             val book = Book(bookId, bookTitle, bookAuthor, bookGenre, bookCoverUrl)
