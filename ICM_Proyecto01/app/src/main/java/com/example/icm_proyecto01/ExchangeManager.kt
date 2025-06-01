@@ -3,6 +3,7 @@ package com.example.icm_proyecto01
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.example.icm_proyecto01.model.BookOffer
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.DataSnapshot
@@ -13,16 +14,32 @@ import com.google.firebase.database.FirebaseDatabase
 object ExchangeManager {
 
 
-    fun rechazarOferta(offer: BookOffer, exchangePointId: String, context: Context) {
+    fun rechazarOferta(
+        offer: BookOffer,
+        exchangePointId: String,
+        context: Context,
+        adapter: RecyclerView.Adapter<*>,
+        offersList: MutableList<BookOffer>,
+        position: Int
+    ) {
         val dbRef = FirebaseDatabase.getInstance().reference
-        dbRef.child("BookOffers").child(exchangePointId).child(offer.bookId).removeValue()
+        if (offer.offerId.isBlank()) {
+            Toast.makeText(context, "ID de la oferta no encontrado", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        dbRef.child("BookOffers").child(exchangePointId).child(offer.offerId).removeValue()
             .addOnSuccessListener {
+                // Eliminar del RecyclerView
+                offersList.removeAt(position)
+                adapter.notifyItemRemoved(position)
                 Toast.makeText(context, "Oferta rechazada", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {
                 Toast.makeText(context, "Error al rechazar oferta", Toast.LENGTH_SHORT).show()
             }
     }
+
 
 
     fun aceptarOferta(

@@ -39,7 +39,7 @@ class OfferedExchangesFragment : Fragment() {
                     snapshot.children.forEach { point ->
                         val receiverId = point.child("receiverUserId").value.toString()
                         if (receiverId == userId) {
-                            val rawBook = point.child("Book")
+                            val rawBook = point.child("BookReceiver")
                             val bookId = rawBook.child("id").value.toString()
                             val state = rawBook.child("state").value.toString()
                             val date = point.child("date").value.toString().split("-")
