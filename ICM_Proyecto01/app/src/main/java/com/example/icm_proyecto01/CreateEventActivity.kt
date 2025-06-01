@@ -25,7 +25,6 @@ import org.osmdroid.views.overlay.Marker
 import java.util.*
 import org.osmdroid.bonuspack.routing.Road
 import org.osmdroid.bonuspack.routing.RoadManager
-import org.osmdroid.bonuspack.routing.RoadNode
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.views.overlay.Polyline
 
@@ -135,11 +134,9 @@ class CreateEventActivity : AppCompatActivity() {
             binding.osmMap.overlays.add(markerDestino)
             binding.osmMap.controller.animateTo(punto)
 
-            // CREAR RUTA
             currentLocation?.let { origen ->
                 generarRuta(origen, punto)
             }
-
             binding.osmMap.invalidate()
 
             selectedLat = punto.latitude
@@ -151,7 +148,6 @@ class CreateEventActivity : AppCompatActivity() {
     }
 
     private fun generarRuta(origen: GeoPoint, destino: GeoPoint) {
-        // Quitar ruta anterior si existe
         roadOverlay?.let { binding.osmMap.overlays.remove(it) }
 
         val roadManager = OSRMRoadManager(this, "AndroidApp")
@@ -203,7 +199,7 @@ class CreateEventActivity : AppCompatActivity() {
     private fun guardarEventoEnFirebase(name: String, location: String, date: String, description: String, lat: Double, lon: Double) {
         val database = FirebaseDatabase.getInstance().reference
         val currentUser = FirebaseAuth.getInstance().currentUser
-        val userId = currentUser?.uid ?: "spagZw9k5cNfsMUeA5moorwddj72" // si no logueado, usar el default
+        val userId = currentUser?.uid ?: "spagZw9k5cNfsMUeA5moorwddj72"
 
         val newEvent = mapOf(
             "userId" to userId,

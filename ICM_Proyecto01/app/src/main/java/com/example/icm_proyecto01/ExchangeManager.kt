@@ -30,7 +30,6 @@ object ExchangeManager {
 
         dbRef.child("BookOffers").child(exchangePointId).child(offer.offerId).removeValue()
             .addOnSuccessListener {
-                // Eliminar del RecyclerView
                 offersList.removeAt(position)
                 adapter.notifyItemRemoved(position)
                 Toast.makeText(context, "Oferta rechazada", Toast.LENGTH_SHORT).show()
@@ -63,25 +62,19 @@ object ExchangeManager {
         dbRef.updateChildren(updates).addOnSuccessListener {
             dbRef.child("BookOffers").child(exchangePointId).child(offer.bookId).removeValue()
 
-            // Leer datos necesarios para eliminar los libros
             dbRef.child("ExchangePoints").child(exchangePointId)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val bookOriginalId = snapshot.child("Book").child("id").getValue(String::class.java)
                         val bookExchangeId = offer.bookId
                         val receiverUserId = offer.userId
-
-                        // Eliminar libro del creador
                         if (!bookOriginalId.isNullOrBlank()) {
                             dbRef.child("Users").child(creatorUserId).child("Books").child(bookOriginalId).removeValue()
                         }
-
-                        // Eliminar libro del receptor (quien ofreció)
                         if (!bookExchangeId.isNullOrBlank()) {
                             dbRef.child("Users").child(receiverUserId).child("Books").child(bookExchangeId).removeValue()
                         }
 
-                        // Lanzar resumen
                         val originalTitulo = snapshot.child("Book").child("titulo").getValue(String::class.java) ?: "Sin título"
                         val originalEstado = snapshot.child("Book").child("state").getValue(String::class.java) ?: "Desconocido"
                         val originalPortada = snapshot.child("Book").child("portadaUrl").getValue(String::class.java) ?: ""
@@ -120,9 +113,5 @@ object ExchangeManager {
             Toast.makeText(context, "Error al confirmar intercambio", Toast.LENGTH_SHORT).show()
         }
     }
-
-
-
-
 
 }

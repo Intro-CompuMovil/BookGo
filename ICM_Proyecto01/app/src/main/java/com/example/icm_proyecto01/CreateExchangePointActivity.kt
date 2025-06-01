@@ -166,7 +166,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
             Log.d("CreateExchange", "Confirm button clicked")
 
             val bookId = selectedBookId ?: ""
-            val bookTitle = selectedBookTitle ?: ""
             val bookState = selectedBookState ?: ""
             val addressInput = binding.searchAddress.text.toString()
             val date = binding.btnSelectDate.text.toString()
@@ -239,7 +238,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
         }
 
     }
-
 
     private fun inicializarMapa() {
         osmMap = binding.osmMap

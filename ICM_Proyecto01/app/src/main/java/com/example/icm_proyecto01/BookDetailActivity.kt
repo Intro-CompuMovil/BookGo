@@ -30,7 +30,6 @@ class BookDetailActivity : AppCompatActivity() {
                 binding.imgBookCover.setImageResource(R.drawable.default_book)
             }
 
-            // Botón para ocultar el libro
             binding.btnOcultar.text = "Ocultar"
             binding.btnOcultar.setOnClickListener {
                 val intent = Intent(this, RegisterHiddenBookActivity::class.java).apply {
@@ -41,12 +40,9 @@ class BookDetailActivity : AppCompatActivity() {
                     putExtra("portada", book.portadaUrl)
                     putExtra("bookId", book.id)
                 }
-
-
                 startActivity(intent)
             }
 
-            // Botón para intercambiar el libro
             binding.btnIntercambiar.setOnClickListener {
                 val intent = Intent(this, CreateExchangePointActivity::class.java)
                 intent.putExtra("selectedBook", book)

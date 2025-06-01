@@ -26,7 +26,7 @@ class BookSearchActivity : AppCompatActivity() {
 
         adapter = BookSearchAdapter(bookList) { selectedBook ->
             val intent = Intent(this, AddBookFromApiActivity::class.java).apply {
-                putExtra("bookId", selectedBook.id) // AÑADIMOS ID DEL LIBRO
+                putExtra("bookId", selectedBook.id)
                 putExtra("title", selectedBook.titulo)
                 putExtra("author", selectedBook.autor)
                 putExtra("genre", selectedBook.genero)

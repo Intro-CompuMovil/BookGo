@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Patterns
@@ -22,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
 import java.io.File
 import java.io.FileOutputStream
 
@@ -30,7 +28,6 @@ class EditProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditProfileBinding
     private var selectedImageUri: Uri? = null
-    private val storage = FirebaseStorage.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,8 +143,6 @@ class EditProfileActivity : AppCompatActivity() {
         if (currentUser != null && userId != null) {
             val database = FirebaseDatabase.getInstance().reference
             val updates = mutableMapOf<String, Any>("name" to newUserName)
-
-
             if (selectedImageUri != null) {
                 StorageHelper.uploadProfileImage(
                     userId, selectedImageUri!!,
@@ -199,7 +194,6 @@ class EditProfileActivity : AppCompatActivity() {
         finish()
     }
 
-    // Permiso de cámara
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             abrirCamara()

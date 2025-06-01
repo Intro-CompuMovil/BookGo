@@ -3,7 +3,6 @@ import android.util.Log
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.example.icm_proyecto01.model.ExchangePoint
 import com.example.icm_proyecto01.model.UserBook
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -13,8 +12,6 @@ class ExchangePointRepository(private val context: Context) {
     private val dbRef = FirebaseDatabase.getInstance().reference
 
 
-
-    // Función modificada para incluir la llamada a la API de Google Books
     fun sincronizarPuntosDeFirebase(onPointsFetched: (Set<String>) -> Unit) {
         val exchangePointsRef = dbRef.child("ExchangePoints")
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -86,8 +83,6 @@ class ExchangePointRepository(private val context: Context) {
     }
 
 
-
-    // Función para obtener la información del libro desde la API de Google Books
     private fun fetchBookFromGoogleApi(id: String, firebaseBookData: DataSnapshot, onResult: (UserBook?) -> Unit) {
         val url = "https://www.googleapis.com/books/v1/volumes/$id"
         val requestQueue = Volley.newRequestQueue(context)

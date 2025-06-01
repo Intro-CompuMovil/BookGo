@@ -7,5 +7,8 @@ data class Event(
     val date: String = "",
     val description: String = "",
     val lat: Double = 0.0,
-    val lon: Double = 0.0
+    val lon: Double = 0.0,
+    val participants: Map<String, Boolean> = emptyMap(),
+    var id: String = ""
 )
+

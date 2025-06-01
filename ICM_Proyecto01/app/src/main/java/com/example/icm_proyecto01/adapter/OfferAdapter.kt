@@ -2,13 +2,11 @@ package com.example.icm_proyecto01.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.icm_proyecto01.ExchangeManager
 import com.example.icm_proyecto01.databinding.ItemOfferBinding
 import com.example.icm_proyecto01.model.BookOffer
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+
 
 class OfferAdapter(
     private val offers: MutableList<BookOffer>,
