@@ -20,6 +20,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
@@ -152,11 +153,6 @@ class HomeActivity : AppCompatActivity() {
         }
 
 
-        findViewById<Button>(R.id.btnMyExchanges).setOnClickListener {
-            val intent = Intent(this, MyExchangesActivity::class.java)
-            startActivity(intent)
-        }
-
 
         binding.searchAddress.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -181,6 +177,11 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, ExchangePointActivity::class.java))
         }
 
+        findViewById<LinearLayout>(R.id.btnMyExchanges).setOnClickListener {
+            startActivity(Intent(this, MyExchangesActivity::class.java))
+        }
+
+
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> true
@@ -196,6 +197,7 @@ class HomeActivity : AppCompatActivity() {
                     overridePendingTransition(0, 0)
                     true
                 }
+
                 R.id.nav_profile -> {
                     val intent = Intent(this, ProfileActivity::class.java)
                     intent.putExtra("userName", userName)

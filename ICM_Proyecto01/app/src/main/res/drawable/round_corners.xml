@@ -1,7 +1,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Color de fondo transparente -->
-    <solid android:color="#CC8A9E63" />
-    <!-- 80% de opacidad (CC) -->
+    <solid android:color="#CCb3d9f5" />
 
     <corners android:radius="25dp" />
 

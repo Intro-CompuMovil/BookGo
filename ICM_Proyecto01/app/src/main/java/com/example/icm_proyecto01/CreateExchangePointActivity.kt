@@ -2,7 +2,6 @@ package com.example.icm_proyecto01
 
 import android.Manifest
 import android.util.Log
-import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -12,6 +11,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import com.google.android.material.appbar.MaterialToolbar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
@@ -116,10 +116,12 @@ class CreateExchangePointActivity : AppCompatActivity() {
         }
 
 
-        binding.btnBack.setOnClickListener{
+        val toolbar = findViewById<MaterialToolbar>(R.id.topAppBar)
+        toolbar.setNavigationOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
         }
+
 
         binding.searchAddress.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -136,8 +138,10 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val day = calendar.get(Calendar.DAY_OF_MONTH)
 
             val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                binding.tvSelectedDate.text = "Fecha: $selectedDay/${selectedMonth + 1}/$selectedYear"
+                val fecha = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                binding.btnSelectDate.text = fecha
             }, year, month, day)
+
 
             datePicker.show()
         }
@@ -149,8 +153,10 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val minute = calendar.get(Calendar.MINUTE)
 
             val timePicker = TimePickerDialog(this, { _, selectedHour, selectedMinute ->
-                binding.tvSelectedTime.text = "Hora: $selectedHour:$selectedMinute"
+                val hora = String.format("%02d:%02d", selectedHour, selectedMinute)
+                binding.btnSelectTime.text = hora
             }, hour, minute, true)
+
 
             timePicker.show()
         }
@@ -163,8 +169,8 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val bookTitle = selectedBookTitle ?: ""
             val bookState = selectedBookState ?: ""
             val addressInput = binding.searchAddress.text.toString()
-            val date = binding.tvSelectedDate.text.toString()
-            val time = binding.tvSelectedTime.text.toString()
+            val date = binding.btnSelectDate.text.toString()
+            val time = binding.btnSelectTime.text.toString()
 
 
             if (bookId.isBlank() || bookState.isBlank() ||

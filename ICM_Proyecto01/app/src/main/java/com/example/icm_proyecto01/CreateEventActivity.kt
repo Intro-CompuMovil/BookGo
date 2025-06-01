@@ -59,7 +59,7 @@ class CreateEventActivity : AppCompatActivity() {
         iniciarMapa()
         pedirPermisosUbicacion()
 
-        binding.btnBack.setOnClickListener { finish() }
+        binding.topAppBar.setOnClickListener { finish() }
         binding.btnSelectDate.setOnClickListener { abrirSelectorFecha() }
         binding.btnSelectTime.setOnClickListener { abrirSelectorHora() }
         binding.btnCreateEvent.setOnClickListener { createEvent() }
