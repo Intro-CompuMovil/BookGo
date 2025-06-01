@@ -49,6 +49,9 @@
             android:name=".ExchangeWebRouteActivity"
             android:exported="false" />
         <activity
+            android:name=".MapToEventActivity"
+            android:exported="false" />
+        <activity
             android:name=".ExchangeRouteActivity"
             android:exported="false" />
         <activity
