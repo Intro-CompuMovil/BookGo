@@ -21,7 +21,13 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
+    <meta-data
+        android:name="com.google.ar.core"
+        android:value="required" />
+
     <application
+        android:usesCleartextTraffic="true"
+        android:requestLegacyExternalStorage="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -39,6 +45,9 @@
             android:exported="false" />
         <activity
             android:name=".MyExchangesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ARBookActivity"
             android:exported="false" />
         <activity
             android:name=".ExchangeWebRouteActivity"
