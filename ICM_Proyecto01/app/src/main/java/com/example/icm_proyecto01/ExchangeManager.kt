@@ -39,7 +39,10 @@ object ExchangeManager {
             "ExchangePoints/$exchangePointId/BookExchange/id" to offer.bookId,
             "ExchangePoints/$exchangePointId/BookExchange/state" to offer.estado,
             "ExchangePoints/$exchangePointId/BookReceiver/id" to offer.bookId,
-            "ExchangePoints/$exchangePointId/BookReceiver/state" to offer.estado
+            "ExchangePoints/$exchangePointId/BookReceiver/state" to offer.estado,
+            "ExchangePoints/$exchangePointId/BookReceiver/titulo" to offer.titulo,
+            "ExchangePoints/$exchangePointId/BookReceiver/portadaUrl" to offer.portadaUrl
+
         )
 
         dbRef.updateChildren(updates).addOnSuccessListener {
@@ -61,7 +64,7 @@ object ExchangeManager {
                     val fecha = fechaHora.split("-").getOrNull(0)?.trim() ?: "-"
                     val hora = fechaHora.split("-").getOrNull(1)?.trim() ?: "-"
                     val intent = Intent(context, ExchangeSummaryFinalActivity::class.java).apply {
-                        putExtra("exchangePointId", exchangePointId) // ✅ Muy importante
+                        putExtra("exchangePointId", exchangePointId)
                         putExtra("libroOriginalTitulo", originalTitulo)
                         putExtra("libroOriginalEstado", originalEstado)
                         putExtra("libroOriginalPortada", originalPortada)

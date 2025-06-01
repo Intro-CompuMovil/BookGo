@@ -75,7 +75,9 @@ class CreatedExchangesFragment : Fragment() {
                         }
 
                     }
+                    exchangeList.sortByDescending { it.receiverUserId.isNotBlank() }
                     adapter.notifyDataSetChanged()
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {}

@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.icm_proyecto01.ExchangeSummaryFinalActivity
 import com.example.icm_proyecto01.OffersActivity
+import com.example.icm_proyecto01.R
 import com.example.icm_proyecto01.databinding.ItemExchangeCreatedBinding
 import com.example.icm_proyecto01.model.ExchangePoint
 import com.google.firebase.database.FirebaseDatabase
@@ -52,6 +53,7 @@ class CreatedExchangesAdapter(private val exchanges: List<ExchangePoint>) :
                 val exchangePointId = item.exchangePointId
 
                 if (item.receiverUserId.isNotBlank()) {
+                    // Cargar resumen del intercambio aceptado
                     val dbRef = FirebaseDatabase.getInstance().reference
                     dbRef.child("ExchangePoints").child(exchangePointId).child("BookReceiver")
                         .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -103,10 +105,23 @@ class CreatedExchangesAdapter(private val exchanges: List<ExchangePoint>) :
                             }
                         })
                 } else {
-                    Toast.makeText(context, "Aún no se ha aceptado ninguna oferta", Toast.LENGTH_SHORT).show()
+                    // Ir a la lista de ofertas
+                    val intent = Intent(context, OffersActivity::class.java).apply {
+                        putExtra("EXCHANGE_POINT_ID", exchangePointId)
+                    }
+                    context.startActivity(intent)
                 }
             }
 
+
+
         }
+
+        if (item.receiverUserId.isNotBlank()) {
+            holder.itemView.setBackgroundResource(R.drawable.card_border_accepted)
+        } else {
+            holder.itemView.setBackgroundResource(R.drawable.card_border_default)
+        }
+
     }
 }
