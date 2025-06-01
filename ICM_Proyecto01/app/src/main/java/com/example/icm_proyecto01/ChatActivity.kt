@@ -13,7 +13,7 @@ class ChatActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityChatBinding
     private lateinit var chatAdapter: ChatMessageAdapter
-    private val messageList = ArrayList<String>() // Lista de mensajes
+    private val messageList = ArrayList<String>()
     private lateinit var sharedPreferences: SharedPreferences
     private var chatName: String = "Chat"
 
@@ -24,7 +24,6 @@ class ChatActivity : AppCompatActivity() {
 
         chatName = intent.getStringExtra("CHAT_NAME") ?: "Chat"
 
-        // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences("ChatPrefs", Context.MODE_PRIVATE)
         loadMessages()
 
@@ -35,12 +34,11 @@ class ChatActivity : AppCompatActivity() {
         binding.btnSend.setOnClickListener {
             val message = binding.etMessage.text.toString().trim()
             if (message.isNotEmpty()) {
-                messageList.add("Yo: $message") // Agregar mensaje a la lista
-                chatAdapter.notifyItemInserted(messageList.size - 1) // Notificar al adaptador
-                binding.rvChatMessages.scrollToPosition(messageList.size - 1) // Auto-scroll al último mensaje
-                binding.etMessage.text.clear() // Limpiar campo de texto
+                messageList.add("Yo: $message")
+                chatAdapter.notifyItemInserted(messageList.size - 1)
+                binding.rvChatMessages.scrollToPosition(messageList.size - 1)
+                binding.etMessage.text.clear()
 
-                // Guardar mensajes en SharedPreferences
                 saveMessages()
             } else {
                 Toast.makeText(this, "Escribe un mensaje para enviar", Toast.LENGTH_SHORT).show()
@@ -50,12 +48,12 @@ class ChatActivity : AppCompatActivity() {
 
     private fun loadMessages() {
         val savedMessages = sharedPreferences.getStringSet(chatName, emptySet()) ?: emptySet()
-        messageList.addAll(savedMessages) // Cargar mensajes previos
+        messageList.addAll(savedMessages)
     }
 
     private fun saveMessages() {
         val editor = sharedPreferences.edit()
-        editor.putStringSet(chatName, messageList.toSet()) // Guardar la conversación
+        editor.putStringSet(chatName, messageList.toSet())
         editor.apply()
     }
 }

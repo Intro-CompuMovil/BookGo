@@ -28,7 +28,6 @@ class OffersActivity : AppCompatActivity() {
         exchangePointId = intent.getStringExtra("EXCHANGE_POINT_ID") ?: ""
         Log.d("OffersActivity", "ExchangePointId recibido: $exchangePointId")
 
-        // Obtener el creatorUserId antes de cargar las ofertas
         dbRef.child("ExchangePoints").child(exchangePointId).child("creatorUserId")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {

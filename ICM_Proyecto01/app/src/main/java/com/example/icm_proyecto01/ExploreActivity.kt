@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.icm_proyecto01.adapter.EventAdapter
 import com.example.icm_proyecto01.databinding.ActivityExploreBinding
 import com.example.icm_proyecto01.model.Event
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
 class ExploreActivity : AppCompatActivity() {
@@ -24,6 +25,11 @@ class ExploreActivity : AppCompatActivity() {
         database = FirebaseDatabase.getInstance().reference
         userName = getSharedPreferences("UserProfile", MODE_PRIVATE).getString("userName", "Jane Doe")
         eventList = mutableListOf()
+
+
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        eventList.sortWith(compareByDescending { it.participants.containsKey(userId) })
+
 
         cargarEventos()
 
@@ -65,20 +71,34 @@ class ExploreActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 eventList.clear()
 
+
                 for (eventSnapshot in snapshot.children) {
                     val event = eventSnapshot.getValue(Event::class.java)
-                    event?.let { eventList.add(it) }
+                    val id = eventSnapshot.key
+
+                    if (event != null && !event.name.isNullOrBlank() && !id.isNullOrBlank()) {
+                        event.id = id
+
+                            eventList.add(event)
+
+                    }
                 }
+
+
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                eventList.sortWith(compareByDescending { it.participants.containsKey(userId) })
 
                 binding.rvEvents.adapter = EventAdapter(eventList) { selectedEvent ->
                     val intent = Intent(this@ExploreActivity, EventDetailActivity::class.java).apply {
+                        putExtra("EVENT_ID", selectedEvent.id)
                         putExtra("EVENT_NAME", selectedEvent.name)
                         putExtra("EVENT_LOCATION", selectedEvent.location)
                         putExtra("EVENT_DATE", selectedEvent.date)
                         putExtra("EVENT_DESCRIPTION", selectedEvent.description)
                     }
-                    startActivity(intent)
+                    startActivityForResult(intent, 1001)
                 }
+
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -86,4 +106,12 @@ class ExploreActivity : AppCompatActivity() {
             }
         })
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1001) {
+            cargarEventos()
+        }
+    }
+
 }

@@ -56,7 +56,6 @@ class CreatedExchangesFragment : Fragment() {
                         val dateTime = point.child("date").value.toString().split("-")
                         val lat = point.child("lat").getValue(Double::class.java) ?: 0.0
                         val lon = point.child("lon").getValue(Double::class.java) ?: 0.0
-                        val receiverUserId = point.child("receiverUserId").value?.toString() ?: ""
 
 
                         val address = point.child("resolvedAddress").value?.toString()

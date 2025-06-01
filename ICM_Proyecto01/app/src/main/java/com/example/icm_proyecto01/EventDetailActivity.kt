@@ -7,6 +7,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icm_proyecto01.databinding.ActivityEventDetailBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+
 
 class EventDetailActivity : AppCompatActivity() {
 
@@ -28,33 +31,45 @@ class EventDetailActivity : AppCompatActivity() {
         binding.tvEventDate.text = date
         binding.tvEventDescription.text = description
 
-        assistPref = getSharedPreferences("EventosAsistidos", MODE_PRIVATE)
-        val isAssisting = assistPref.contains(name)
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val eventId = intent.getStringExtra("EVENT_ID") ?: return
+        val eventRef = FirebaseDatabase.getInstance().getReference("Events").child(eventId)
 
-        if (isAssisting) {
-            binding.btnAttend.text = "Desasistir"
-            binding.btnGoToEvent.visibility = View.VISIBLE
-        } else {
-            binding.btnAttend.text = "Asistir"
-            binding.btnGoToEvent.visibility = View.GONE
-        }
+        eventRef.child("participants").child(userId).get().addOnSuccessListener { snapshot ->
+            val isParticipating = snapshot.exists()
 
-        binding.btnAttend.setOnClickListener {
-            val editor = assistPref.edit()
-
-            if (binding.btnAttend.text == "Asistir") {
-                editor.putBoolean(name, true).apply()
-                Toast.makeText(this, "¡Te has registrado en $name!", Toast.LENGTH_SHORT).show()
+            if (isParticipating) {
                 binding.btnAttend.text = "Desasistir"
                 binding.btnGoToEvent.visibility = View.VISIBLE
             } else {
-                editor.remove(name).apply()
-                Toast.makeText(this, "Has cancelado tu asistencia a $name", Toast.LENGTH_SHORT).show()
                 binding.btnAttend.text = "Asistir"
                 binding.btnGoToEvent.visibility = View.GONE
             }
-
         }
+
+
+        binding.btnAttend.setOnClickListener {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            val eventId = intent.getStringExtra("EVENT_ID") ?: return@setOnClickListener
+            val eventRef = FirebaseDatabase.getInstance().getReference("Events").child(eventId)
+
+            eventRef.child("participants").child(userId).get().addOnSuccessListener { snapshot ->
+                val isParticipating = snapshot.exists()
+
+                if (!isParticipating) {
+                    eventRef.child("participants").child(userId).setValue(true)
+                    Toast.makeText(this, "¡Te has registrado en $name!", Toast.LENGTH_SHORT).show()
+                    binding.btnAttend.text = "Desasistir"
+                    binding.btnGoToEvent.visibility = View.VISIBLE
+                } else {
+                    eventRef.child("participants").child(userId).removeValue()
+                    Toast.makeText(this, "Has cancelado tu asistencia a $name", Toast.LENGTH_SHORT).show()
+                    binding.btnAttend.text = "Asistir"
+                    binding.btnGoToEvent.visibility = View.GONE
+                }
+            }
+        }
+
 
         binding.btnGoToEvent.setOnClickListener {
             val intent = Intent(this, MapToEventActivity::class.java)

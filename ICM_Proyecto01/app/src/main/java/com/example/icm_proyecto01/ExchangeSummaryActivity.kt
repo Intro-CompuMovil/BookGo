@@ -65,7 +65,6 @@ class ExchangeSummaryActivity : AppCompatActivity() {
                     }
                 })
 
-            // Cargar información del punto (dirección, fecha, hora)
             Log.d("ExchangeSummary", "Cargando datos del punto de intercambio...")
             dbRef.child("ExchangePoints").child(exchangePointId)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -88,7 +87,6 @@ class ExchangeSummaryActivity : AppCompatActivity() {
                 })
         }
 
-        // Mostrar el libro ofrecido por el usuario
         if (userBook != null) {
             binding.tvBookUserTitle.text = userBook.titulo
             binding.tvBookUserGenre.text = "Género: ${userBook.genero}"
@@ -103,7 +101,6 @@ class ExchangeSummaryActivity : AppCompatActivity() {
             }
         }
 
-        // Confirmar intercambio (crear oferta)
         binding.btnConfirmExchange.setOnClickListener {
             val userId = FirebaseAuth.getInstance().currentUser?.uid
 

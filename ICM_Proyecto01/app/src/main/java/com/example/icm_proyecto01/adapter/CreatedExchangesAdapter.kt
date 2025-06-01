@@ -1,7 +1,6 @@
 package com.example.icm_proyecto01.adapters
 
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -53,7 +52,6 @@ class CreatedExchangesAdapter(private val exchanges: List<ExchangePoint>) :
                 val exchangePointId = item.exchangePointId
 
                 if (item.receiverUserId.isNotBlank()) {
-                    // Cargar resumen del intercambio aceptado
                     val dbRef = FirebaseDatabase.getInstance().reference
                     dbRef.child("ExchangePoints").child(exchangePointId).child("BookReceiver")
                         .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -105,7 +103,6 @@ class CreatedExchangesAdapter(private val exchanges: List<ExchangePoint>) :
                             }
                         })
                 } else {
-                    // Ir a la lista de ofertas
                     val intent = Intent(context, OffersActivity::class.java).apply {
                         putExtra("EXCHANGE_POINT_ID", exchangePointId)
                     }

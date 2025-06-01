@@ -3,14 +3,10 @@ package com.example.icm_proyecto01.adapters
 import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.icm_proyecto01.ExchangeManager
 import com.example.icm_proyecto01.databinding.ItemBookOfferBinding
 import com.example.icm_proyecto01.model.BookOffer
-import com.example.icm_proyecto01.notifications.ExchangeNotificationManager
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
 
 class BookOfferAdapter(
@@ -66,8 +62,8 @@ class BookOfferAdapter(
                             offer,
                             exchangePointId,
                             holder.itemView.context,
-                            this@BookOfferAdapter, // adaptador
-                            offers as MutableList<BookOffer>, // lista mutable
+                            this@BookOfferAdapter,
+                            offers as MutableList<BookOffer>,
                             holder.adapterPosition
                         )
                     }

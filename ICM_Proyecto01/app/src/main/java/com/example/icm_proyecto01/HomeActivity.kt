@@ -18,7 +18,6 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -32,7 +31,6 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
-import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
@@ -59,11 +57,10 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var roadManager: RoadManager
     private lateinit var locationCallback: LocationCallback
-
     private var currentLocation: GeoPoint? = null
+
     private var userName: String? = null
     private var marker: Marker? = null
-
 
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
@@ -115,7 +112,6 @@ class HomeActivity : AppCompatActivity() {
         geocoder = Geocoder(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-
         escucharNuevasOfertasDeIntercambio()
         escucharAceptacionDeMiOferta()
         ExchangeNotificationManager.startListening(this)
@@ -128,7 +124,6 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
-
         roadManager = OSRMRoadManager(this, "ANDROID")
         inicializarMapa()
         pedirPermisos()
@@ -143,7 +138,6 @@ class HomeActivity : AppCompatActivity() {
 
         val focusLat = intent.getDoubleExtra("focusLat", Double.NaN)
         val focusLon = intent.getDoubleExtra("focusLon", Double.NaN)
-
         if (!focusLat.isNaN() && !focusLon.isNaN()) {
             val focusPoint = GeoPoint(focusLat, focusLon)
             osmMap.controller.setCenter(focusPoint)
@@ -151,7 +145,6 @@ class HomeActivity : AppCompatActivity() {
 
             osmMap.invalidate()
         }
-
 
 
         binding.searchAddress.setOnEditorActionListener { _, actionId, _ ->
@@ -208,7 +201,6 @@ class HomeActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
 
     }
 

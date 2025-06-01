@@ -14,7 +14,7 @@ class AddBookFromApiActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddBookFromApiBinding
     private var userName: String? = null
-    private var bookId: String? = null // NUEVO
+    private var bookId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

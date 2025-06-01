@@ -50,7 +50,6 @@ class OfferedExchangesFragment : Fragment() {
 
                     for (offerSnapshot in exchangeSnapshot.children) {
                         val offerUserId = offerSnapshot.child("userId").value.toString()
-                        val offerBookId = offerSnapshot.child("bookId").value.toString()
                         val offerEstado = offerSnapshot.child("estado").value.toString()
                         val offerTitulo = offerSnapshot.child("titulo").value.toString()
                         val portadaUrl = offerSnapshot.child("portadaUrl").value.toString()

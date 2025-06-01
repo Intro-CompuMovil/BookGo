@@ -9,7 +9,6 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -52,8 +51,6 @@ class ExchangePointActivity : AppCompatActivity() {
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osm_prefs", MODE_PRIVATE))
         binding = ActivityExchangePointBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Inicializar mapa y servicios
         osmMap = binding.osmMap
         osmMap.setTileSource(TileSourceFactory.MAPNIK)
         osmMap.setMultiTouchControls(true)
@@ -65,7 +62,6 @@ class ExchangePointActivity : AppCompatActivity() {
 
         pedirPermisos()
 
-        // Obtener datos del intent
         val extras = intent.extras
         val lat = extras?.getDouble("lat") ?: 0.0
         val lon = extras?.getDouble("lon") ?: 0.0
@@ -98,8 +94,6 @@ class ExchangePointActivity : AppCompatActivity() {
             binding.imgLibroSeleccionado.setImageResource(R.drawable.default_book)
         }
 
-
-        // Botones
         binding.backButton.setOnClickListener { finish() }
 
         binding.btnCancelar.setOnClickListener { finish() }
