@@ -50,7 +50,6 @@ object ExchangeManager {
     ) {
         val dbRef = FirebaseDatabase.getInstance().reference
 
-
         val updates = mapOf(
             "ExchangePoints/$exchangePointId/receiverUserId" to offer.userId,
             "ExchangePoints/$exchangePointId/BookExchange/id" to offer.bookId,
@@ -59,52 +58,70 @@ object ExchangeManager {
             "ExchangePoints/$exchangePointId/BookReceiver/state" to offer.estado,
             "ExchangePoints/$exchangePointId/BookReceiver/titulo" to offer.titulo,
             "ExchangePoints/$exchangePointId/BookReceiver/portadaUrl" to offer.portadaUrl
-
         )
 
         dbRef.updateChildren(updates).addOnSuccessListener {
-
             dbRef.child("BookOffers").child(exchangePointId).child(offer.bookId).removeValue()
 
-            Toast.makeText(context, "Intercambio confirmado, prepara tu libro", Toast.LENGTH_SHORT).show()
+            // Leer datos necesarios para eliminar los libros
+            dbRef.child("ExchangePoints").child(exchangePointId)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val bookOriginalId = snapshot.child("Book").child("id").getValue(String::class.java)
+                        val bookExchangeId = offer.bookId
+                        val receiverUserId = offer.userId
 
-            dbRef.child("ExchangePoints").child(exchangePointId).addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val originalTitulo = snapshot.child("Book").child("titulo").getValue(String::class.java) ?: "Sin título"
-                    val originalEstado = snapshot.child("Book").child("state").getValue(String::class.java) ?: "Desconocido"
-                    val originalPortada = snapshot.child("Book").child("portadaUrl").getValue(String::class.java) ?: ""
+                        // Eliminar libro del creador
+                        if (!bookOriginalId.isNullOrBlank()) {
+                            dbRef.child("Users").child(creatorUserId).child("Books").child(bookOriginalId).removeValue()
+                        }
 
+                        // Eliminar libro del receptor (quien ofreció)
+                        if (!bookExchangeId.isNullOrBlank()) {
+                            dbRef.child("Users").child(receiverUserId).child("Books").child(bookExchangeId).removeValue()
+                        }
 
-                    val direccion = snapshot.child("resolvedAddress").getValue(String::class.java)
-                        ?: snapshot.child("address").getValue(String::class.java) ?: "Ubicación desconocida"
-                    val fechaHora = snapshot.child("date").getValue(String::class.java) ?: "- -"
-                    val fecha = fechaHora.split("-").getOrNull(0)?.trim() ?: "-"
-                    val hora = fechaHora.split("-").getOrNull(1)?.trim() ?: "-"
-                    val intent = Intent(context, ExchangeSummaryFinalActivity::class.java).apply {
-                        putExtra("exchangePointId", exchangePointId)
-                        putExtra("libroOriginalTitulo", originalTitulo)
-                        putExtra("libroOriginalEstado", originalEstado)
-                        putExtra("libroOriginalPortada", originalPortada)
+                        // Lanzar resumen
+                        val originalTitulo = snapshot.child("Book").child("titulo").getValue(String::class.java) ?: "Sin título"
+                        val originalEstado = snapshot.child("Book").child("state").getValue(String::class.java) ?: "Desconocido"
+                        val originalPortada = snapshot.child("Book").child("portadaUrl").getValue(String::class.java) ?: ""
 
-                        putExtra("libroOfrecidoTitulo", offer.titulo)
-                        putExtra("libroOfrecidoEstado", offer.estado)
-                        putExtra("libroOfrecidoPortada", offer.portadaUrl)
+                        val direccion = snapshot.child("resolvedAddress").getValue(String::class.java)
+                            ?: snapshot.child("address").getValue(String::class.java) ?: "Ubicación desconocida"
+                        val fechaHora = snapshot.child("date").getValue(String::class.java) ?: "- -"
+                        val fecha = fechaHora.split("-").getOrNull(0)?.trim() ?: "-"
+                        val hora = fechaHora.split("-").getOrNull(1)?.trim() ?: "-"
 
-                        putExtra("direccion", direccion)
-                        putExtra("fecha", fecha)
-                        putExtra("hora", hora)
+                        val intent = Intent(context, ExchangeSummaryFinalActivity::class.java).apply {
+                            putExtra("exchangePointId", exchangePointId)
+                            putExtra("libroOriginalTitulo", originalTitulo)
+                            putExtra("libroOriginalEstado", originalEstado)
+                            putExtra("libroOriginalPortada", originalPortada)
+
+                            putExtra("libroOfrecidoTitulo", offer.titulo)
+                            putExtra("libroOfrecidoEstado", offer.estado)
+                            putExtra("libroOfrecidoPortada", offer.portadaUrl)
+
+                            putExtra("direccion", direccion)
+                            putExtra("fecha", fecha)
+                            putExtra("hora", hora)
+                        }
+
+                        context.startActivity(intent)
+                        Toast.makeText(context, "Intercambio confirmado. Libros removidos.", Toast.LENGTH_SHORT).show()
                     }
-                    context.startActivity(intent)
-                }
 
-                override fun onCancelled(error: DatabaseError) {
-                }
-            })
+                    override fun onCancelled(error: DatabaseError) {
+                        Toast.makeText(context, "Error al acceder al punto de intercambio", Toast.LENGTH_SHORT).show()
+                    }
+                })
 
         }.addOnFailureListener {
             Toast.makeText(context, "Error al confirmar intercambio", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 
 
 
