@@ -15,10 +15,12 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
@@ -151,11 +153,6 @@ class HomeActivity : AppCompatActivity() {
         }
 
 
-        findViewById<Button>(R.id.btnMyExchanges).setOnClickListener {
-            val intent = Intent(this, MyExchangesActivity::class.java)
-            startActivity(intent)
-        }
-
 
         binding.searchAddress.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -180,6 +177,11 @@ class HomeActivity : AppCompatActivity() {
             startActivity(Intent(this, ExchangePointActivity::class.java))
         }
 
+        findViewById<LinearLayout>(R.id.btnMyExchanges).setOnClickListener {
+            startActivity(Intent(this, MyExchangesActivity::class.java))
+        }
+
+
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> true
@@ -195,6 +197,7 @@ class HomeActivity : AppCompatActivity() {
                     overridePendingTransition(0, 0)
                     true
                 }
+
                 R.id.nav_profile -> {
                     val intent = Intent(this, ProfileActivity::class.java)
                     intent.putExtra("userName", userName)
@@ -295,103 +298,114 @@ class HomeActivity : AppCompatActivity() {
     //Para el intercambio
     private fun cargarPuntosDeIntercambio() {
         val exchangePointRepository = ExchangePointRepository(this)
-        Log.d("PrimerLog", "llamado a puntoIntercambio")
         exchangePointRepository.sincronizarPuntosDeFirebase { points ->
-            Log.d("PrimerLog", "llamado a $points")
-            // Verificamos si los puntos existen
             if (points.isNotEmpty()) {
-                Log.d("PrimerLog", "no esta empty $points")
                 binding.puntosCercanosContainer.removeAllViews()
 
-                for (punto in points) {
+                val vistasUrgentes = mutableListOf<View>()
+                val vistasNormales = mutableListOf<View>()
+
+                val puntosOrdenados = points.sortedByDescending { punto ->
+                    val datos = punto.split("|")
+                    if (datos.size >= 3) {
+                        val fecha = datos[1]
+                        val hora = datos[2]
+                        esUrgente(fecha, hora)
+                    } else false
+                }
+
+                for (punto in puntosOrdenados) {
                     val datos = punto.split("|")
                     if (datos.size >= 5) {
-                        Log.d("PuntoIntercambio", "datos = $datos")
                         val tituloLibro = datos[0]
-                        Log.d("PuntoIntercambio:", "Titulo $tituloLibro" )
                         val fecha = datos[1]
                         val hora = datos[2]
                         val lat = datos[3].toDoubleOrNull()
                         val lon = datos[4].toDoubleOrNull()
-                        Log.d("PuntoIntercambio:", "Lon $lon" )
                         val estadoLibro = if (datos.size >= 6) datos[5] else "No disponible"
                         val portadaUrl = if (datos.size >= 7) datos[6] else ""
                         val idPunto = if (datos.size >= 8) datos[7] else "404"
                         val receiverUserId = if (datos.size >= 9) datos[8] else ""
+                        val urgente = esUrgente(fecha, hora)
 
                         val direccion = obtenerDireccionDesdeGeoPoint(lat, lon)
 
-                            val cardView = layoutInflater.inflate(
-                                R.layout.item_exchange_point_home,
-                                binding.puntosCercanosContainer,
-                                false
-                            )
+                        val cardView = layoutInflater.inflate(
+                            R.layout.item_exchange_point_home,
+                            binding.puntosCercanosContainer,
+                            false
+                        )
 
-                            val tvLocation = cardView.findViewById<TextView>(R.id.tvLocation)
-                            val tvDescription =
-                                cardView.findViewById<TextView>(R.id.tvDescription)
-                            val tvDateTime = cardView.findViewById<TextView>(R.id.tvDateTime)
-
-                            tvLocation.text = direccion
-                            tvDescription.text = "Libro: $tituloLibro\nEstado: $estadoLibro"
-                            tvDateTime.text = "$fecha - $hora"
-
-
-                            val imgCover = cardView.findViewById<ImageView>(R.id.imgBookCover)
-                            if (portadaUrl.isNotEmpty()) {
-                                Picasso.get().load(portadaUrl)
-                                    .placeholder(R.drawable.default_book).into(imgCover)
-                            } else {
-                                imgCover.setImageResource(R.drawable.default_book)
-                            }
-
-
-                            cardView.setOnClickListener {
-                                if (lat != null && lon != null) {
-                                    Log.d("PuntoIntercambio", "lon y lat no null")
-                                    val intent =
-                                        Intent(this, ExchangePointActivity::class.java).apply {
-                                            putExtra("titulo", tituloLibro)
-                                            putExtra("direccion", direccion)
-                                            putExtra("fecha", fecha)
-                                            putExtra("hora", hora)
-                                            putExtra("lat", lat)
-                                            putExtra("lon", lon)
-                                            Log.d("PuntoIntercambio", "puso lon")
-                                            putExtra("estadoLibro", estadoLibro)
-                                            putExtra("portadaUrl", portadaUrl)
-                                            putExtra("idPunto", idPunto)
-                                        }
-                                    startActivity(intent)
-
-                                }
-                            }
-
-                            binding.puntosCercanosContainer.addView(cardView)
-
-                            if (lat != null && lon != null) {
-                                val marcador = Marker(osmMap).apply {
-                                    Log.d("PuntoIntercambioOSM", "Lon en OSM=$lon")
-                                    position = GeoPoint(lat, lon)
-                                    title = "$tituloLibro\n$direccion\n$fecha $hora"
-                                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                                    icon = ContextCompat.getDrawable(
-                                        this@HomeActivity,
-                                        R.drawable.ic_exchange_point
-                                    )
-                                }
-                                osmMap.overlays.add(marcador)
-                            }
+                        if (urgente) {
+                            cardView.setBackgroundResource(R.drawable.card_blue_border)
+                            vistasUrgentes.add(cardView)
+                        } else {
+                            vistasNormales.add(cardView)
                         }
 
-                    }
-                    osmMap.invalidate()
-            }else{
-                Log.d("PrimerLog", "si esta empty $points")
-            }
+                        val tvLocation = cardView.findViewById<TextView>(R.id.tvLocation)
+                        val tvDescription = cardView.findViewById<TextView>(R.id.tvDescription)
+                        val tvDateTime = cardView.findViewById<TextView>(R.id.tvDateTime)
 
+                        tvLocation.text = direccion
+                        tvDescription.text = "Libro: $tituloLibro\nEstado: $estadoLibro"
+                        tvDateTime.text = "$fecha - $hora"
+
+                        val imgCover = cardView.findViewById<ImageView>(R.id.imgBookCover)
+                        if (portadaUrl.isNotEmpty()) {
+                            Picasso.get().load(portadaUrl).placeholder(R.drawable.default_book).into(imgCover)
+                        } else {
+                            imgCover.setImageResource(R.drawable.default_book)
+                        }
+
+                        cardView.setOnClickListener {
+                            if (lat != null && lon != null) {
+                                val intent = Intent(this, ExchangePointActivity::class.java).apply {
+                                    putExtra("titulo", tituloLibro)
+                                    putExtra("direccion", direccion)
+                                    putExtra("fecha", fecha)
+                                    putExtra("hora", hora)
+                                    putExtra("lat", lat)
+                                    putExtra("lon", lon)
+                                    putExtra("estadoLibro", estadoLibro)
+                                    putExtra("portadaUrl", portadaUrl)
+                                    putExtra("idPunto", idPunto)
+                                }
+                                startActivity(intent)
+                            }
+                        }
+                        if (lat != null && lon != null) {
+                            val marcador = Marker(osmMap).apply {
+                                position = GeoPoint(lat, lon)
+                                title = "$tituloLibro\n$direccion\n$fecha $hora"
+                                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                                icon = ContextCompat.getDrawable(this@HomeActivity, R.drawable.ic_exchange_point)
+                            }
+                            osmMap.overlays.add(marcador)
+                        }
+                    }
+                }
+                for (v in vistasUrgentes) binding.puntosCercanosContainer.addView(v)
+                for (v in vistasNormales) binding.puntosCercanosContainer.addView(v)
+
+                osmMap.invalidate()
+            }
         }
     }
+
+
+    private fun esUrgente(fecha: String, hora: String): Boolean {
+        return try {
+            val sdf = java.text.SimpleDateFormat("dd/MM/yyyy - HH:mm")
+            val date = sdf.parse("$fecha - $hora")
+            val ahora = java.util.Date()
+            val diferencia = date.time - ahora.time
+            diferencia in 0..(24 * 60 * 60 * 1000)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
 
 
     private fun obtenerDireccionDesdeGeoPoint(lat: Double?, lon: Double?): String {
@@ -435,7 +449,6 @@ class HomeActivity : AppCompatActivity() {
             permisos.add(Manifest.permission.ACTIVITY_RECOGNITION)
         }
 
-        // Solo pedir POST_NOTIFICATIONS si estamos en Android 13 o superior
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {

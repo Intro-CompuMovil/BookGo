@@ -49,15 +49,22 @@ class OfferedExchangesFragment : Fragment() {
                             dbRef.child("ExchangePoints").child(exchangePointId)
                                 .addListenerForSingleValueEvent(object : ValueEventListener {
                                     override fun onDataChange(pointSnapshot: DataSnapshot) {
-                                        val receiverId = pointSnapshot.child("receiverUserId").value.toString()
+                                        val receiverId =
+                                            pointSnapshot.child("receiverUserId").value.toString()
                                         val isAccepted = receiverId == userId
 
-                                        val date = pointSnapshot.child("date").value.toString().split("-")
-                                        val lat = pointSnapshot.child("lat").getValue(Double::class.java) ?: 0.0
-                                        val lon = pointSnapshot.child("lon").getValue(Double::class.java) ?: 0.0
-                                        val address = pointSnapshot.child("resolvedAddress").value?.toString()
-                                            ?: pointSnapshot.child("address").value?.toString()
-                                            ?: "Dirección no disponible"
+                                        val date =
+                                            pointSnapshot.child("date").value.toString().split("-")
+                                        val lat =
+                                            pointSnapshot.child("lat").getValue(Double::class.java)
+                                                ?: 0.0
+                                        val lon =
+                                            pointSnapshot.child("lon").getValue(Double::class.java)
+                                                ?: 0.0
+                                        val address =
+                                            pointSnapshot.child("resolvedAddress").value?.toString()
+                                                ?: pointSnapshot.child("address").value?.toString()
+                                                ?: "Dirección no disponible"
 
                                         val fecha = date.getOrNull(0)?.trim() ?: "-"
                                         val hora = date.getOrNull(1)?.trim() ?: "-"
@@ -76,9 +83,16 @@ class OfferedExchangesFragment : Fragment() {
                                                 receiverUserId = if (isAccepted) userId else ""
                                             )
                                         )
-                                        adapter.notifyItemInserted(offeredList.size - 1)
-                                    }
+                                        if (offeredList.size == contarTotalOfertasDelUsuario(
+                                                bookOffersSnapshot,
+                                                userId
+                                            )
+                                        ) {
+                                            offeredList.sortByDescending { it.receiverUserId.isNotBlank() }
+                                            adapter.notifyDataSetChanged()
+                                        }
 
+                                    }
                                     override fun onCancelled(error: DatabaseError) {}
                                 })
                         }
@@ -90,6 +104,18 @@ class OfferedExchangesFragment : Fragment() {
         })
     }
 
+
+    private fun contarTotalOfertasDelUsuario(snapshot: DataSnapshot, userId: String): Int {
+        var count = 0
+        for (exchangeSnapshot in snapshot.children) {
+            for (offerSnapshot in exchangeSnapshot.children) {
+                if (offerSnapshot.child("userId").value.toString() == userId) {
+                    count++
+                }
+            }
+        }
+        return count
+    }
 
 
     private fun fetchBookFromGoogleApi(bookId: String, callback: (String, String) -> Unit) {

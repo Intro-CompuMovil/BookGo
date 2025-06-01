@@ -35,6 +35,7 @@
         app:menu="@menu/bottom_navigation_menu"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:background="#FAFAFA"/>
 
 </RelativeLayout>

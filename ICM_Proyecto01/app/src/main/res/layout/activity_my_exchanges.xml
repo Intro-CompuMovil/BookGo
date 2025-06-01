@@ -1,38 +1,50 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
+    <!-- Barra superior -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/btnBack"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:title="Mis Intercambios"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        android:title="Mis intercambios"
+        android:titleTextColor="@color/white"
+        android:fontFamily="@font/poppins_bold"
+        android:background="@color/green_500"
         app:navigationIcon="@drawable/ic_back_arrow"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
+    <!-- Pestañas con estilos -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:background="@color/white"
+        app:tabIndicatorColor="@color/green_700"
+        app:tabSelectedTextColor="@color/green_700"
+        app:tabTextColor="@color/lightGray"
+        app:tabRippleColor="@color/green_translucent"
         app:tabMode="fixed"
         app:tabGravity="fill"
-        app:layout_constraintTop_toBottomOf="@id/btnBack"/>
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- ViewPager para los intercambios -->
     <androidx.viewpager2.widget.ViewPager2
+        android:layout_marginTop="10dp"
         android:id="@+id/viewPager"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:background="@color/neutralGray"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

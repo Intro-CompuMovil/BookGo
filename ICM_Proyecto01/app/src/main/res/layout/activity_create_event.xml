@@ -6,56 +6,53 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- Botón de regreso -->
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/ic_back_arrow"
-        android:contentDescription="Volver"
-        app:layout_constraintStart_toStartOf="parent"
+    <!-- Material Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/ic_back_arrow"
         app:layout_constraintTop_toTopOf="parent"
-        android:padding="8dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="6dp" />
 
-    <!-- Título centrado -->
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvToolbarTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Crear Evento"
-        android:textSize="22sp"
-        android:textStyle="bold"
+        android:textColor="@color/green"
+        android:textSize="26sp"
         android:fontFamily="@font/poppins_bold"
-        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@id/topAppBar"
+        app:layout_constraintBottom_toBottomOf="@id/topAppBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnBack"
-        android:layout_marginTop="12dp" />
+        android:padding="8dp"/>
 
-    <!-- Campos de texto y botones -->
+    <!-- Contenido -->
     <LinearLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@id/topAppBar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- EditText para el nombre del evento con estilo bonito -->
         <EditText
             android:id="@+id/etEventName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nombre del Evento"
             android:padding="12dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/round_corners"
-            android:elevation="4dp" />
+            android:layout_marginVertical="12dp"
+            android:backgroundTint="@android:color/white"
+            android:background="@color/neutralGray"
+            android:elevation="4dp"/>
 
-        <!-- Botón Seleccionar Fecha -->
         <Button
             android:id="@+id/btnSelectDate"
             android:layout_width="match_parent"
@@ -65,16 +62,15 @@
             android:backgroundTint="@color/green"
             android:textColor="@android:color/white"/>
 
-        <!-- TextView para la fecha seleccionada centrado -->
         <TextView
             android:id="@+id/tvSelectedDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Fecha: No seleccionada"
             android:gravity="center"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="12dp"
+            android:fontFamily="@font/poppins_regular"/>
 
-        <!-- Botón Seleccionar Hora -->
         <Button
             android:id="@+id/btnSelectTime"
             android:layout_width="match_parent"
@@ -84,28 +80,28 @@
             android:backgroundTint="@color/green"
             android:textColor="@android:color/white"/>
 
-        <!-- TextView para la hora seleccionada centrado -->
         <TextView
             android:id="@+id/tvSelectedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hora: No seleccionada"
             android:gravity="center"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp"
+            android:fontFamily="@font/poppins_regular"/>
 
-        <!-- EditText para la descripción con estilo bonito -->
         <EditText
             android:id="@+id/etEventDescription"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="70dp"
             android:hint="Descripción del Evento"
             android:padding="12dp"
             android:gravity="top"
+            android:backgroundTint="@android:color/white"
+            android:background="@color/neutralGray"
+            android:elevation="4dp"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/round_corners"
-            android:elevation="4dp"/>
+            android:fontFamily="@font/poppins_regular"/>
 
-        <!-- Mapa con búsqueda -->
         <RelativeLayout
             android:id="@+id/mapContainer"
             android:layout_width="match_parent"
@@ -115,23 +111,23 @@
             <org.osmdroid.views.MapView
                 android:id="@+id/osmMap"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="250dp" />
 
             <EditText
                 android:id="@+id/searchAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Buscar dirección..."
+                android:background="@drawable/round_corners"
                 android:imeOptions="actionSend"
                 android:inputType="text"
-                android:layout_margin="16dp"
                 android:padding="12dp"
-                android:background="@drawable/round_corners"
-                android:elevation="6dp" />
+                android:elevation="6dp"
+                android:layout_margin="16dp"
+                android:fontFamily="@font/poppins_regular" />
         </RelativeLayout>
     </LinearLayout>
 
-    <!-- Botón fijo abajo -->
     <Button
         android:id="@+id/btnCreateEvent"
         android:layout_width="0dp"
@@ -142,5 +138,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="12dp"/>
+        android:layout_marginBottom="2dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

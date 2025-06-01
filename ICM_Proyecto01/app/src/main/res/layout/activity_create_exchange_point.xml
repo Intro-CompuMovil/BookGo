@@ -1,138 +1,150 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CreateExchangePointActivity">
+    tools:context=".CreateExchangePointActivity"
+    android:background="@color/neutralGray">
 
-    <!-- Botón de regreso -->
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:padding="10dp"
-        android:src="@drawable/ic_back_arrow"
-        android:contentDescription="Volver"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="12dp"/>
-
-    <!-- Título -->
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Crear Punto de Intercambio"
-        android:textColor="@android:color/black"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/poppins_bold"
-        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:navigationIcon="@drawable/ic_back_arrow"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"/>
+        android:elevation="6dp" />
 
-    <!-- Formulario de información -->
-    <LinearLayout
+    <TextView
+        android:id="@+id/customToolbarTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nuevo Intercambio"
+        android:textColor="@color/green"
+        android:textSize="26sp"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/poppins_bold"
+        app:layout_constraintTop_toTopOf="@id/topAppBar"
+        app:layout_constraintBottom_toBottomOf="@id/topAppBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="8dp"/>
+
+
+    <!-- Formulario: libro, fecha, hora -->
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp"
+        app:layout_constraintTop_toBottomOf="@id/topAppBar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="12dp"
-        android:gravity="center">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Botón para seleccionar libro -->
-        <Button
-            android:id="@+id/tvSelectedBook"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Seleccionar Libro"
-            android:backgroundTint="@color/green"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="12dp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tvEstadoLibro"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Estado: No seleccionado"
-            android:layout_marginBottom="12dp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tvSelectedBook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Seleccionar libro"
+                android:icon="@drawable/ic_launcher_foreground"
+                android:iconTint="@android:color/white"
+                android:backgroundTint="@color/green_500"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/poppins_regular"
+                android:layout_marginBottom="8dp" />
 
-        <Button
-            android:id="@+id/btnSelectDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/green"
-            android:text="Seleccionar Fecha"
-            android:layout_marginBottom="12dp"/>
+            <TextView
+                android:id="@+id/tvEstadoLibro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Estado: No seleccionado"
+                android:textColor="@color/black"
+                android:fontFamily="@font/poppins_regular"
+                android:layout_marginBottom="12dp" />
 
-        <TextView
-            android:id="@+id/tvSelectedDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Fecha: No seleccionada"
-            android:layout_marginBottom="12dp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSelectDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Seleccionar Fecha"
+                android:backgroundTint="@color/green_500"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/poppins_regular"
+                android:icon="@drawable/ic_book_register"
+                android:iconTint="@android:color/white"
+                android:layout_marginBottom="8dp" />
 
-        <Button
-            android:id="@+id/btnSelectTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Seleccionar Hora"
-            android:backgroundTint="@color/green"
-            android:layout_marginBottom="12dp"/>
 
-        <TextView
-            android:id="@+id/tvSelectedTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hora: No seleccionada"/>
-    </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSelectTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Seleccionar Hora"
+                android:backgroundTint="@color/green_500"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/poppins_regular"
+                android:icon="@drawable/ic_back_arrow"
+                android:iconTint="@android:color/white"
+                android:layout_marginBottom="8dp" />
 
-    <!-- Mapa -->
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Mapa con buscador -->
     <RelativeLayout
         android:id="@+id/mapContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@id/container"
         app:layout_constraintBottom_toTopOf="@id/btnConfirm"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="12dp">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <org.osmdroid.views.MapView
             android:id="@+id/osmMap"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="300dp" />
 
         <EditText
             android:id="@+id/searchAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Buscar dirección..."
+            android:background="@drawable/round_corners"
             android:imeOptions="actionSend"
             android:inputType="text"
-            android:layout_margin="16dp"
             android:padding="12dp"
-            android:background="@drawable/round_corners"
-            android:elevation="6dp"/>
+            android:elevation="6dp"
+            android:layout_margin="16dp"
+            android:fontFamily="@font/poppins_regular" />
     </RelativeLayout>
 
     <!-- Botón confirmar -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnConfirm"
         android:layout_width="0dp"
+        android:layout_marginTop="4dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:backgroundTint="@color/green"
         android:text="Confirmar Intercambio"
         android:textColor="@android:color/white"
+        android:fontFamily="@font/poppins_regular"
+        android:backgroundTint="@color/green_700"
+        android:iconTint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

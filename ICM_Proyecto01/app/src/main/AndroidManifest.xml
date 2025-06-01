@@ -61,9 +61,6 @@
             android:name=".ExchangeSummaryActivity"
             android:exported="false" />
         <activity
-            android:name=".SelectExchangePointActivity"
-            android:exported="false" />
-        <activity
             android:name=".BookDetailActivity"
             android:exported="false" />
         <activity
