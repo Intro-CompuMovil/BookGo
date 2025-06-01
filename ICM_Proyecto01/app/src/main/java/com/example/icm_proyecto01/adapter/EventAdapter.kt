@@ -50,7 +50,7 @@ class EventAdapter(
             val isParticipant = userId != null && event.participants.containsKey(userId)
 
             if (isParticipant) {
-                cardView.setBackgroundResource(R.drawable.card_blue_border)
+                cardView.setBackgroundResource(R.drawable.card_border_accepted)
             } else {
                 cardView.setCardBackgroundColor(ContextCompat.getColor(itemView.context, android.R.color.white))
             }
