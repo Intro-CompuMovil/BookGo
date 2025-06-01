@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="teal_700">#00796B</color>
-    <color name="teal_200">#80CBC4</color>
+
     <color name="green">#879957</color>
     <color name="backgroundGreen">#734CAF50</color>
-    <color name="lightGray">#73B8C7B8</color>
-    <color name="neutralGray">#f7f7f9</color>
     <color name="red">#F44336</color>
     <color name="blue">#3873EB</color>
     <color name="purple_200">#BB86FC</color>
     <color name="purple_700">#3700B3</color>
+
+
+    <!-- NEUTROS -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="neutralGray">#F7F7F9</color>
+    <color name="lightGray">#B8C7B8</color> <!-- corregido alpha -->
+
+    <!-- PRIMARIOS: VERDES -->
+    <color name="green_500">#879957</color>
+    <color name="green_700">#6C7E43</color>
+    <color name="green_200">#C5D1A8</color>
+    <color name="green_background">#79DE7D</color>
+    <color name="green_translucent">#73347837</color>
+
+    <!-- SECUNDARIOS: AZULES -->
+    <color name="blue_500">#3873EB</color>
+    <color name="blue_100">#DCE8FF</color>
+    <color name="blue_translucent">#CCE3F2FD</color>
+
+    <!-- ACCIÓN -->
+    <color name="error_red">#F44336</color>
+    <color name="teal_700">#00796B</color>
+    <color name="teal_200">#80CBC4</color>
+
 
 
 </resources>

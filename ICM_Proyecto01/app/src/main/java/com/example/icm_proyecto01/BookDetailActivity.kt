@@ -30,7 +30,6 @@ class BookDetailActivity : AppCompatActivity() {
                 binding.imgBookCover.setImageResource(R.drawable.default_book)
             }
 
-            // ⬇️ VERIFICAR SI EL LIBRO YA ESTÁ OCULTO
             val hiddenPref = getSharedPreferences("HiddenBooks", MODE_PRIVATE)
             val isHidden = hiddenPref.contains(book.titulo)
 
@@ -55,12 +54,12 @@ class BookDetailActivity : AppCompatActivity() {
                 }
             }
 
-            // botón de intercambio
             binding.btnIntercambiar.setOnClickListener {
-                val intent = Intent(this, SelectExchangePointActivity::class.java)
+                val intent = Intent(this, CreateExchangePointActivity::class.java)
                 intent.putExtra("selectedBook", book)
                 startActivity(intent)
             }
+
         } ?: Toast.makeText(this, "No se pudo cargar el libro", Toast.LENGTH_SHORT).show()
 
         binding.btnBack.setOnClickListener {

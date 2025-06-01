@@ -62,7 +62,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Intercambios"
+                    android:text="Recorridos"
                     android:fontFamily="@font/poppins_bold"
                     android:textSize="16sp"
                     android:textColor="@color/black"/>
@@ -70,7 +70,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Completa 4 intercambios y recibe un poema."
+                    android:text="Supera el recuento de pasos para subir de nivel."
                     android:textSize="14sp"
                     android:layout_marginTop="4dp"/>
 
@@ -93,6 +93,7 @@
                     android:layout_marginTop="6dp"/>
             </LinearLayout>
 
+            <!-- REWARD DE LIBROS AGREGADOS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -103,7 +104,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Eventos"
+                    android:text="Libros Agregados"
                     android:fontFamily="@font/poppins_bold"
                     android:textSize="16sp"
                     android:textColor="@color/black"/>
@@ -111,45 +112,31 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Asiste a 2 eventos y sube de nivel."
+                    android:text="Agrega 10 libros a tu perfil para recibir una insignia."
                     android:textSize="14sp"
                     android:layout_marginTop="4dp"/>
 
                 <TextView
-                    android:id="@+id/tvProgress2"
+                    android:id="@+id/tvProgressBooks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1/2"
+                    android:text="0/10"
                     android:textSize="14sp"
                     android:layout_marginTop="8dp"/>
 
-                <SeekBar
-                    android:id="@+id/seekBar2"
+                <ProgressBar
+                    android:id="@+id/progressBarBooks"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="2"
-                    android:progress="1"
-                    android:thumbTint="@color/green"
-                    android:progressTint="@color/green"
+                    android:layout_height="8dp"
+                    android:max="100"
+                    android:progress="0"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:progressDrawable="@drawable/progress_bar_custom"
                     android:layout_marginTop="6dp"/>
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="12dp">
-                <TextView
-                    android:id="@+id/tvSteps"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pasos dados: 0"
-                    android:textSize="16sp"
-                    android:textColor="@color/black"
-                    android:fontFamily="@font/poppins_regular"
-                    android:layout_marginTop="8dp"/>
-            </LinearLayout>
+
+
 
         </LinearLayout>
     </ScrollView>

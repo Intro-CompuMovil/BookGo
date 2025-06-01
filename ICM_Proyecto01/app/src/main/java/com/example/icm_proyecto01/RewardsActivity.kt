@@ -26,14 +26,13 @@ class RewardsActivity : AppCompatActivity() {
 
     private fun cargarRecompensas() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
+        val db = FirebaseDatabase.getInstance()
 
+        val userRef = db.getReference("Users").child(uid)
         userRef.child("readerLvl").get().addOnSuccessListener { snapshot ->
             val pasos = snapshot.getValue(Int::class.java) ?: 0
 
-            binding.tvSteps.text = "Pasos dados: $pasos"
 
-            // Límites de niveles
             val limite1 = 100
             val limite2 = 1000
             val limite3 = 5000
@@ -57,6 +56,23 @@ class RewardsActivity : AppCompatActivity() {
 
         }.addOnFailureListener {
             Toast.makeText(this, "No se pudieron cargar los pasos", Toast.LENGTH_SHORT).show()
+        }
+
+        val booksRef = db.getReference("Users").child(uid).child("Books")
+        booksRef.get().addOnSuccessListener { snapshot ->
+            val totalLibros = snapshot.childrenCount.toInt()
+            val metaLibros = 10
+            val progresoLibros = (totalLibros * 100) / metaLibros
+
+            binding.tvProgressBooks.text = "$totalLibros/$metaLibros"
+            binding.progressBarBooks.progress = progresoLibros.coerceAtMost(100)
+
+
+            if (totalLibros >= metaLibros) {
+                Toast.makeText(this, "¡Felicidades! Has agregado $metaLibros libros 🎉", Toast.LENGTH_LONG).show()
+            }
+        }.addOnFailureListener {
+            Toast.makeText(this, "No se pudieron cargar los libros", Toast.LENGTH_SHORT).show()
         }
     }
 

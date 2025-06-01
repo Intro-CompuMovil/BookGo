@@ -60,18 +60,10 @@ class SelectUserBookActivity : AppCompatActivity() {
 
                 } else {
                     val intent = Intent(this, ExchangeSummaryActivity::class.java).apply {
-                        putExtra("selectedBookId", selectedBook.id)
                         putExtra("selectedBook", selectedBook)
-                        putExtra("titulo", exchangeTitulo)
-                        putExtra("direccion", exchangeDireccion)
-                        putExtra("fecha", exchangeFecha)
-                        putExtra("hora", exchangeHora)
-                        putExtra("lat", exchangeLat)
-                        putExtra("lon", exchangeLon)
-                        putExtra("estadoLibroDisponible", estadoLibroDisponible)
-                        putExtra("portadaLibroDisponible", portadaLibroDisponible)
-                        putExtra("idPunto", idPunto)
+                        putExtra("exchangePointId", idPunto)
                     }
+
                     startActivity(intent)
                     finish()
                 }

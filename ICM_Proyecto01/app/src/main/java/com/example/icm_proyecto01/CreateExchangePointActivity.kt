@@ -2,7 +2,6 @@ package com.example.icm_proyecto01
 
 import android.Manifest
 import android.util.Log
-import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
@@ -12,12 +11,14 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import com.google.android.material.appbar.MaterialToolbar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.icm_proyecto01.databinding.ActivityCreateExchangePointBinding
+import com.example.icm_proyecto01.model.UserBook
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.*
@@ -59,6 +60,7 @@ class CreateExchangePointActivity : AppCompatActivity() {
     private var selectedBookId: String? = null
 
 
+
     private val selectBookLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -94,18 +96,32 @@ class CreateExchangePointActivity : AppCompatActivity() {
         userName = sharedPref.getString("userName", "Jane Doe")
 
 
+        intent.getSerializableExtra("selectedBook")?.let { serializable ->
+            val book = serializable as UserBook
+            selectedBookId = book.id
+            selectedBookTitle = book.titulo
+            selectedBookState = book.estado
+            selectedBookCoverUrl = book.portadaUrl
+
+            binding.tvSelectedBook.text = selectedBookTitle ?: "Libro no seleccionado"
+            binding.tvEstadoLibro.text = "Estado: ${selectedBookState ?: "-"}"
+        }
+
+
         binding.tvSelectedBook.setOnClickListener {
+
             val intent = Intent(this, SelectUserBookActivity::class.java)
             intent.putExtra("from", "createExchange")
             selectBookLauncher.launch(intent)
         }
 
 
-
-        binding.btnBack.setOnClickListener{
+        val toolbar = findViewById<MaterialToolbar>(R.id.topAppBar)
+        toolbar.setNavigationOnClickListener {
             val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
         }
+
 
         binding.searchAddress.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEND) {
@@ -122,8 +138,10 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val day = calendar.get(Calendar.DAY_OF_MONTH)
 
             val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
-                binding.tvSelectedDate.text = "Fecha: $selectedDay/${selectedMonth + 1}/$selectedYear"
+                val fecha = "$selectedDay/${selectedMonth + 1}/$selectedYear"
+                binding.btnSelectDate.text = fecha
             }, year, month, day)
+
 
             datePicker.show()
         }
@@ -135,8 +153,10 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val minute = calendar.get(Calendar.MINUTE)
 
             val timePicker = TimePickerDialog(this, { _, selectedHour, selectedMinute ->
-                binding.tvSelectedTime.text = "Hora: $selectedHour:$selectedMinute"
+                val hora = String.format("%02d:%02d", selectedHour, selectedMinute)
+                binding.btnSelectTime.text = hora
             }, hour, minute, true)
+
 
             timePicker.show()
         }
@@ -149,8 +169,8 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val bookTitle = selectedBookTitle ?: ""
             val bookState = selectedBookState ?: ""
             val addressInput = binding.searchAddress.text.toString()
-            val date = binding.tvSelectedDate.text.toString()
-            val time = binding.tvSelectedTime.text.toString()
+            val date = binding.btnSelectDate.text.toString()
+            val time = binding.btnSelectTime.text.toString()
 
 
             if (bookId.isBlank() || bookState.isBlank() ||
@@ -172,7 +192,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
             val cleanedTime = time.replace("Hora: ", "").trim()
             val fechaCompleta = "$cleanedDate - $cleanedTime"
 
-            // 👉 Obtener dirección real con Geocoder
             val resolvedAddress = try {
                 val addresses = geocoder.getFromLocation(puntoSeleccionado!!.latitude, puntoSeleccionado!!.longitude, 1)
                 addresses?.firstOrNull()?.getAddressLine(0) ?: "Dirección no disponible"
@@ -199,9 +218,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
                 "receiverUserId" to ""
             )
 
-
-            Log.d("CreateExchange", "ExchangePoint to save: $exchangePoint")
-
             val dbRef = FirebaseDatabase.getInstance().reference
             val newExchangePointRef = dbRef.child("ExchangePoints").push()
 
@@ -221,9 +237,6 @@ class CreateExchangePointActivity : AppCompatActivity() {
                     Toast.makeText(this, "Error al crear punto de intercambio: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         }
-
-
-
 
     }
 

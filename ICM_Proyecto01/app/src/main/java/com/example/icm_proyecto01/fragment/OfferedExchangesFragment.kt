@@ -11,7 +11,6 @@ import com.example.icm_proyecto01.databinding.FragmentOfferedExchangesBinding
 import com.example.icm_proyecto01.model.ExchangePoint
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-
 class OfferedExchangesFragment : Fragment() {
 
     private lateinit var binding: FragmentOfferedExchangesBinding
@@ -32,50 +31,92 @@ class OfferedExchangesFragment : Fragment() {
 
     private fun loadOfferedExchanges() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        dbRef.child("ExchangePoints")
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    offeredList.clear()
-                    snapshot.children.forEach { point ->
-                        val receiverId = point.child("receiverUserId").value.toString()
-                        if (receiverId == userId) {
-                            val rawBook = point.child("Book")
-                            val bookId = rawBook.child("id").value.toString()
-                            val state = rawBook.child("state").value.toString()
-                            val date = point.child("date").value.toString().split("-")
-                            val lat = point.child("lat").getValue(Double::class.java) ?: 0.0
-                            val lon = point.child("lon").getValue(Double::class.java) ?: 0.0
+        offeredList.clear()
 
-                            // ✅ Dirección preferida: resolvedAddress > address > fallback
-                            val address = point.child("resolvedAddress").value?.toString()
-                                ?: point.child("address").value?.toString()
-                                ?: "Dirección no disponible"
+        dbRef.child("BookOffers").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(bookOffersSnapshot: DataSnapshot) {
+                for (exchangeSnapshot in bookOffersSnapshot.children) {
+                    val exchangePointId = exchangeSnapshot.key ?: continue
 
-                            val fecha = date.getOrNull(0)?.trim() ?: "-"
-                            val hora = date.getOrNull(1)?.trim() ?: "-"
+                    for (offerSnapshot in exchangeSnapshot.children) {
+                        val offerUserId = offerSnapshot.child("userId").value.toString()
+                        val offerBookId = offerSnapshot.child("bookId").value.toString()
+                        val offerEstado = offerSnapshot.child("estado").value.toString()
+                        val offerTitulo = offerSnapshot.child("titulo").value.toString()
+                        val portadaUrl = offerSnapshot.child("portadaUrl").value.toString()
 
-                            fetchBookFromGoogleApi(bookId) { titulo, portada ->
-                                offeredList.add(
-                                    ExchangePoint(
-                                        tituloLibro = titulo,
-                                        estadoLibro = state,
-                                        fecha = fecha,
-                                        hora = hora,
-                                        lat = lat,
-                                        lon = lon,
-                                        portadaUrl = portada,
-                                        direccion = address
-                                    )
-                                )
-                                adapter.notifyItemInserted(offeredList.size - 1)
-                            }
+                        if (offerUserId == userId) {
+                            dbRef.child("ExchangePoints").child(exchangePointId)
+                                .addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(pointSnapshot: DataSnapshot) {
+                                        val receiverId =
+                                            pointSnapshot.child("receiverUserId").value.toString()
+                                        val isAccepted = receiverId == userId
+
+                                        val date =
+                                            pointSnapshot.child("date").value.toString().split("-")
+                                        val lat =
+                                            pointSnapshot.child("lat").getValue(Double::class.java)
+                                                ?: 0.0
+                                        val lon =
+                                            pointSnapshot.child("lon").getValue(Double::class.java)
+                                                ?: 0.0
+                                        val address =
+                                            pointSnapshot.child("resolvedAddress").value?.toString()
+                                                ?: pointSnapshot.child("address").value?.toString()
+                                                ?: "Dirección no disponible"
+
+                                        val fecha = date.getOrNull(0)?.trim() ?: "-"
+                                        val hora = date.getOrNull(1)?.trim() ?: "-"
+
+                                        offeredList.add(
+                                            ExchangePoint(
+                                                exchangePointId = exchangePointId,
+                                                tituloLibro = offerTitulo,
+                                                estadoLibro = offerEstado,
+                                                fecha = fecha,
+                                                hora = hora,
+                                                lat = lat,
+                                                lon = lon,
+                                                portadaUrl = portadaUrl,
+                                                direccion = address,
+                                                receiverUserId = if (isAccepted) userId else ""
+                                            )
+                                        )
+                                        if (offeredList.size == contarTotalOfertasDelUsuario(
+                                                bookOffersSnapshot,
+                                                userId
+                                            )
+                                        ) {
+                                            offeredList.sortByDescending { it.receiverUserId.isNotBlank() }
+                                            adapter.notifyDataSetChanged()
+                                        }
+
+                                    }
+                                    override fun onCancelled(error: DatabaseError) {}
+                                })
                         }
                     }
                 }
+            }
 
-                override fun onCancelled(error: DatabaseError) {}
-            })
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
+
+
+    private fun contarTotalOfertasDelUsuario(snapshot: DataSnapshot, userId: String): Int {
+        var count = 0
+        for (exchangeSnapshot in snapshot.children) {
+            for (offerSnapshot in exchangeSnapshot.children) {
+                if (offerSnapshot.child("userId").value.toString() == userId) {
+                    count++
+                }
+            }
+        }
+        return count
+    }
+
 
     private fun fetchBookFromGoogleApi(bookId: String, callback: (String, String) -> Unit) {
         val url = "https://www.googleapis.com/books/v1/volumes/$bookId"

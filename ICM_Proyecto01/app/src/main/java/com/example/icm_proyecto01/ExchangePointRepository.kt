@@ -11,25 +11,53 @@ import com.google.firebase.database.*
 class ExchangePointRepository(private val context: Context) {
 
     private val dbRef = FirebaseDatabase.getInstance().reference
-    private val auth = FirebaseAuth.getInstance()
 
-    fun fetchExchangePointsForMap(onPointsFetched: (List<ExchangePoint>) -> Unit) {
+
+
+    // Función modificada para incluir la llamada a la API de Google Books
+    fun sincronizarPuntosDeFirebase(onPointsFetched: (Set<String>) -> Unit) {
         val exchangePointsRef = dbRef.child("ExchangePoints")
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
 
         exchangePointsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val pointsList = mutableListOf<ExchangePoint>()
-
-                val puntosProcesados = snapshot.children.count()
+                val pointsSet = mutableSetOf<String>()
+                val puntosProcesados = snapshot.childrenCount.toInt()
                 var puntosCargados = 0
 
                 snapshot.children.forEach { pointSnapshot ->
-                    val receiverId = pointSnapshot.child("receiverUserId").value.toString()
-                    val idLibro = pointSnapshot.child("Book").child("id").value.toString()
-                    val state = pointSnapshot.child("Book").child("state").value.toString()
-                    val date = pointSnapshot.child("date").value.toString()
+                    val idPunto = pointSnapshot.key ?: return@forEach
+
+                    val bookReceiverId = pointSnapshot.child("BookReceiver").child("id").getValue(String::class.java)
+                    val creatorUserId = pointSnapshot.child("creatorUserId").getValue(String::class.java)
+                    val excluirPorBookReceiver = !bookReceiverId.isNullOrBlank()
+                    val excluirPorCreador = creatorUserId == currentUserId
+
+
+                    if (excluirPorBookReceiver || excluirPorCreador) {
+                        puntosCargados++
+                        if (puntosCargados == puntosProcesados) {
+                            onPointsFetched(pointsSet)
+                        }
+                        return@forEach
+                    }
+
+
+                    val idLibro = pointSnapshot.child("Book").child("id").getValue(String::class.java)
+                    if (idLibro.isNullOrBlank()) {
+                        puntosCargados++
+                        if (puntosCargados == puntosProcesados) {
+                            onPointsFetched(pointsSet)
+                        }
+                        return@forEach
+                    }
+
+                    val state = pointSnapshot.child("Book").child("state").getValue(String::class.java) ?: "Desconocido"
+                    val date = pointSnapshot.child("date").getValue(String::class.java) ?: "Fecha desconocida"
                     val lat = pointSnapshot.child("lat").getValue(Double::class.java) ?: 0.0
                     val lon = pointSnapshot.child("lon").getValue(Double::class.java) ?: 0.0
+                    val receiverUserId = pointSnapshot.child("receiverUserId").getValue(String::class.java) ?: ""
+
 
                     fetchBookFromGoogleApi(idLibro, pointSnapshot) { book ->
                         book?.let {
@@ -37,119 +65,27 @@ class ExchangePointRepository(private val context: Context) {
                             val fecha = date.split(" ")[0]
                             val hora = if (date.contains("-")) date.split("-").getOrNull(1)?.trim() ?: "00:00" else "00:00"
 
-                            pointsList.add(
-                                ExchangePoint(
-                                    tituloLibro = it.titulo,
-                                    fecha = fecha,
-                                    hora = hora,
-                                    lat = lat,
-                                    lon = lon,
-                                    estadoLibro = state,
-                                    portadaUrl = portadaUrl,
-                                    direccion = ""
-                                )
-                            )
+                            val puntoFormateado =
+                                "${it.titulo}|$fecha|$hora|$lat|$lon|$state|$portadaUrl|$idPunto|$receiverUserId"
+
+                            pointsSet.add(puntoFormateado)
                         }
 
                         puntosCargados++
                         if (puntosCargados == puntosProcesados) {
-                            onPointsFetched(pointsList)
+                            onPointsFetched(pointsSet)
                         }
                     }
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                onPointsFetched(emptyList())
-            }
-        })
-    }
-
-
-    // Función modificada para incluir la llamada a la API de Google Books
-    fun sincronizarPuntosDeFirebase(onPointsFetched: (Set<String>) -> Unit) {
-
-        val exchangePointsRef = dbRef.child("ExchangePoints")
-
-        exchangePointsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val pointsSet = mutableSetOf<String>()
-                Log.d("Firebase", "Puntos de intercambio obtenidos: ${snapshot.childrenCount}")
-
-                val puntosProcesados = snapshot.children.count()
-                var puntosCargados = 0
-
-                snapshot.children.forEach { pointSnapshot ->
-                    var idPuntoIntercambio = ""
-                    pointSnapshot.key?.let { id ->
-                        idPuntoIntercambio = id
-                    }
-                    Log.d("Firebase", "Id Punto Intercambio = $idPuntoIntercambio")
-                    val receiverId = pointSnapshot.child("receiverUserId").value.toString()
-                    val exchangerId = pointSnapshot.child("exchangeUserId").value.toString()
-                    val uid = FirebaseAuth.getInstance().currentUser?.uid
-                    Log.d("Pruebas", "exchangerId = $exchangerId , current = $uid, receiverId = $receiverId")
-                        val idLibro = pointSnapshot.child("Book").child("id").value.toString()
-                        val state = pointSnapshot.child("Book").child("state").value.toString()
-
-                        Log.d(
-                            "Firebase",
-                            "Procesando punto: libroId=$idLibro, receiverId=$receiverId, estado=$state"
-                        )
-
-                        val date = pointSnapshot.child("date").value.toString()
-                        val lat = pointSnapshot.child("lat").getValue(Double::class.java) ?: 0.0
-                        val lon = pointSnapshot.child("lon").getValue(Double::class.java) ?: 0.0
-
-
-                        Log.d("Firebase", "Punto válido, lat=$lat, lon=$lon, fecha=$date")
-
-                        // Llamada a la API de Google Books para obtener detalles del libro
-                        fetchBookFromGoogleApi(idLibro, pointSnapshot) { book ->
-                            book?.let {
-                                if (exchangerId != uid && receiverId.isNullOrEmpty()) {
-                                    val idPunto = idPuntoIntercambio
-                                    Log.d("Firebase", "Id Punto para array = $idPunto")
-                                    val portadaUrl = it.portadaUrl
-                                    val fecha = date.split(" ")[0]
-                                    val hora =
-                                        if (date.contains("-")) date.split("-").getOrNull(1)?.trim()
-                                            ?: "00:00" else "00:00"
-
-                                    // Formateamos el punto para agregarlo al set
-                                    val puntoFormateado =
-                                        "${it.titulo}|$fecha|$hora|$lat|$lon|$state|$portadaUrl|$idPunto"
-                                    Log.d("Firebase", "Punto formateado: $puntoFormateado")
-
-                                    // Agregamos el punto formateado al conjunto
-                                    pointsSet.add(puntoFormateado)
-                                } else {
-                                    Log.d("Firebase", "Punto descartado por condición")
-                                }
-                        }
-
-                            // Aumentamos el contador de puntos cargados
-                            puntosCargados++
-
-                            // Si hemos procesado todos los puntos, llamamos al callback
-                            if (puntosCargados == puntosProcesados) {
-                                Log.d(
-                                    "Firebase",
-                                    "Sincronización completa, puntos encontrados: ${pointsSet.size}"
-                                )
-                                Log.d("Firebase Log", "array = $pointsSet")
-                                onPointsFetched(pointsSet)
-                            }
-                        }
-                    }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("Firebase", "Error al cargar los puntos de intercambio: ${error.message}")
                 onPointsFetched(emptySet())
             }
         })
     }
+
+
 
     // Función para obtener la información del libro desde la API de Google Books
     private fun fetchBookFromGoogleApi(id: String, firebaseBookData: DataSnapshot, onResult: (UserBook?) -> Unit) {
