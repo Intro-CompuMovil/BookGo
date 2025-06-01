@@ -14,10 +14,11 @@ import com.google.firebase.database.FirebaseDatabase
 import com.squareup.picasso.Picasso
 
 class BookOfferAdapter(
-    private val offers: List<BookOffer>,
+    private val offers: MutableList<BookOffer>,
     private val exchangePointId: String,
     private val creatorUserId: String
 ) : RecyclerView.Adapter<BookOfferAdapter.ViewHolder>() {
+
 
 
     inner class ViewHolder(val binding: ItemBookOfferBinding) : RecyclerView.ViewHolder(binding.root)
@@ -57,8 +58,23 @@ class BookOfferAdapter(
             }
 
             btnReject.setOnClickListener {
-                ExchangeManager.rechazarOferta(offer, exchangePointId, holder.itemView.context)
+                AlertDialog.Builder(holder.itemView.context)
+                    .setTitle("Rechazar oferta")
+                    .setMessage("¿Estás seguro de rechazar este libro?")
+                    .setPositiveButton("Rechazar") { _, _ ->
+                        ExchangeManager.rechazarOferta(
+                            offer,
+                            exchangePointId,
+                            holder.itemView.context,
+                            this@BookOfferAdapter, // adaptador
+                            offers as MutableList<BookOffer>, // lista mutable
+                            holder.adapterPosition
+                        )
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
             }
+
 
 
 

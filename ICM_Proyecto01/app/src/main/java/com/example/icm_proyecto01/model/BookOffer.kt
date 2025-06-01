@@ -7,5 +7,7 @@ data class BookOffer(
     val portadaUrl: String = "",
     val titulo: String = "",
     val userId: String = "",
-    val timestamp: String = ""
+    val timestamp: String = "",
+    var offerId: String = ""
+
 )

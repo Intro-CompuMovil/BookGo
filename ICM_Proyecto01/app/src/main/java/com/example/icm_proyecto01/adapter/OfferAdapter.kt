@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
 class OfferAdapter(
-    private val offers: List<BookOffer>,
+    private val offers: MutableList<BookOffer>,
     private val exchangePointId: String,
     private val creatorUserId: String
 ) : RecyclerView.Adapter<OfferAdapter.ViewHolder>() {
@@ -39,8 +39,23 @@ class OfferAdapter(
             }
 
             btnReject.setOnClickListener {
-                ExchangeManager.rechazarOferta(offer, exchangePointId, holder.itemView.context)
+                androidx.appcompat.app.AlertDialog.Builder(holder.itemView.context)
+                    .setTitle("Rechazar oferta")
+                    .setMessage("¿Estás seguro de rechazar este libro?")
+                    .setPositiveButton("Rechazar") { _, _ ->
+                        ExchangeManager.rechazarOferta(
+                            offer,
+                            exchangePointId,
+                            holder.itemView.context,
+                            this@OfferAdapter,
+                            offers,
+                            holder.adapterPosition
+                        )
+                    }
+                    .setNegativeButton("Cancelar", null)
+                    .show()
             }
+
 
         }
     }

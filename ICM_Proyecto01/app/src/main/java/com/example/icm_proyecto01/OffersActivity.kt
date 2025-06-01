@@ -72,6 +72,7 @@ class OffersActivity : AppCompatActivity() {
                     for (offerSnapshot in snapshot.children) {
                         val bookOffer = offerSnapshot.getValue(BookOffer::class.java)
                         if (bookOffer != null) {
+                            bookOffer.offerId = offerSnapshot.key ?: ""
                             offersList.add(bookOffer)
                             Log.d("OffersActivity", "Oferta añadida: ${bookOffer.titulo}")
                             count++
@@ -79,6 +80,7 @@ class OffersActivity : AppCompatActivity() {
                             Log.e("OffersActivity", "Error al convertir: ${offerSnapshot.key}")
                         }
                     }
+
 
                     binding.tvNoOffers.visibility = if (offersList.isEmpty()) View.VISIBLE else View.GONE
                     adapter.notifyDataSetChanged()
