@@ -30,30 +30,23 @@ class BookDetailActivity : AppCompatActivity() {
                 binding.imgBookCover.setImageResource(R.drawable.default_book)
             }
 
-            val hiddenPref = getSharedPreferences("HiddenBooks", MODE_PRIVATE)
-            val isHidden = hiddenPref.contains(book.titulo)
+            // Botón para ocultar el libro
+            binding.btnOcultar.text = "Ocultar"
+            binding.btnOcultar.setOnClickListener {
+                val intent = Intent(this, RegisterHiddenBookActivity::class.java).apply {
+                    putExtra("titulo", book.titulo)
+                    putExtra("autor", book.autor)
+                    putExtra("genero", book.genero)
+                    putExtra("estado", book.estado)
+                    putExtra("portada", book.portadaUrl)
+                    putExtra("bookId", book.id)
+                }
 
-            if (isHidden) {
-                binding.btnOcultar.text = "Desocultar"
-                binding.btnOcultar.setOnClickListener {
-                    hiddenPref.edit().remove(book.titulo).apply()
-                    Toast.makeText(this, "Libro desocultado", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
-            } else {
-                binding.btnOcultar.text = "Ocultar"
-                binding.btnOcultar.setOnClickListener {
-                    val intent = Intent(this, RegisterHiddenBookActivity::class.java).apply {
-                        putExtra("titulo", book.titulo)
-                        putExtra("autor", book.autor)
-                        putExtra("genero", book.genero)
-                        putExtra("estado", book.estado)
-                        putExtra("portada", book.portadaUrl)
-                    }
-                    startActivity(intent)
-                }
+
+                startActivity(intent)
             }
 
+            // Botón para intercambiar el libro
             binding.btnIntercambiar.setOnClickListener {
                 val intent = Intent(this, CreateExchangePointActivity::class.java)
                 intent.putExtra("selectedBook", book)
@@ -66,5 +59,4 @@ class BookDetailActivity : AppCompatActivity() {
             finish()
         }
     }
-
 }

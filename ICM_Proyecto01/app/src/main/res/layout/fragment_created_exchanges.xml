@@ -6,6 +6,20 @@
     android:background="@color/white"
     android:padding="12dp">
 
+    <TextView
+        android:id="@+id/tvEmptyCreatedExchanges"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No has creado puntos de intercambio"
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:visibility="gone"
+        android:layout_marginTop="24dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCreatedExchanges"
     android:layout_width="0dp"

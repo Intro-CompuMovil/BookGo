@@ -5,6 +5,7 @@ data class Book(
     val titulo: String,
     val autor: String,
     val genero: String,
-    val portadaUrl: String
+    val portadaUrl: String,
+    val estado: String = ""
 )
 

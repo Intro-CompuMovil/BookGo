@@ -20,11 +20,16 @@ class BookSearchAdapter(
         private val tvTitle: TextView = view.findViewById(R.id.tvBookTitle)
         private val tvAuthor: TextView = view.findViewById(R.id.tvBookAuthor)
         private val tvCategory: TextView = view.findViewById(R.id.tvBookCategory)
+        private val tvState: TextView = view.findViewById(R.id.tvBookState)
+
 
         fun bind(book: Book) {
             tvTitle.text = book.titulo
             tvAuthor.text = book.autor
             tvCategory.text = book.genero
+            tvState.text = "Estado: ${book.estado}"
+
+
 
             if (book.portadaUrl.isNotEmpty()) {
                 Picasso.get()

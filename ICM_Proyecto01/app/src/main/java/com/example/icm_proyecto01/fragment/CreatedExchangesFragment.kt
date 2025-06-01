@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.icm_proyecto01.adapters.CreatedExchangesAdapter
@@ -36,6 +37,17 @@ class CreatedExchangesFragment : Fragment() {
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     exchangeList.clear()
+
+                    if (!snapshot.hasChildren()) {
+                        binding.tvEmptyCreatedExchanges.visibility = View.VISIBLE
+                        Toast.makeText(requireContext(), "No has creado puntos de intercambio", Toast.LENGTH_SHORT).show()
+                        adapter.notifyDataSetChanged()
+                        return
+                    } else {
+                        binding.tvEmptyCreatedExchanges.visibility = View.GONE
+                    }
+
+
                     snapshot.children.forEach { point ->
                         val pointId = point.key ?: return@forEach
                         val raw = point.child("Book")

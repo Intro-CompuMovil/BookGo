@@ -9,6 +9,6 @@ data class UserBook(
     val genero: String,
     val estado: String,
     val portadaUrl: String,
-    val hidden : Boolean,
-    val status : String
+    var hidden : Boolean,
+    var status : String
 ): Serializable
