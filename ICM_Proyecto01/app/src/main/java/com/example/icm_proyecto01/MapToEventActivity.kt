@@ -74,12 +74,14 @@ class MapToEventActivity : AppCompatActivity() {
                         position = userPoint
                         title = "Tu ubicación"
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        icon = resources.getDrawable(R.drawable.ic_my_location, null)
                     }
 
                     val eventMarker = Marker(osmMap).apply {
                         position = eventPoint
                         title = "Evento"
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        icon = resources.getDrawable(R.drawable.ic_event_point, null)
                     }
 
                     osmMap.overlays.add(userMarker)

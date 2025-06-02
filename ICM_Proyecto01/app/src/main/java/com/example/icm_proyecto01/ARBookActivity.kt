@@ -33,6 +33,23 @@ class ARBookActivity : AppCompatActivity() {
         setContentView(R.layout.activity_ar_book)
 
         userBook = intent.getSerializableExtra("USER_BOOK") as? UserBook
+
+        val dbRef = FirebaseDatabase.getInstance().reference
+        dbRef.child("HiddenBooks").child(userBook!!.id).child("locationHint")
+            .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
+                override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                    val hint = snapshot.getValue(String::class.java)
+                    if (!hint.isNullOrBlank()) {
+                        Toast.makeText(this@ARBookActivity, "Pista: $hint", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+                override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                    Toast.makeText(this@ARBookActivity, "No se pudo cargar la pista", Toast.LENGTH_SHORT).show()
+                }
+            })
+
+
         if (userBook == null) {
             Toast.makeText(this, "Error: libro no cargado", Toast.LENGTH_SHORT).show()
             finish()
@@ -126,6 +143,7 @@ class ARBookActivity : AppCompatActivity() {
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 0 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             recreate()
         } else {

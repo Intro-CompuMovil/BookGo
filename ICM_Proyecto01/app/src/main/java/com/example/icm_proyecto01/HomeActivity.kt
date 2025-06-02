@@ -556,26 +556,39 @@ class HomeActivity : AppCompatActivity() {
 
 
     private fun mostrarLibrosOcultos() {
-        val shared = getSharedPreferences("HiddenBooks", Context.MODE_PRIVATE)
-        val all = shared.all
+        val dbRef = FirebaseDatabase.getInstance().getReference("HiddenBooks")
 
-        for ((_, data) in all) {
-            val partes = data.toString().split("|")
-            if (partes.size >= 7) {
-                val titulo = partes[0].trim()
-                val autor = partes[1].trim()
-                val lat = partes[5].toDoubleOrNull()
-                val lon = partes[6].toDoubleOrNull()
-                val instruccion = if (partes.size >= 8) partes[7].trim() else "Sin instrucciones"
+        dbRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (bookSnapshot in snapshot.children) {
+                    val hidden = bookSnapshot.child("hidden").getValue(Boolean::class.java) ?: false
+                    val finderUserId = bookSnapshot.child("finderUserId").getValue(String::class.java)
 
-                if (lat != null && lon != null) {
-                    mostrarLibroOculto(lat, lon, titulo, autor, instruccion)
+                    // Mostrar solo libros ocultos que aún NO han sido encontrados
+                    if (!hidden || !finderUserId.isNullOrEmpty()) continue
+
+                    val titulo = bookSnapshot.child("title").getValue(String::class.java) ?: "Libro sin título"
+                    val autor = bookSnapshot.child("author").getValue(String::class.java) ?: "Autor desconocido"
+                    val instruccion = bookSnapshot.child("locationHint").getValue(String::class.java) ?: "Sin instrucciones"
+                    val lat = bookSnapshot.child("latitude").getValue(Double::class.java)
+                    val lon = bookSnapshot.child("longitude").getValue(Double::class.java)
+
+                    if (lat != null && lon != null) {
+                        mostrarLibroOculto(lat, lon, titulo, autor, instruccion)
+                    }
                 }
-            }
-        }
 
-        osmMap.invalidate()
+                osmMap.invalidate()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(this@HomeActivity, "Error al cargar libros ocultos", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
+
+
+
 
 
     private fun guardarUltimaNotificacion(tipo: String, id: String) {
