@@ -605,36 +605,66 @@ class HomeActivity : AppCompatActivity() {
 
     private fun escucharNuevasOfertasDeIntercambio() {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val dbRef = FirebaseDatabase.getInstance().getReference("ExchangePoints")
+        val dbRef = FirebaseDatabase.getInstance().getReference("BookOffers")
 
         dbRef.addChildEventListener(object : ChildEventListener {
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val creatorUserId = snapshot.child("creatorUserId").getValue(String::class.java)
-                val receiverUserId = snapshot.child("receiverUserId").getValue(String::class.java)
-                val exchangeId = snapshot.key ?: return
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val exchangePointId = snapshot.key ?: return
 
-                if (
-                    creatorUserId == currentUserId &&
-                    !receiverUserId.isNullOrEmpty() &&
-                    receiverUserId != currentUserId &&
-                    ultimaNotificacion("oferta_recibida") != exchangeId
-                ) {
-                    guardarUltimaNotificacion("oferta_recibida", exchangeId)
+                snapshot.children.forEach { offerSnapshot ->
+                    val offerId = offerSnapshot.key ?: return@forEach
+                    val offerUserId = offerSnapshot.child("userId").getValue(String::class.java)
 
-                    ExchangeNotificationManager.sendNotification(
-                        this@HomeActivity,
-                        "¡Nuevo libro ofrecido!",
-                        "Un usuario ofreció un libro en tu punto de intercambio."
-                    )
+                    if (offerUserId == currentUserId) return@forEach // ignorar si yo mismo la ofrecí
+
+                    val exchangeRef = FirebaseDatabase.getInstance()
+                        .getReference("ExchangePoints")
+                        .child(exchangePointId)
+
+                    exchangeRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(exchangeSnapshot: DataSnapshot) {
+                            val creatorUserId = exchangeSnapshot.child("creatorUserId").getValue(String::class.java)
+
+                            if (creatorUserId == currentUserId &&
+                                !fueNotificadaOferta(offerId))
+                            {
+                                registrarOfertaNotificada(offerId)
+
+                                ExchangeNotificationManager.sendNotification(
+                                    this@HomeActivity,
+                                    "¡Nuevo libro ofrecido!",
+                                    "Un usuario ofreció un libro en tu punto de intercambio."
+                                )
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
                 }
             }
 
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot) {}
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {}
         })
     }
+
+
+
+    private fun fueNotificadaOferta(offerId: String): Boolean {
+        val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+        val set = prefs.getStringSet("ofertas_notificadas", emptySet()) ?: emptySet()
+        return set.contains(offerId)
+    }
+
+    private fun registrarOfertaNotificada(offerId: String) {
+        val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+        val set = prefs.getStringSet("ofertas_notificadas", mutableSetOf())?.toMutableSet() ?: mutableSetOf()
+        set.add(offerId)
+        prefs.edit().putStringSet("ofertas_notificadas", set).apply()
+    }
+
 
 
 
@@ -748,10 +778,16 @@ class HomeActivity : AppCompatActivity() {
         cargarPuntosDeIntercambio()
         mostrarLibrosOcultos()
     }
+    private fun limpiarOfertasNotificadas() {
+        val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+        prefs.edit().remove("ofertas_notificadas").apply()
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+        limpiarOfertasNotificadas()
     }
 
 

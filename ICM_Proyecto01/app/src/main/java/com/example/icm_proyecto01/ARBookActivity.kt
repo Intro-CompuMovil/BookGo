@@ -34,6 +34,13 @@ class ARBookActivity : AppCompatActivity() {
 
         userBook = intent.getSerializableExtra("USER_BOOK") as? UserBook
 
+        if (userBook == null) {
+            Toast.makeText(this, "Error: libro no cargado", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        // Mostrar pista
         val dbRef = FirebaseDatabase.getInstance().reference
         dbRef.child("HiddenBooks").child(userBook!!.id).child("locationHint")
             .addListenerForSingleValueEvent(object : com.google.firebase.database.ValueEventListener {
@@ -48,13 +55,6 @@ class ARBookActivity : AppCompatActivity() {
                     Toast.makeText(this@ARBookActivity, "No se pudo cargar la pista", Toast.LENGTH_SHORT).show()
                 }
             })
-
-
-        if (userBook == null) {
-            Toast.makeText(this, "Error: libro no cargado", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED) {
@@ -109,10 +109,11 @@ class ARBookActivity : AppCompatActivity() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance().reference
 
+        // Actualiza estado oculto en Books global
         userBook!!.hidden = false
-        userBook!!.status = "activo"
         dbRef.child("Books").child(userBook!!.id).child("hidden").setValue(false)
 
+        // Guarda en la colección del usuario
         dbRef.child("Users").child(uid).child("Books").child(userBook!!.id).setValue(userBook)
             .addOnSuccessListener {
                 registrarLibroEncontrado(userBook!!)
@@ -121,7 +122,6 @@ class ARBookActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al guardar el libro", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     private fun registrarLibroEncontrado(userBook: UserBook) {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -140,7 +140,6 @@ class ARBookActivity : AppCompatActivity() {
                 Toast.makeText(this, "Error al registrar el libro", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
