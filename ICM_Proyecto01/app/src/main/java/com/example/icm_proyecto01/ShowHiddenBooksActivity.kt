@@ -42,7 +42,6 @@ class ShowHiddenBooksActivity : AppCompatActivity() {
                 estado = selectedBook.estado,
                 portadaUrl = selectedBook.portadaUrl,
                 hidden = true,
-                status = "oculto"
             )
 
 

@@ -30,6 +30,9 @@
         android:textColor="@android:color/darker_gray" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginHorizontal="12dp"
+        android:clipToPadding="false"
+        android:padding="2dp"
         android:id="@+id/booksRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

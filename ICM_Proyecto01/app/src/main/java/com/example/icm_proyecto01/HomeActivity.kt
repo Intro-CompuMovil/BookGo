@@ -70,7 +70,7 @@ class HomeActivity : AppCompatActivity() {
     private var lastMagnitude = 0.0
     private var lastStepTime: Long = 0
     private val stepInterval = 500
-    private val stepThreshold = 4.5 // ajustable
+    private val stepThreshold = 10.5 // ajustable
 
     private val sensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent?) {
