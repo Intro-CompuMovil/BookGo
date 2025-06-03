@@ -66,7 +66,13 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
     private var isStepSensorActive = false
-    private var stepCount = 0
+
+    private var stepCount: Int = 0
+    private var lastMagnitude = 0.0
+    private var lastStepTime: Long = 0
+    private val stepInterval = 500
+    private val stepThreshold = 4.5 // ajustable
+
 
     private val sensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent?) {

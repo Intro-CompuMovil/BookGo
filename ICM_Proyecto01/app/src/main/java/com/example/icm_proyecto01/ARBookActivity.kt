@@ -30,6 +30,7 @@ class ARBookActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        startService(Intent(this, StepService::class.java))
         setContentView(R.layout.activity_ar_book)
 
         userBook = intent.getSerializableExtra("USER_BOOK") as? UserBook

@@ -1,5 +1,6 @@
 package com.example.icm_proyecto01
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,7 @@ class RewardsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        startService(Intent(this, StepService::class.java))
         binding = ActivityRewardsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
