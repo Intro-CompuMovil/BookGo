@@ -66,9 +66,9 @@ class ProfileActivity : AppCompatActivity() {
                 .addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         if (dataSnapshot.exists()) {
-                            val userName = dataSnapshot.child("name").value.toString()
-                            val email = dataSnapshot.child("email").value.toString()
-                            val profilePicUrl = dataSnapshot.child("profilePictureUrl").value.toString()
+                            val userName = dataSnapshot.child("nombre").value.toString()
+                            val email = dataSnapshot.child("correo").value.toString()
+                            val profilePicUrl = dataSnapshot.child("fotoPerfilUrl").value.toString()
                             val expValue = dataSnapshot.child("readerLvl").getValue(Int::class.java) ?: 0
 
                             val readerLevel = when {

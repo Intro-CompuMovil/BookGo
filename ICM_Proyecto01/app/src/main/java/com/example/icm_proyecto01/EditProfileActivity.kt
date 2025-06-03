@@ -62,8 +62,8 @@ class EditProfileActivity : AppCompatActivity() {
             val database = FirebaseDatabase.getInstance().reference
             database.child("Users").child(userId).get()
                 .addOnSuccessListener { snapshot ->
-                    val nombre = snapshot.child("name").getValue(String::class.java)
-                    val fotoUrl = snapshot.child("profilePictureUrl").getValue(String::class.java)
+                    val nombre = snapshot.child("nombre").getValue(String::class.java)
+                    val fotoUrl = snapshot.child("fotoPerfilUrl").getValue(String::class.java)
 
                     binding.etUserName.setText(nombre ?: "")
 
@@ -147,7 +147,7 @@ class EditProfileActivity : AppCompatActivity() {
                 StorageHelper.uploadProfileImage(
                     userId, selectedImageUri!!,
                     onSuccess = { imageUrl ->
-                        updates["profilePictureUrl"] = imageUrl
+                        updates["fotoPerfilUrl"] = imageUrl
                         actualizarFirebase(database, userId, updates, currentUser, newUserEmail)
                     },
                     onFailure = {
