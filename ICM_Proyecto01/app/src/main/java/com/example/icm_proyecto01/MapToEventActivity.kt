@@ -69,7 +69,11 @@ class MapToEventActivity : AppCompatActivity() {
                     val eventLon = addressList[0].longitude
                     val eventPoint = GeoPoint(eventLat, eventLon)
 
-                    // Añadir marcadores
+                    // Obtener dirección completa del evento
+                    val eventAddressList = geocoder.getFromLocation(eventLat, eventLon, 1)
+                    val eventAddressLine = eventAddressList?.firstOrNull()?.getAddressLine(0) ?: "Dirección no disponible"
+
+                    // Marcador del usuario
                     val userMarker = Marker(osmMap).apply {
                         position = userPoint
                         title = "Tu ubicación"
@@ -77,11 +81,16 @@ class MapToEventActivity : AppCompatActivity() {
                         icon = resources.getDrawable(R.drawable.ic_my_location, null)
                     }
 
+                    // Marcador del evento con dirección real
                     val eventMarker = Marker(osmMap).apply {
                         position = eventPoint
-                        title = "Evento"
+                        title = eventAddressLine
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         icon = resources.getDrawable(R.drawable.ic_event_point, null)
+                        setOnMarkerClickListener { marker, _ ->
+                            marker.showInfoWindow()
+                            true
+                        }
                     }
 
                     osmMap.overlays.add(userMarker)
@@ -98,6 +107,7 @@ class MapToEventActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun drawRoute(inicio: GeoPoint, destino: GeoPoint) {
         roadOverlay?.let { osmMap.overlays.remove(it) }
