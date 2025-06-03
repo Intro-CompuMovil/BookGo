@@ -30,7 +30,7 @@
             android:text="Agregar Libro"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true" />
     </RelativeLayout>
 
     <!-- Imagen del libro -->
@@ -41,6 +41,7 @@
         android:layout_gravity="center"
         android:scaleType="centerCrop"
         android:src="@drawable/default_book"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="16dp" />
 
     <!-- Título del libro -->

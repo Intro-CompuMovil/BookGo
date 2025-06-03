@@ -62,6 +62,7 @@ class HomeActivity : AppCompatActivity() {
     private var userName: String? = null
     private var marker: Marker? = null
 
+
     private lateinit var sensorManager: SensorManager
     private var stepSensor: Sensor? = null
     private var isStepSensorActive = false
@@ -72,27 +73,16 @@ class HomeActivity : AppCompatActivity() {
     private val stepInterval = 500
     private val stepThreshold = 4.5 // ajustable
 
+
     private val sensorListener = object : SensorEventListener {
         override fun onSensorChanged(event: SensorEvent?) {
-            if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
-                val x = event.values[0]
-                val y = event.values[1]
-                val z = event.values[2]
+            if (event?.sensor?.type == Sensor.TYPE_STEP_DETECTOR) {
+                stepCount++
+                Log.d("StepCounter", "Paso detectado. Total: $stepCount")
 
-                val magnitude = Math.sqrt((x * x + y * y + z * z).toDouble())
-                val delta = magnitude - lastMagnitude
-                lastMagnitude = magnitude
-
-                val currentTime = System.currentTimeMillis()
-                if (delta > stepThreshold && currentTime - lastStepTime > stepInterval) {
-                    stepCount += 1
-                    lastStepTime = currentTime
-
-                    Log.d("StepCounter", "Paso detectado. Total: $stepCount")
-                    val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
-                    sharedPref.edit().putInt("steps", stepCount).apply()
-                    actualizarPasosEnFirebase(stepCount)
-                }
+                val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
+                sharedPref.edit().putInt("steps", stepCount).apply()
+                actualizarPasosEnFirebase(stepCount)
             }
         }
 
@@ -101,6 +91,9 @@ class HomeActivity : AppCompatActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
+
         super.onCreate(savedInstanceState)
 
         Configuration.getInstance().load(applicationContext, getSharedPreferences("osm_prefs", MODE_PRIVATE))
@@ -115,6 +108,24 @@ class HomeActivity : AppCompatActivity() {
         escucharNuevasOfertasDeIntercambio()
         escucharAceptacionDeMiOferta()
         ExchangeNotificationManager.startListening(this)
+
+
+
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
+
+        if (stepSensor != null) {
+            sensorManager.registerListener(sensorListener, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            isStepSensorActive = true
+            Log.d("StepSensor", "Sensor de pasos activado: ${stepSensor!!.name}")
+        } else {
+            Log.d("StepSensor", "Sensor de pasos no disponible")
+        }
+
+        // Restaurar pasos desde SharedPreferences
+        val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
+        stepCount = sharedPref.getInt("steps", 0)
+
 
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
@@ -237,8 +248,8 @@ class HomeActivity : AppCompatActivity() {
                         eventoObj.put("name", eventoSnapshot.child("name").getValue(String::class.java) ?: "Evento")
                         eventoObj.put("location", eventoSnapshot.child("location").getValue(String::class.java) ?: "Dirección desconocida")
                         eventoObj.put("date", eventoSnapshot.child("date").getValue(String::class.java) ?: "")
-                        eventoObj.put("lat", eventoSnapshot.child("lat").getValue(Double::class.java) ?: Double.NaN)
-                        eventoObj.put("lon", eventoSnapshot.child("lon").getValue(Double::class.java) ?: Double.NaN)
+                        eventoObj.put("lat", eventoSnapshot.child("lat").getValue(Double::class.java) ?: 0.0)
+                        eventoObj.put("lon", eventoSnapshot.child("lon").getValue(Double::class.java) ?: 0.0)
 
                         eventosList.add(eventoObj)
                     } catch (e: Exception) {
@@ -399,7 +410,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-
     private fun obtenerDireccionDesdeGeoPoint(lat: Double?, lon: Double?): String {
         return if (lat != null && lon != null) {
             try {
@@ -440,7 +450,6 @@ class HomeActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
             permisos.add(Manifest.permission.ACTIVITY_RECOGNITION)
         }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -451,11 +460,11 @@ class HomeActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, permisos.toTypedArray(), 1)
         } else {
             obtenerUbicacion()
-            inicializarSensorDePasos()
             iniciarActualizacionesDeUbicacion()
             ExchangeNotificationManager.startListening(this)
         }
     }
+
 
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
@@ -501,41 +510,23 @@ class HomeActivity : AppCompatActivity() {
 
     private fun inicializarSensorDePasos() {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
 
         if (stepSensor != null) {
-            val sharedPref = getSharedPreferences("StepCounter", Context.MODE_PRIVATE)
-            stepCount = sharedPref.getInt("steps", 0)
-            Log.d("StepSensor", "Pasos cargados desde SharedPreferences: $stepCount")
-            activarSensorDePasos()
-        } else {
-            Toast.makeText(this, "Acelerómetro no disponible", Toast.LENGTH_LONG).show()
-        }
-    }
-
-
-
-    private fun activarSensorDePasos() {
-        if (stepSensor != null) {
-            sensorManager.registerListener(sensorListener, stepSensor, SensorManager.SENSOR_DELAY_UI)
+            sensorManager.registerListener(sensorListener, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
             isStepSensorActive = true
-            Log.d("StepSensor", "Acelerómetro activado")
+            Log.d("StepSensor", "Sensor de pasos registrado exitosamente")
         } else {
-            Toast.makeText(this, "Sensor no disponible", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Sensor de pasos no disponible", Toast.LENGTH_SHORT).show()
+            Log.e("StepSensor", "No se encontró TYPE_STEP_DETECTOR")
         }
     }
 
 
-    private fun actualizarPasosEnFirebase(nuevosPasos: Int) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val userRef = FirebaseDatabase.getInstance().getReference("Users").child(uid)
-        userRef.child("readerLvl").setValue(nuevosPasos)
-            .addOnSuccessListener {
-                Log.d("Firebase", "readerLvl actualizado correctamente: $nuevosPasos")
-            }
-            .addOnFailureListener {
-                Log.e("Firebase", "Error al actualizar readerLvl", it)
-            }
+    private fun actualizarPasosEnFirebase(pasos: Int) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val databaseRef = FirebaseDatabase.getInstance().getReference("Users").child(userId)
+        databaseRef.child("readerLvl").setValue(pasos)
     }
 
 
@@ -588,9 +579,6 @@ class HomeActivity : AppCompatActivity() {
     }
 
 
-
-
-
     private fun guardarUltimaNotificacion(tipo: String, id: String) {
         val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
         prefs.edit().putString("last_$tipo", id).apply()
@@ -605,37 +593,64 @@ class HomeActivity : AppCompatActivity() {
 
     private fun escucharNuevasOfertasDeIntercambio() {
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val dbRef = FirebaseDatabase.getInstance().getReference("ExchangePoints")
+        val dbRef = FirebaseDatabase.getInstance().getReference("BookOffers")
 
         dbRef.addChildEventListener(object : ChildEventListener {
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val creatorUserId = snapshot.child("creatorUserId").getValue(String::class.java)
-                val receiverUserId = snapshot.child("receiverUserId").getValue(String::class.java)
-                val exchangeId = snapshot.key ?: return
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val exchangePointId = snapshot.key ?: return
 
-                if (
-                    creatorUserId == currentUserId &&
-                    !receiverUserId.isNullOrEmpty() &&
-                    receiverUserId != currentUserId &&
-                    ultimaNotificacion("oferta_recibida") != exchangeId
-                ) {
-                    guardarUltimaNotificacion("oferta_recibida", exchangeId)
+                snapshot.children.forEach { offerSnapshot ->
+                    val offerId = offerSnapshot.key ?: return@forEach
+                    val offerUserId = offerSnapshot.child("userId").getValue(String::class.java)
 
-                    ExchangeNotificationManager.sendNotification(
-                        this@HomeActivity,
-                        "¡Nuevo libro ofrecido!",
-                        "Un usuario ofreció un libro en tu punto de intercambio."
-                    )
+                    if (offerUserId == currentUserId) return@forEach // ignorar si yo mismo la ofrecí
+
+                    val exchangeRef = FirebaseDatabase.getInstance()
+                        .getReference("ExchangePoints")
+                        .child(exchangePointId)
+
+                    exchangeRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(exchangeSnapshot: DataSnapshot) {
+                            val creatorUserId = exchangeSnapshot.child("creatorUserId").getValue(String::class.java)
+
+                            if (creatorUserId == currentUserId &&
+                                !fueNotificadaOferta(offerId))
+                            {
+                                registrarOfertaNotificada(offerId)
+
+                                ExchangeNotificationManager.sendNotification(
+                                    this@HomeActivity,
+                                    "¡Nuevo libro ofrecido!",
+                                    "Un usuario ofreció un libro en tu punto de intercambio."
+                                )
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
                 }
             }
 
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot) {}
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {}
         })
     }
 
+
+    private fun fueNotificadaOferta(offerId: String): Boolean {
+        val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+        val set = prefs.getStringSet("ofertas_notificadas", emptySet()) ?: emptySet()
+        return set.contains(offerId)
+    }
+
+    private fun registrarOfertaNotificada(offerId: String) {
+        val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+        val set = prefs.getStringSet("ofertas_notificadas", mutableSetOf())?.toMutableSet() ?: mutableSetOf()
+        set.add(offerId)
+        prefs.edit().putStringSet("ofertas_notificadas", set).apply()
+    }
 
 
     private fun escucharAceptacionDeMiOferta() {
@@ -669,9 +684,6 @@ class HomeActivity : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {}
         })
     }
-
-
-
 
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
@@ -736,9 +748,6 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (isStepSensorActive) {
-            activarSensorDePasos()
-        }
         binding.osmMap.onResume()
         osmMap.onResume()
         val uiManager = getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
@@ -748,10 +757,16 @@ class HomeActivity : AppCompatActivity() {
         cargarPuntosDeIntercambio()
         mostrarLibrosOcultos()
     }
+    private fun limpiarOfertasNotificadas() {
+        val prefs = getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+        prefs.edit().remove("ofertas_notificadas").apply()
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+        limpiarOfertasNotificadas()
     }
 
 

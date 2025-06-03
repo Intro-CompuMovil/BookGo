@@ -110,8 +110,7 @@ class ExchangePointRepository(private val context: Context) {
                         genero = genre,
                         estado = estado,
                         portadaUrl = thumbnailUrl,
-                        hidden = hidden,
-                        status = estado
+                        hidden = hidden
                     )
                     onResult(book)
                 } catch (e: Exception) {

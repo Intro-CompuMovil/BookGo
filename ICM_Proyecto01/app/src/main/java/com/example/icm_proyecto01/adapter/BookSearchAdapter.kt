@@ -26,7 +26,6 @@ class BookSearchAdapter(
             tvTitle.text = book.titulo
             tvAuthor.text = book.autor
             tvCategory.text = book.genero
-            tvState.text = "Estado: ${book.estado}"
 
             if (book.portadaUrl.isNotEmpty()) {
                 Picasso.get()
